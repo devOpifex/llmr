@@ -28,7 +28,7 @@ new_message <- function(content, role = "user") {
 #'
 #' @name clear_messages
 clear_messages <- function(provider) {
-  provider$messages <- list()
+  provider$env$messages <- list()
   invisible(provider)
 }
 
@@ -40,6 +40,6 @@ append_message <- function(provider, message) {
   if (!inherits(message, "message")) {
     stop("message must be an object of class 'message'")
   }
-  provider$messages <- c(provider$messages, list(message))
+  provider$env$messages <- c(provider$env$messages, list(message))
   invisible(provider)
 }

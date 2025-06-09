@@ -13,11 +13,14 @@
 new_provider <- function(name, url, ...) {
   cls <- paste0("provider_", name)
 
+  env <- new.env()
+  env$messages <- list()
+  
   structure(
     list(
       url = gsub("/$", "", url),
       options = list(...),
-      messages = list()
+      env = env
     ),
     name = name,
     key = "",

@@ -12,15 +12,15 @@ request <- function(provider, message) UseMethod("request")
 #' @method request provider_anthropic
 #' @export
 request.provider_anthropic <- function(provider, message) {
-  provider$messages <- c(provider$messages, list(message))
+  provider <- append_message(provider, message)
 
   body <- list(
     model = attr(provider, "model"),
     max_tokens = attr(provider, "max_tokens"),
-    messages = provider$messages
+    messages = provider$env$messages
   )
 
-  httr2::request(provider$url) |>
+  response <- httr2::request(provider$url) |>
     httr2::req_url_path(path = "v1/messages") |>
     httr2::req_headers(
       "content-type" = "application/json",
@@ -31,4 +31,11 @@ request.provider_anthropic <- function(provider, message) {
     httr2::req_method("POST") |>
     httr2::req_perform() |>
     httr2::resp_body_json()
+
+  provider <- append_message(
+    provider,
+    new_message(response$content, role = "assistant")
+  )
+
+  response
 }
