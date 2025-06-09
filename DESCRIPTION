@@ -18,4 +18,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests:
-  httr2
+  httr2,
+  mcpr
+Remotes:
+  devOpifex/mcpr

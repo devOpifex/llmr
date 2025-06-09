@@ -15,8 +15,10 @@ new_provider <- function(name, url, ...) {
 
   env <- new.env()
   env$messages <- list()
-  
-  structure(
+  env$mcps <- list()
+  env$tools <- list()
+
+  p <- structure(
     list(
       url = gsub("/$", "", url),
       options = list(...),
@@ -25,8 +27,10 @@ new_provider <- function(name, url, ...) {
     name = name,
     key = "",
     version = "",
-    class = c("provider", cls)
+    class = c(cls, "provider")
   )
+
+  invisible(p)
 }
 
 #' @rdname provider

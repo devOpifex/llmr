@@ -20,6 +20,11 @@ request.provider_anthropic <- function(provider, message) {
     messages = provider$env$messages
   )
 
+  # Add tools if available
+  if (length(provider$env$tools)) {
+    body$tools <- provider$env$tools
+  }
+
   response <- httr2::request(provider$url) |>
     httr2::req_url_path(path = "v1/messages") |>
     httr2::req_headers(

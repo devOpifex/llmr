@@ -1,32 +1,39 @@
-#' Create a new mcp provider
+#' Register a memory client provider
 #'
-#' @param command The command to run
-#' @param args Arguments to pass to the command
-#' @param name The name of the provider
+#' @param provider An object of class `provider`.
+#' @param mcp An object of class `client` from the {mcpr} package.
 #'
-#' @return A new mcp provider
+#' @return A provider object
 #' @export
-#'
-#' @examples
-new_mcp <- function(
-  command,
-  args = character(),
-  name = command,
-  version = "1.0.0"
-) {
-  stopifnot(is.character(command), length(command) == 1)
+register_mcp <- function(provider, mcp) UseMethod("register_mcp", mcp)
 
-  p <- processx::process$new(
-    command = command,
-    args = args,
-    stdin = "|",
-    stdout = "|"
+#' @method register_mcp client
+#' @export
+register_mcp.client <- function(provider, mcp) {
+  provider$env$mcps <- c(provider$env$mcps, list(mcp))
+
+  tools <- tryCatch(
+    mcpr::tools_list(mcp),
+    error = function(e) e
   )
 
-  structure(
-    p,
-    name = name,
-    version = version,
-    class = c("mcp", class(p))
-  )
+  if (inherits(tools, "error")) {
+    stop(
+      sprintf(
+        "Could not retrieve tools from MCP client provider: %s",
+        tools$message
+      )
+    )
+  }
+
+  provider$env$tools[[attr(mcp, "name")]] <- namespace(mcp, tools)
+
+  invisible(provider)
+}
+
+namespace <- function(mcp, tools) {
+  lapply(tools, function(tool) {
+    tool$name <- sprintf("%s::%s", attr(mcp, "name"), tool$name)
+    tool
+  })
 }
