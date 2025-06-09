@@ -25,7 +25,7 @@ request.provider_anthropic <- function(provider, message) {
     body$tools <- provider$env$tools
   }
 
-  response <- httr2::request(provider$url) |>
+  req <- httr2::request(provider$url) |>
     httr2::req_url_path(path = "v1/messages") |>
     httr2::req_headers(
       "content-type" = "application/json",
@@ -33,9 +33,21 @@ request.provider_anthropic <- function(provider, message) {
       "anthropic-version" = attr(provider, "version")
     ) |>
     httr2::req_body_json(body) |>
-    httr2::req_method("POST") |>
-    httr2::req_perform() |>
-    httr2::resp_body_json()
+    httr2::req_method("POST")
+
+  response <- req |>
+    httr2::req_perform()
+
+  if (httr2::resp_status(response) != 200) {
+    stop(
+      sprintf(
+        "LLM provider returned an error: %s",
+        httr2::resp_status_desc(response)
+      )
+    )
+  }
+
+  response <- httr2::resp_body_json(response)
 
   provider <- append_message(
     provider,
