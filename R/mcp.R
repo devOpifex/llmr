@@ -5,11 +5,11 @@
 #'
 #' @return A provider object
 #' @export
-register_mcp <- function(provider, mcp) UseMethod("register_mcp", mcp)
+register_mcp <- function(provider, mcp) UseMethod("register_mcp")
 
-#' @method register_mcp client
+#' @method register_mcp provider_anthropic
 #' @export
-register_mcp.client <- function(provider, mcp) {
+register_mcp.provider_anthropic <- function(provider, mcp) {
   provider$env$mcps <- c(provider$env$mcps, list(mcp))
 
   tools <- tryCatch(
@@ -26,7 +26,7 @@ register_mcp.client <- function(provider, mcp) {
     )
   }
 
-  tools <- mcp_to_provider_tools(tools$result$tools)
+  tools <- mcp_to_provider_tools(provider, tools$result$tools)
   tools <- namespace(mcp, tools)
   provider$env$tools <- c(provider$env$tools, tools)
 
@@ -40,7 +40,12 @@ namespace <- function(mcp, tools) {
   })
 }
 
-mcp_to_provider_tools <- function(tools) {
+mcp_to_provider_tools <- function(provider, tools)
+  UseMethod("mcp_to_provider_tools")
+
+#' @method mcp_to_provider_tools provider_anthropic
+#' @export
+mcp_to_provider_tools.provider_anthropic <- function(provider, tools) {
   lapply(tools, function(tool) {
     tool$input_schema <- tool$inputSchema
     tool$input_schema$additionalProperties <- NULL
