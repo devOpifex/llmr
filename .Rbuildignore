@@ -1,2 +1,4 @@
 ^test\.R$
 ^makefile$
+^LICENSE\.md$
+^CLAUDE\.md$

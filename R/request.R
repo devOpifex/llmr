@@ -6,20 +6,19 @@
 #' @return A response object
 #' @export
 #'
-#' @examples
-#' response <- request(provider, endpoint)
 #' @name request
 request <- function(provider, message) UseMethod("request")
 
 #' @method request provider_anthropic
 #' @export
 request.provider_anthropic <- function(provider, message) {
+  provider$messages <- c(provider$messages, list(message))
+
   body <- list(
     model = attr(provider, "model"),
     max_tokens = attr(provider, "max_tokens"),
-    messages = list(message)
+    messages = provider$messages
   )
-  print(body)
 
   httr2::request(provider$url) |>
     httr2::req_url_path(path = "v1/messages") |>

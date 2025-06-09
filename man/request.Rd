@@ -17,6 +17,3 @@ A response object
 \description{
 Make a request to an LLM provider
 }
-\examples{
-response <- request(provider, endpoint)
-}

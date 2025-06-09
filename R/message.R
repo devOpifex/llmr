@@ -26,10 +26,20 @@ new_message <- function(content, role = "user") {
 #' @return A response object
 #' @export
 #'
-#' @examples
-#' response <- clear_messages(provider)
 #' @name clear_messages
 clear_messages <- function(provider) {
   provider$messages <- list()
+  invisible(provider)
+}
+
+#' Add a message to the list
+#'
+#' @param provider An object of class `provider`.
+#' @param message A message object.
+append_message <- function(provider, message) {
+  if (!inherits(message, "message")) {
+    stop("message must be an object of class 'message'")
+  }
+  provider$messages <- c(provider$messages, list(message))
   invisible(provider)
 }
