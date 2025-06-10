@@ -106,19 +106,46 @@ set_api_key("your_anthropic_api_key")
 provider <- new_anthropic()
 
 # Create an MCP client that connects to an external calculator service
-calculator_client <- mcpr::new_client(
+client <- mcpr::new_client(
   command = "Rscript",
-  args = c("-e", "mcpr::serve()"),
+  args = "/path/to/server.R",
   name = "calculator"
 )
 
 # Register the MCP with the provider
-provider <- register_mcp(provider, calculator_client)
+register_mcp(provider, client)
 
-# Make a request using the external calculator
+# Create an agent
+agent <- new_agent("Weather forecaster")
+
+# Add a custom weather tool
+add_tool(
+  agent,
+  mcpr::new_tool(
+    name = "weather",
+    description = "Get the weather forecast for a given location",
+    input_schema = mcpr::schema(
+      properties = mcpr::properties(
+        location = mcpr::property_string(
+          title = "Location",
+          description = "The location for which you want the weather forecast",
+          required = TRUE
+        )
+      )
+    ),
+    handler = function(params) {
+      sprintf("The weather forecast for %s is dark and rainy", params$location)
+    }
+  )
+)
+
+# Register the agent with the provider
+provider <- register_agent(provider, agent)
+
+# Make a request
 response <- request(
-  provider,
-  new_message("What is the square root of 144?")
+  provider, 
+  new_message("What's the weather like in New York?")
 )
 
 # Print the response
