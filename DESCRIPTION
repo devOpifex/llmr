@@ -1,5 +1,5 @@
 Package: llmr
-Title: What the Package Does (One Line, Title Case)
+Title: Interface to Large Language Models
 Version: 0.0.0.9000
 Authors@R: 
   c(
@@ -11,7 +11,7 @@ Authors@R:
            role = c("cph", "fnd"),
            email = "john@opifex.org")
   )
-Description: What the package does (one paragraph).
+Description: A flexible R interface to large language models (LLMs) with support for multiple providers, conversation management, and tool use.
 Depends: R (>= 4.1.0)
 License: GPL (>= 2)
 Encoding: UTF-8
