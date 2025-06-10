@@ -19,6 +19,11 @@ request.provider_anthropic <- function(provider, message) {
     max_tokens = attr(provider, "max_tokens"),
     messages = provider$env$messages
   )
+  
+  # Add system prompt if available
+  if (!is.null(attr(provider, "system"))) {
+    body$system <- attr(provider, "system")
+  }
 
   # Add tools if available
   if (length(provider$env$tools)) {
