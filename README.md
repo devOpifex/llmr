@@ -1,4 +1,6 @@
-# llmr
+<div align="center">
+<img src="man/figures/logo.png" />
+</div>
 
 An R package for interacting with Large Language Models (LLMs) with support for tools and agents.
 
