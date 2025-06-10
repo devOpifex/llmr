@@ -19,7 +19,7 @@ request.provider_anthropic <- function(provider, message) {
     max_tokens = attr(provider, "max_tokens"),
     messages = provider$env$messages
   )
-  
+
   # Add system prompt if available
   if (!is.null(attr(provider, "system"))) {
     body$system <- attr(provider, "system")
@@ -109,50 +109,36 @@ handle_tool_use <- function(provider, response) {
     if (message$type != "tool_use") return()
 
     tool_call <- message
-
-    # Parse the tool name to check if it's namespaced
     tool_name <- tool_call$name
-    parts <- strsplit(tool_name, "__")[[1]]
 
-    if (length(parts) == 2) {
-      # Namespaced tool
-      mcp_name <- parts[1]
-      actual_tool_name <- parts[2]
-
-      # Find the appropriate MCP
-      mcp <- find_mcp_by_name(provider, mcp_name)
-
-      if (is.null(mcp)) {
-        warning(sprintf("MCP '%s' not found", mcp_name))
+    if (!grepl("__", tool_name)) {
+      tool <- Filter(function(tool) tool$name == tool_name, provider$env$tools)
+      if (!length(tool)) {
+        warning(sprintf("Tool '%s' not found", tool_name))
         return(list(
           type = "tool_result",
           tool_use_id = tool_call$id,
-          content = sprintf("Error: MCP '%s' not found", mcp_name)
+          content = sprintf("Error: Tool '%s' not found", tool_name)
         ))
       }
 
-      params <- list(
-        name = actual_tool_name,
-        arguments = tool_call$input
-      )
+      tool <- tool[[1]]
+      handler <- attr(tool, "handler")
 
-      # Call the tool
+      # Call the tool handler
       tryCatch(
         {
-          result <- mcpr::tools_call(
-            mcp,
-            params,
-            tool_call$id
-          )
+          result <- handler(tool_call$input)
 
           # Return the tool result
           list(
             type = "tool_result",
             tool_use_id = tool_call$id,
-            content = result$content
+            content = result
           )
         },
         error = function(e) {
+          warning(sprintf("Error calling tool: %s", e$message))
           list(
             type = "tool_result",
             tool_use_id = tool_call$id,
@@ -161,12 +147,63 @@ handle_tool_use <- function(provider, response) {
         }
       )
     } else {
-      # Non-namespaced tool (not supported)
-      list(
-        type = "tool_result",
-        tool_call_id = tool_call$id,
-        content = "Error: Non-namespaced tools not supported"
-      )
+      # Check if it's a namespaced tool (for backward compatibility)
+      parts <- strsplit(tool_name, "__")[[1]]
+
+      if (length(parts) == 2) {
+        # Namespaced tool
+        mcp_name <- parts[1]
+        actual_tool_name <- parts[2]
+
+        # Find the appropriate MCP
+        mcp <- find_mcp_by_name(provider, mcp_name)
+
+        if (is.null(mcp)) {
+          warning(sprintf("MCP '%s' not found", mcp_name))
+          return(list(
+            type = "tool_result",
+            tool_use_id = tool_call$id,
+            content = sprintf("Error: MCP '%s' not found", mcp_name)
+          ))
+        }
+
+        params <- list(
+          name = actual_tool_name,
+          arguments = tool_call$input
+        )
+
+        # Call the tool
+        tryCatch(
+          {
+            result <- mcpr::tools_call(
+              mcp,
+              params,
+              tool_call$id
+            )
+
+            # Return the tool result
+            list(
+              type = "tool_result",
+              tool_use_id = tool_call$id,
+              content = result$content
+            )
+          },
+          error = function(e) {
+            list(
+              type = "tool_result",
+              tool_use_id = tool_call$id,
+              content = sprintf("Error calling tool: %s", e$message)
+            )
+          }
+        )
+      } else {
+        # Tool not found
+        list(
+          type = "tool_result",
+          tool_use_id = tool_call$id,
+          content = sprintf("Error: Tool '%s' not found", tool_name)
+        )
+      }
     }
   })
 
