@@ -62,24 +62,32 @@ request.provider_anthropic <- function(provider, message) {
 #'
 #' @param provider An object of class `provider`.
 #' @param response A response object from the LLM provider.
+#' @param loop Whether to loop the request or not..
 #'
 #' @return A response object
 #' @export
-handle_response <- function(provider, response) UseMethod("handle_response")
+handle_response <- function(provider, response, loop = TRUE)
+  UseMethod("handle_response")
 
 #' @method handle_response provider_anthropic
 #' @export
-handle_response.provider_anthropic <- function(provider, response) {
-  # Check if response has tool_use as stop_reason
+handle_response.provider_anthropic <- function(
+  provider,
+  response,
+  loop = TRUE
+) {
   if (length(response$stop_reason) && response$stop_reason == "tool_use") {
-    # Handle tool use
     tool_response <- handle_tool_use(provider, response)
 
-    # Make a new request with the tool response included
+    if (!length(tool_response)) return(response)
+
+    if (!loop) {
+      return(tool_response)
+    }
+
     return(request(provider, new_message(tool_response, role = "user")))
   }
 
-  # Return the original response for normal responses
   response
 }
 
