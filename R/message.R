@@ -13,7 +13,7 @@ new_message <- function(content, role = "user") {
   structure(
     list(
       role = role,
-      content = as.character(content)
+      content = content
     ),
     class = c("message", "list")
   )

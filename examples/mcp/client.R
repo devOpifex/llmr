@@ -10,4 +10,4 @@ client <- mcpr::new_client(
 
 register_mcp(provider, client)
 
-request(provider, new_message("Substract 23 from 1143"))
+request(provider, new_message("Substract 3 from 45"))

@@ -54,5 +54,123 @@ request.provider_anthropic <- function(provider, message) {
     new_message(response$content, role = "assistant")
   )
 
+  # Handle the response (for tool_use etc.)
+  handle_response(provider, response)
+}
+
+#' Handle response from an LLM provider
+#'
+#' @param provider An object of class `provider`.
+#' @param response A response object from the LLM provider.
+#'
+#' @return A response object
+#' @export
+handle_response <- function(provider, response) UseMethod("handle_response")
+
+#' @method handle_response provider_anthropic
+#' @export
+handle_response.provider_anthropic <- function(provider, response) {
+  # Check if response has tool_use as stop_reason
+  if (length(response$stop_reason) && response$stop_reason == "tool_use") {
+    # Handle tool use
+    tool_response <- handle_tool_use(provider, response)
+
+    # Make a new request with the tool response included
+    return(request(provider, new_message(tool_response, role = "user")))
+  }
+
+  # Return the original response for normal responses
   response
+}
+
+#' Handle tool use in a response
+#'
+#' @param provider An object of class `provider`.
+#' @param response A response object from the LLM provider.
+#'
+#' @return A formatted tool response
+handle_tool_use <- function(provider, response) {
+  results <- lapply(response$content, function(message) {
+    if (!length(message$type)) return()
+
+    if (message$type != "tool_use") return()
+
+    tool_call <- message
+
+    # Parse the tool name to check if it's namespaced
+    tool_name <- tool_call$name
+    parts <- strsplit(tool_name, "__")[[1]]
+
+    if (length(parts) == 2) {
+      # Namespaced tool
+      mcp_name <- parts[1]
+      actual_tool_name <- parts[2]
+
+      # Find the appropriate MCP
+      mcp <- find_mcp_by_name(provider, mcp_name)
+
+      if (is.null(mcp)) {
+        warning(sprintf("MCP '%s' not found", mcp_name))
+        return(list(
+          type = "tool_result",
+          tool_use_id = tool_call$id,
+          content = sprintf("Error: MCP '%s' not found", mcp_name)
+        ))
+      }
+
+      params <- list(
+        name = actual_tool_name,
+        arguments = tool_call$input
+      )
+
+      # Call the tool
+      tryCatch(
+        {
+          result <- mcpr::tools_call(
+            mcp,
+            params,
+            tool_call$id
+          )
+
+          # Return the tool result
+          list(
+            type = "tool_result",
+            tool_use_id = tool_call$id,
+            content = result$content
+          )
+        },
+        error = function(e) {
+          list(
+            type = "tool_result",
+            tool_use_id = tool_call$id,
+            content = sprintf("Error calling tool: %s", e$message)
+          )
+        }
+      )
+    } else {
+      # Non-namespaced tool (not supported)
+      list(
+        type = "tool_result",
+        tool_call_id = tool_call$id,
+        content = "Error: Non-namespaced tools not supported"
+      )
+    }
+  })
+
+  Filter(Negate(is.null), results)
+}
+
+#' Find an MCP by name
+#'
+#' @param provider An object of class `provider`.
+#' @param name The name of the MCP to find.
+#'
+#' @return An MCP object or NULL if not found
+find_mcp_by_name <- function(provider, name) {
+  for (mcp in provider$env$mcps) {
+    if (attr(mcp, "name") == name) {
+      return(mcp)
+    }
+  }
+  NULL
 }
