@@ -154,14 +154,38 @@ request.provider_openai <- function(provider, message) {
 handle_response <- function(provider, response, loop = TRUE)
   UseMethod("handle_response")
 
-#' @method handle_response provider
+#' @method handle_response provider_anthropic
 #' @export
-handle_response.provider <- function(
+handle_response.provider_anthropic <- function(
   provider,
   response,
   loop = TRUE
 ) {
   if (length(response$stop_reason) && response$stop_reason == "tool_use") {
+    tool_response <- handle_tool_use(provider, response)
+
+    if (!length(tool_response)) return(response)
+
+    if (!loop) {
+      return(tool_response)
+    }
+
+    return(request(provider, new_message(tool_response, role = "user")))
+  }
+
+  response
+}
+
+#' @method handle_response provider_openai
+#' @export
+handle_response.provider_openai <- function(
+  provider,
+  response,
+  loop = TRUE
+) {
+  if (
+    length(response$finish_reason) && response$finish_reason == "tool_calls"
+  ) {
     tool_response <- handle_tool_use(provider, response)
 
     if (!length(tool_response)) return(response)
@@ -182,7 +206,11 @@ handle_response.provider <- function(
 #' @param response A response object from the LLM provider.
 #'
 #' @return A formatted tool response
-handle_tool_use <- function(provider, response) {
+handle_tool_use <- function(provider, response) UseMethod("handle_tool_use")
+
+#' @export
+#' @method handle_tool_use provider_anthropic
+handle_tool_use.provider_anthropic <- function(provider, response) {
   results <- lapply(response$content, function(message) {
     if (!length(message$type)) return()
 
