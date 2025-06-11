@@ -2,7 +2,7 @@ devtools::load_all()
 
 provider <- new_anthropic()
 
-client <- mcpr::new_client(
+client <- mcpr::new_client_io(
   command = "Rscript",
   args = "/home/john/Opifex/Packages/llmr/examples/mcp/server.R",
   name = "calculator"
@@ -33,5 +33,7 @@ add_tool(
 )
 
 provider <- register_agent(provider, agent)
+
+set_retry(provider, max_tries = 5)
 
 request(provider, new_message("What's the weather like in New York?"))

@@ -40,6 +40,11 @@ request.provider_anthropic <- function(provider, message) {
     httr2::req_body_json(body) |>
     httr2::req_method("POST")
 
+  # Apply retry configuration if available
+  if (length(provider$env$retry)) {
+    req <- req |> httr2::req_retry(max_tries = provider$env$retry$max_tries)
+  }
+
   response <- req |>
     httr2::req_perform()
 
