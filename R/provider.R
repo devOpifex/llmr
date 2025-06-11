@@ -52,5 +52,7 @@ new_openai <- function(
   url = "https://api.openai.com",
   ...
 ) {
-  new_provider("openai", url, ...)
+  new_provider("openai", url, ...) |>
+    set_api_key(Sys.getenv("OPENAI_API_KEY")) |>
+    set_model("gpt-4")
 }
