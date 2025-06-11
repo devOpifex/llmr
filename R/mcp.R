@@ -7,9 +7,9 @@
 #' @export
 register_mcp <- function(provider, mcp) UseMethod("register_mcp")
 
-#' @method register_mcp provider_anthropic
+#' @method register_mcp provider
 #' @export
-register_mcp.provider_anthropic <- function(provider, mcp) {
+register_mcp.provider <- function(provider, mcp) {
   provider$env$mcps <- c(provider$env$mcps, list(mcp))
 
   tools <- tryCatch(
@@ -57,5 +57,28 @@ mcp_to_provider_tools.provider_anthropic <- function(provider, tools) {
         prop
       })
     tool
+  })
+}
+
+#' @method mcp_to_provider_tools provider_openai
+#' @export
+mcp_to_provider_tools.provider_openai <- function(provider, tools) {
+  lapply(tools, function(tool) {
+    tool$parameters <- tool$inputSchema
+    tool$parameters$additionalProperties <- NULL
+    tool$inputSchema <- NULL
+
+    tool$type <- "function"
+
+    tool$parameters$properties <- tool$parameters$properties |>
+      lapply(function(prop) {
+        prop$title <- NULL
+        prop
+      })
+
+    list(
+      type = "function",
+      `function` = tool
+    )
   })
 }

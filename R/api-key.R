@@ -9,7 +9,8 @@
 set_api_key <- function(x, key, ...) UseMethod("set_api_key")
 
 #' @export
-set_api_key.provider_anthropic <- function(x, key, ...) {
+#' @method set_api_key provider
+set_api_key.provider <- function(x, key, ...) {
   stopifnot(!missing(key))
   stopifnot(is.character(key), length(key) == 1)
 

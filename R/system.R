@@ -18,3 +18,13 @@ set_system_prompt.provider_anthropic <- function(x, prompt, ...) {
 
   x
 }
+
+#' @method set_system_prompt provider_openai
+#' @export
+set_system_prompt.provider_openai <- function(x, prompt, ...) {
+  stopifnot(is.character(prompt), length(prompt) == 1)
+
+  x <- append_message(x, new_message(prompt, role = "system"))
+
+  x
+}

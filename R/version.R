@@ -8,6 +8,7 @@
 #' @export
 set_version <- function(x, version, ...) UseMethod("set_version")
 
+#' @method set_version provider_anthropic
 #' @export
 set_version.provider_anthropic <- function(x, version, ...) {
   stopifnot(!missing(version))
@@ -17,4 +18,3 @@ set_version.provider_anthropic <- function(x, version, ...) {
 
   invisible(x)
 }
-

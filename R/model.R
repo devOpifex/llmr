@@ -9,9 +9,9 @@
 #' @name set_model
 set_model <- function(x, name, ...) UseMethod("set_model")
 
-#' @method set_model provider_anthropic
+#' @method set_model provider
 #' @export
-set_model.provider_anthropic <- function(x, name, ...) {
+set_model.provider <- function(x, name, ...) {
   stopifnot(is.character(name), length(name) == 1)
 
   attr(x, "model") <- name

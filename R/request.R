@@ -24,7 +24,7 @@ request.provider_anthropic <- function(provider, message) {
   if (!is.null(attr(provider, "system"))) {
     body$system <- attr(provider, "system")
   }
-  
+
   # Add temperature if available
   if (!is.null(attr(provider, "temperature"))) {
     body$temperature <- attr(provider, "temperature")
@@ -50,13 +50,83 @@ request.provider_anthropic <- function(provider, message) {
     req <- req |> httr2::req_retry(max_tries = provider$env$retry$max_tries)
   }
 
-  response <- req |>
-    httr2::req_perform()
+  response <- tryCatch(
+    httr2::req_perform(req),
+    error = function(e) e
+  )
+
+  if (inherits(response, "error")) {
+    stop(response$message)
+  }
 
   if (httr2::resp_status(response) != 200) {
     stop(
       sprintf(
-        "LLM provider returned an error: %s",
+        "Anthropic returned an error: %s",
+        httr2::resp_status_desc(response)
+      )
+    )
+  }
+
+  response <- httr2::resp_body_json(response)
+
+  provider <- append_message(
+    provider,
+    new_message(response$content, role = "assistant")
+  )
+
+  # Handle the response (for tool_use etc.)
+  handle_response(provider, response)
+}
+
+#' @method request provider_openai
+#' @export
+request.provider_openai <- function(provider, message) {
+  provider <- append_message(provider, message)
+
+  body <- list(
+    model = attr(provider, "model"),
+    max_tokens = attr(provider, "max_tokens"),
+    messages = provider$env$messages
+  )
+
+  # Add temperature if available
+  if (!is.null(attr(provider, "temperature"))) {
+    body$temperature <- attr(provider, "temperature")
+  }
+
+  # Add tools if available
+  if (length(provider$env$tools)) {
+    body$tools <- provider$env$tools
+  }
+
+  req <- httr2::request(provider$url) |>
+    httr2::req_url_path(path = "v1/chat/completions") |>
+    httr2::req_headers(
+      "Content-Type" = "application/json",
+      "Authorization" = sprintf("Bearer %s", attr(provider, "key"))
+    ) |>
+    httr2::req_body_json(body) |>
+    httr2::req_method("POST")
+
+  # Apply retry configuration if available
+  if (length(provider$env$retry)) {
+    req <- req |> httr2::req_retry(max_tries = provider$env$retry$max_tries)
+  }
+
+  response <- tryCatch(
+    httr2::req_perform(req),
+    error = function(e) e
+  )
+
+  if (inherits(response, "error")) {
+    stop(response$message, call. = FALSE)
+  }
+
+  if (httr2::resp_status(response) != 200) {
+    stop(
+      sprintf(
+        "OpenAI returned an error: %s",
         httr2::resp_status_desc(response)
       )
     )
@@ -84,9 +154,9 @@ request.provider_anthropic <- function(provider, message) {
 handle_response <- function(provider, response, loop = TRUE)
   UseMethod("handle_response")
 
-#' @method handle_response provider_anthropic
+#' @method handle_response provider
 #' @export
-handle_response.provider_anthropic <- function(
+handle_response.provider <- function(
   provider,
   response,
   loop = TRUE

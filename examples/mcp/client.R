@@ -1,6 +1,6 @@
 devtools::load_all()
 
-provider <- new_anthropic()
+provider <- new_openai()
 
 client <- mcpr::new_client_io(
   command = "Rscript",

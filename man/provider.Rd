@@ -9,7 +9,7 @@
 \usage{
 new_provider(name, url, ...)
 
-new_anthropic(url = "https://api.anthropic.com/v1", ...)
+new_anthropic(url = "https://api.anthropic.com", ...)
 
 new_openai(url = "https://api.openai.com", ...)
 }

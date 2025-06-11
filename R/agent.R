@@ -58,9 +58,9 @@ add_tool.agent <- function(x, tool, ...) {
 #' @name register_agent
 register_agent <- function(provider, agent, ...) UseMethod("register_agent")
 
-#' @method register_agent provider_anthropic
+#' @method register_agent provider
 #' @export
-register_agent.provider_anthropic <- function(provider, agent, ...) {
+register_agent.provider <- function(provider, agent, ...) {
   stopifnot(inherits(agent, "agent"))
 
   # Get tools from the agent

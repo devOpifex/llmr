@@ -36,7 +36,7 @@ new_provider <- function(name, url, ...) {
 #' @rdname provider
 #' @export
 new_anthropic <- function(
-  url = "https://api.anthropic.com/v1",
+  url = "https://api.anthropic.com",
   ...
 ) {
   new_provider("anthropic", url, ...) |>
@@ -54,5 +54,6 @@ new_openai <- function(
 ) {
   new_provider("openai", url, ...) |>
     set_api_key(Sys.getenv("OPENAI_API_KEY")) |>
-    set_model("gpt-4")
+    set_model("gpt-4") |>
+    set_max_tokens(1024)
 }
