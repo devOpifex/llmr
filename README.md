@@ -31,7 +31,7 @@ set_api_key("your-api-key")
 # Create a provider
 provider <- new_anthropic()
 
-# Create a message
+# defaults to user role
 message <- new_message("Explain quantum computing in simple terms")
 
 # Send request and get response
@@ -51,6 +51,10 @@ clear_messages(provider)
 
 ## Creating a Simple Agent
 
+Note that we leverage the tooling from the [mcpr](https://github.com/devOpifex/mcpr)
+package to create the tools.
+This allows seamless integration with MCP (Model Context Protocol) servers.
+
 ```r
 library(llmr)
 
@@ -64,61 +68,6 @@ provider <- new_anthropic()
 agent <- new_agent("calculator")
 
 # Add a calculator tool to the agent
-add_tool(
-  agent,
-  name = "calculate",
-  description = "Performs basic arithmetic calculations",
-  parameters = list(
-    expression = list(
-      type = "string", 
-      description = "The mathematical expression to evaluate"
-    )
-  ),
-  handler = function(params) {
-    result <- eval(parse(text = params$expression))
-    return(as.character(result))
-  }
-)
-
-# Register the agent with the provider
-provider <- register_agent(provider, agent)
-
-# Make a request to the LLM
-response <- request(
-  provider,
-  new_message("What is 123 * 456? Please use the calculate tool.")
-)
-
-# Print the response
-cat(response$content)
-```
-
-## Integrating with MCP (Model Context Protocol)
-
-```r
-library(llmr)
-library(mcpr)
-
-# Set your API key
-set_api_key("your_anthropic_api_key")
-
-# Create a provider
-provider <- new_anthropic()
-
-# Create an MCP client that connects to an external calculator service
-client <- mcpr::new_client(
-  command = "Rscript",
-  args = "/path/to/server.R",
-  name = "calculator"
-)
-
-# Register the MCP with the provider
-register_mcp(provider, client)
-
-# Create an agent
-agent <- new_agent("Weather forecaster")
-
-# Add a custom weather tool
 add_tool(
   agent,
   mcpr::new_tool(
@@ -142,10 +91,45 @@ add_tool(
 # Register the agent with the provider
 provider <- register_agent(provider, agent)
 
+# Make a request to the LLM
+response <- request(
+  provider,
+  new_message("What is 123 * 456? Please use the calculate tool.")
+)
+
+# Print the response
+cat(response$content)
+```
+
+## Integrating with MCP (Model Context Protocol)
+
+See [mcpr](https://github.com/devOpifex/mcpr) for how to create and use MCP
+servers (and clients).
+
+```r
+library(llmr)
+library(mcpr)
+
+# Set your API key
+set_api_key("your_anthropic_api_key")
+
+# Create a provider
+provider <- new_anthropic()
+
+# Create an MCP client that connects to an external calculator service
+client <- mcpr::new_client(
+  command = "Rscript",
+  args = "/path/to/server.R",
+  name = "calculator"
+)
+
+# Register the MCP with the provider
+register_mcp(provider, client)
+
 # Make a request
 response <- request(
   provider, 
-  new_message("What's the weather like in New York?")
+  new_message("Subtract 5 from 10.")
 )
 
 # Print the response
