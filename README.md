@@ -148,6 +148,9 @@ set_max_tokens(provider, 1024)
 # Set API version
 set_version(provider, "2023-06-01")
 
+# Set temperature for response randomness (0.0 to 1.0)
+set_temperature(provider, 0.7)
+
 # Set system prompt
 set_system_prompt(provider, "You are a helpful assistant that specializes in R programming.")
 ```

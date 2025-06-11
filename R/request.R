@@ -24,6 +24,11 @@ request.provider_anthropic <- function(provider, message) {
   if (!is.null(attr(provider, "system"))) {
     body$system <- attr(provider, "system")
   }
+  
+  # Add temperature if available
+  if (!is.null(attr(provider, "temperature"))) {
+    body$temperature <- attr(provider, "temperature")
+  }
 
   # Add tools if available
   if (length(provider$env$tools)) {
