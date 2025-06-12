@@ -2,6 +2,8 @@
 #'
 #' @param content Content of the message
 #' @param role Role of the message
+#' @param tool_calls Optional tool calls for OpenAI
+#' @param tool_call_id Optional tool call ID for OpenAI tool responses
 #'
 #' @return A message object
 #' @export
@@ -9,12 +11,24 @@
 #' @examples
 #' message <- new_message("Hello, world!")
 #' @name message
-new_message <- function(content, role = "user") {
+new_message <- function(content, role = "user", tool_calls = NULL, tool_call_id = NULL) {
+  message <- list(
+    role = role,
+    content = content
+  )
+  
+  # Add tool_calls if provided (for OpenAI)
+  if (!is.null(tool_calls)) {
+    message$tool_calls <- tool_calls
+  }
+  
+  # Add tool_call_id if provided (for OpenAI tool responses)
+  if (!is.null(tool_call_id)) {
+    message$tool_call_id <- tool_call_id
+  }
+  
   structure(
-    list(
-      role = role,
-      content = content
-    ),
+    message,
     class = c("message", "list")
   )
 }

@@ -133,11 +133,28 @@ request.provider_openai <- function(provider, message) {
   }
 
   response <- httr2::resp_body_json(response)
-
-  provider <- append_message(
-    provider,
-    new_message(response$content, role = "assistant")
-  )
+  
+  # Extract the assistant's message from OpenAI response
+  assistant_message <- response$choices[[1]]$message
+  
+  # Add the assistant message to the conversation history
+  if (!is.null(assistant_message$tool_calls) && length(assistant_message$tool_calls) > 0) {
+    # For messages with tool calls
+    provider <- append_message(
+      provider,
+      new_message(
+        content = assistant_message$content, 
+        role = "assistant",
+        tool_calls = assistant_message$tool_calls
+      )
+    )
+  } else if (!is.null(assistant_message$content)) {
+    # For regular text responses
+    provider <- append_message(
+      provider,
+      new_message(assistant_message$content, role = "assistant")
+    )
+  }
 
   # Handle the response (for tool_use etc.)
   handle_response(provider, response)
@@ -183,20 +200,36 @@ handle_response.provider_openai <- function(
   response,
   loop = TRUE
 ) {
-  if (
-    length(response$finish_reason) && response$finish_reason == "tool_calls"
-  ) {
-    tool_response <- handle_tool_use(provider, response)
-
-    if (!length(tool_response)) return(response)
-
-    if (!loop) {
-      return(tool_response)
+  # Check if the response contains tool calls
+  if (length(response$choices) > 0 && 
+      response$choices[[1]]$finish_reason == "tool_calls") {
+    
+    # Process tool calls
+    tool_responses <- handle_tool_use(provider, response)
+    
+    if (length(tool_responses) == 0) return(response)
+    
+    # Add each tool response to the provider's messages
+    for (tool_response in tool_responses) {
+      provider <- append_message(
+        provider,
+        new_message(
+          content = tool_response$content, 
+          role = "tool",
+          tool_call_id = tool_response$tool_call_id
+        )
+      )
     }
-
-    return(request(provider, new_message(tool_response, role = "user")))
+    
+    if (!loop) {
+      return(tool_responses)
+    }
+    
+    # Continue the conversation with the LLM by sending an empty message
+    # with all current messages (including tool responses)
+    return(request(provider, new_message("", role = "user")))
   }
-
+  
   response
 }
 
@@ -315,6 +348,129 @@ handle_tool_use.provider_anthropic <- function(provider, response) {
     }
   })
 
+  Filter(Negate(is.null), results)
+}
+
+#' @export
+#' @method handle_tool_use provider_openai
+handle_tool_use.provider_openai <- function(provider, response) {
+  # Extract the tool calls from the OpenAI response
+  tool_calls <- response$choices[[1]]$message$tool_calls
+  
+  # Process each tool call
+  results <- lapply(tool_calls, function(tool_call) {
+    tool_id <- tool_call$id
+    function_info <- tool_call$`function`  # Use backticks for reserved R keyword
+    tool_name <- function_info$name
+    arguments <- function_info$arguments
+    
+    # Parse arguments (OpenAI returns them as JSON string)
+    arguments <- tryCatch(
+      yyjsonr::read_json_str(arguments),
+      error = function(e) arguments
+    )
+    
+    if (!grepl("__", tool_name)) {
+      # Direct tool call
+      tool <- Filter(function(t) {
+        if (is.list(t) && "function" %in% names(t)) {
+          return(t$`function`$name == tool_name)  # Use backticks for reserved R keyword
+        }
+        return(FALSE)
+      }, provider$env$tools)
+      
+      if (!length(tool)) {
+        warning(sprintf("Tool '%s' not found", tool_name))
+        return(list(
+          role = "tool",
+          tool_call_id = tool_id,
+          content = sprintf("Error: Tool '%s' not found", tool_name)
+        ))
+      }
+      
+      tool <- tool[[1]]$`function`  # Use backticks for reserved R keyword
+      handler <- attr(tool, "handler")
+      
+      # Call the tool handler
+      tryCatch({
+          result <- handler(arguments)
+          
+          # Return the tool result
+          list(
+            role = "tool",
+            tool_call_id = tool_id,
+            content = result
+          )
+        },
+        error = function(e) {
+          warning(sprintf("Error calling tool: %s", e$message))
+          list(
+            role = "tool",
+            tool_call_id = tool_id,
+            content = sprintf("Error calling tool: %s", e$message)
+          )
+        }
+      )
+    } else {
+      # Namespaced tool (MCP)
+      parts <- strsplit(tool_name, "__")[[1]]
+      
+      if (length(parts) == 2) {
+        mcp_name <- parts[1]
+        actual_tool_name <- parts[2]
+        
+        # Find the appropriate MCP
+        mcp <- find_mcp_by_name(provider, mcp_name)
+        
+        if (is.null(mcp)) {
+          warning(sprintf("MCP '%s' not found", mcp_name))
+          return(list(
+            role = "tool",
+            tool_call_id = tool_id,
+            content = sprintf("Error: MCP '%s' not found", mcp_name)
+          ))
+        }
+        
+        params <- list(
+          name = actual_tool_name,
+          arguments = arguments
+        )
+        
+        # Call the tool via MCP
+        tryCatch({
+            result <- mcpr::tools_call(
+              mcp,
+              params,
+              tool_id
+            )
+            
+            # Return the tool result
+            list(
+              role = "tool",
+              tool_call_id = tool_id,
+              content = result$content
+            )
+          },
+          error = function(e) {
+            list(
+              role = "tool",
+              tool_call_id = tool_id,
+              content = sprintf("Error calling tool: %s", e$message)
+            )
+          }
+        )
+      } else {
+        # Invalid tool name format
+        list(
+          role = "tool",
+          tool_call_id = tool_id,
+          content = sprintf("Error: Tool '%s' not found", tool_name)
+        )
+      }
+    }
+  })
+  
+  # Return list of tool results
   Filter(Negate(is.null), results)
 }
 
