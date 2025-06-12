@@ -133,17 +133,20 @@ request.provider_openai <- function(provider, message) {
   }
 
   response <- httr2::resp_body_json(response)
-  
+
   # Extract the assistant's message from OpenAI response
   assistant_message <- response$choices[[1]]$message
-  
+
   # Add the assistant message to the conversation history
-  if (!is.null(assistant_message$tool_calls) && length(assistant_message$tool_calls) > 0) {
+  if (
+    !is.null(assistant_message$tool_calls) &&
+      length(assistant_message$tool_calls) > 0
+  ) {
     # For messages with tool calls
     provider <- append_message(
       provider,
       new_message(
-        content = assistant_message$content, 
+        content = assistant_message$content,
         role = "assistant",
         tool_calls = assistant_message$tool_calls
       )
@@ -201,35 +204,36 @@ handle_response.provider_openai <- function(
   loop = TRUE
 ) {
   # Check if the response contains tool calls
-  if (length(response$choices) > 0 && 
-      response$choices[[1]]$finish_reason == "tool_calls") {
-    
+  if (
+    length(response$choices) > 0 &&
+      response$choices[[1]]$finish_reason == "tool_calls"
+  ) {
     # Process tool calls
     tool_responses <- handle_tool_use(provider, response)
-    
+
     if (length(tool_responses) == 0) return(response)
-    
+
     # Add each tool response to the provider's messages
     for (tool_response in tool_responses) {
       provider <- append_message(
         provider,
         new_message(
-          content = tool_response$content, 
+          content = tool_response$content,
           role = "tool",
           tool_call_id = tool_response$tool_call_id
         )
       )
     }
-    
+
     if (!loop) {
       return(tool_responses)
     }
-    
+
     # Continue the conversation with the LLM by sending an empty message
     # with all current messages (including tool responses)
     return(request(provider, new_message("", role = "user")))
   }
-  
+
   response
 }
 
@@ -356,31 +360,26 @@ handle_tool_use.provider_anthropic <- function(provider, response) {
 handle_tool_use.provider_openai <- function(provider, response) {
   # Extract the tool calls from the OpenAI response
   tool_calls <- response$choices[[1]]$message$tool_calls
-  
+
   # Process each tool call
   results <- lapply(tool_calls, function(tool_call) {
     tool_id <- tool_call$id
-    function_info <- tool_call$`function`  # Use backticks for reserved R keyword
+    function_info <- tool_call$`function` # Use backticks for reserved R keyword
     tool_name <- function_info$name
     arguments <- function_info$arguments
-    
+
     # Parse arguments (OpenAI returns them as JSON string)
     arguments <- tryCatch(
       yyjsonr::read_json_str(arguments),
       error = function(e) arguments
     )
-    
-    if (!grepl("__", tool_name)) {
-      # Direct tool call
-      tool <- Filter(function(t) {
-        if (is.list(t) && "function" %in% names(t)) {
-          return(t$`function`$name == tool_name)  # Use backticks for reserved R keyword
-        }
-        return(FALSE)
-      }, provider$env$tools)
+
+    # Handle namespaced tools (MCP)
+    if (grepl("__", tool_name)) {
+      parts <- strsplit(tool_name, "__")[[1]]
       
-      if (!length(tool)) {
-        warning(sprintf("Tool '%s' not found", tool_name))
+      # If not a properly formatted namespaced tool, return error
+      if (length(parts) != 2) {
         return(list(
           role = "tool",
           tool_call_id = tool_id,
@@ -388,88 +387,101 @@ handle_tool_use.provider_openai <- function(provider, response) {
         ))
       }
       
-      tool <- tool[[1]]$`function`  # Use backticks for reserved R keyword
-      handler <- attr(tool, "handler")
+      # Extract namespace parts
+      mcp_name <- parts[1]
+      actual_tool_name <- parts[2]
       
-      # Call the tool handler
-      tryCatch({
-          result <- handler(arguments)
+      # Find the appropriate MCP
+      mcp <- find_mcp_by_name(provider, mcp_name)
+      
+      # If MCP not found, return error
+      if (is.null(mcp)) {
+        warning(sprintf("MCP '%s' not found", mcp_name))
+        return(list(
+          role = "tool",
+          tool_call_id = tool_id,
+          content = sprintf("Error: MCP '%s' not found", mcp_name)
+        ))
+      }
+      
+      # Set up parameters for MCP tool call
+      params <- list(
+        name = actual_tool_name,
+        arguments = arguments
+      )
+      
+      # Call the tool via MCP and return result
+      return(tryCatch(
+        {
+          result <- mcpr::tools_call(
+            mcp,
+            params,
+            tool_id
+          )
           
-          # Return the tool result
           list(
             role = "tool",
             tool_call_id = tool_id,
-            content = result
+            content = result$content
           )
         },
         error = function(e) {
-          warning(sprintf("Error calling tool: %s", e$message))
           list(
             role = "tool",
             tool_call_id = tool_id,
             content = sprintf("Error calling tool: %s", e$message)
           )
         }
-      )
-    } else {
-      # Namespaced tool (MCP)
-      parts <- strsplit(tool_name, "__")[[1]]
-      
-      if (length(parts) == 2) {
-        mcp_name <- parts[1]
-        actual_tool_name <- parts[2]
-        
-        # Find the appropriate MCP
-        mcp <- find_mcp_by_name(provider, mcp_name)
-        
-        if (is.null(mcp)) {
-          warning(sprintf("MCP '%s' not found", mcp_name))
-          return(list(
-            role = "tool",
-            tool_call_id = tool_id,
-            content = sprintf("Error: MCP '%s' not found", mcp_name)
-          ))
+      ))
+    }
+    
+    # Direct tool call (not namespaced)
+    tool <- Filter(
+      function(t) {
+        if (is.list(t) && "function" %in% names(t)) {
+          return(t$`function`$name == tool_name) # Use backticks for reserved R keyword
         }
+        return(FALSE)
+      },
+      provider$env$tools
+    )
+    
+    # If tool not found, return error
+    if (!length(tool)) {
+      warning(sprintf("Tool '%s' not found", tool_name))
+      return(list(
+        role = "tool",
+        tool_call_id = tool_id,
+        content = sprintf("Error: Tool '%s' not found", tool_name)
+      ))
+    }
+    
+    # Extract tool and handler
+    tool <- tool[[1]]$`function` # Use backticks for reserved R keyword
+    handler <- attr(tool, "handler")
+    
+    # Call the tool handler and return result
+    return(tryCatch(
+      {
+        result <- handler(arguments)
         
-        params <- list(
-          name = actual_tool_name,
-          arguments = arguments
-        )
-        
-        # Call the tool via MCP
-        tryCatch({
-            result <- mcpr::tools_call(
-              mcp,
-              params,
-              tool_id
-            )
-            
-            # Return the tool result
-            list(
-              role = "tool",
-              tool_call_id = tool_id,
-              content = result$content
-            )
-          },
-          error = function(e) {
-            list(
-              role = "tool",
-              tool_call_id = tool_id,
-              content = sprintf("Error calling tool: %s", e$message)
-            )
-          }
-        )
-      } else {
-        # Invalid tool name format
         list(
           role = "tool",
           tool_call_id = tool_id,
-          content = sprintf("Error: Tool '%s' not found", tool_name)
+          content = result
+        )
+      },
+      error = function(e) {
+        warning(sprintf("Error calling tool: %s", e$message))
+        list(
+          role = "tool",
+          tool_call_id = tool_id,
+          content = sprintf("Error calling tool: %s", e$message)
         )
       }
-    }
+    ))
   })
-  
+
   # Return list of tool results
   Filter(Negate(is.null), results)
 }
@@ -488,3 +500,4 @@ find_mcp_by_name <- function(provider, name) {
   }
   NULL
 }
+
