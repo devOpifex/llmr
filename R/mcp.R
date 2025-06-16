@@ -1,16 +1,16 @@
 #' Register a memory client provider
 #'
-#' @param provider An object of class `provider`.
+#' @param x An object of class `agent`.
 #' @param mcp An object of class `client` from the "mcpr" package.
 #'
 #' @return A provider object
 #' @export
-register_mcp <- function(provider, mcp) UseMethod("register_mcp")
+register_mcp <- function(x, mcp) UseMethod("register_mcp")
 
-#' @method register_mcp provider
+#' @method register_mcp agent
 #' @export
-register_mcp.provider <- function(provider, mcp) {
-  provider$env$mcps <- c(provider$env$mcps, list(mcp))
+register_mcp.agent <- function(x, mcp) {
+  x$env$mcps <- c(x$env$mcps, list(mcp))
 
   tools <- tryCatch(
     mcpr::tools_list(mcp),
@@ -26,9 +26,9 @@ register_mcp.provider <- function(provider, mcp) {
     )
   }
 
-  tools <- mcp_to_provider_tools(provider, tools$result$tools)
+  tools <- mcp_to_provider_tools(x$provider, tools$result$tools)
   tools <- namespace(mcp, tools)
-  provider$env$tools <- c(provider$env$tools, tools)
+  x$env$tools <- c(x$env$tools, tools)
 
   invisible(provider)
 }
@@ -40,8 +40,9 @@ namespace <- function(mcp, tools) {
   })
 }
 
-mcp_to_provider_tools <- function(provider, tools)
+mcp_to_provider_tools <- function(provider, tools) {
   UseMethod("mcp_to_provider_tools")
+}
 
 #' @method mcp_to_provider_tools provider_anthropic
 #' @export

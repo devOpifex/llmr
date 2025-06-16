@@ -1,53 +1,75 @@
 #' Make a request to an LLM provider
 #'
-#' @param provider An object of class `provider`.
+#' @param x An object of class `provider` or `agent`.
 #' @param message A message object.
 #'
 #' @return A response object
 #' @export
 #'
 #' @name request
-request <- function(provider, message) UseMethod("request")
+request <- function(x, message = NULL, ...) UseMethod("request")
+
+#' @method request agent
+#' @export
+request.agent <- function(x, message = NULL, ...) {
+  if (!is.null(message)) {
+    x <- append_message(x, message)
+  }
+
+  response <- request(
+    x$provider,
+    x$env$messages,
+    tools = x$env$tools
+  )
+
+  x <- append_message(
+    x,
+    new_message(response$content, role = "assistant")
+  )
+
+  # Handle the response (for tool_use etc.)
+  handle_response(x$provider, x, response)
+
+  x
+}
 
 #' @method request provider_anthropic
 #' @export
-request.provider_anthropic <- function(provider, message) {
-  provider <- append_message(provider, message)
-
+request.provider_anthropic <- function(x, message, ..., tools = NULL) {
   body <- list(
-    model = attr(provider, "model"),
-    max_tokens = attr(provider, "max_tokens"),
-    messages = provider$env$messages
+    model = attr(x, "model"),
+    max_tokens = attr(x, "max_tokens"),
+    messages = message
   )
 
   # Add system prompt if available
-  if (!is.null(attr(provider, "system"))) {
-    body$system <- attr(provider, "system")
+  if (!is.null(attr(x, "system"))) {
+    body$system <- attr(x, "system")
   }
 
   # Add temperature if available
-  if (!is.null(attr(provider, "temperature"))) {
-    body$temperature <- attr(provider, "temperature")
+  if (!is.null(attr(x, "temperature"))) {
+    body$temperature <- attr(x, "temperature")
   }
 
   # Add tools if available
-  if (length(provider$env$tools)) {
-    body$tools <- provider$env$tools
+  if (length(tools)) {
+    body$tools <- tools
   }
 
-  req <- httr2::request(provider$url) |>
+  req <- httr2::request(x$url) |>
     httr2::req_url_path(path = "v1/messages") |>
     httr2::req_headers(
       "content-type" = "application/json",
-      "x-api-key" = attr(provider, "key"),
-      "anthropic-version" = attr(provider, "version")
+      "x-api-key" = attr(x, "key"),
+      "anthropic-version" = attr(x, "version")
     ) |>
     httr2::req_body_json(body) |>
     httr2::req_method("POST")
 
   # Apply retry configuration if available
-  if (length(provider$env$retry)) {
-    req <- req |> httr2::req_retry(max_tries = provider$env$retry$max_tries)
+  if (length(x$env$retry)) {
+    req <- req |> httr2::req_retry(max_tries = x$env$retry$max_tries)
   }
 
   response <- tryCatch(
@@ -68,36 +90,26 @@ request.provider_anthropic <- function(provider, message) {
     )
   }
 
-  response <- httr2::resp_body_json(response)
-
-  provider <- append_message(
-    provider,
-    new_message(response$content, role = "assistant")
-  )
-
-  # Handle the response (for tool_use etc.)
-  handle_response(provider, response)
+  httr2::resp_body_json(response)
 }
 
 #' @method request provider_openai
 #' @export
-request.provider_openai <- function(provider, message) {
-  provider <- append_message(provider, message)
-
+request.provider_openai <- function(x, message, tools = NULL) {
   body <- list(
-    model = attr(provider, "model"),
-    max_tokens = attr(provider, "max_tokens"),
-    messages = provider$env$messages
+    model = attr(x, "model"),
+    max_tokens = attr(x, "max_tokens"),
+    messages = x$env$messages
   )
 
   # Add temperature if available
-  if (!is.null(attr(provider, "temperature"))) {
-    body$temperature <- attr(provider, "temperature")
+  if (!is.null(attr(x$provider, "temperature"))) {
+    body$temperature <- attr(x$provider, "temperature")
   }
 
   # Add tools if available
   if (length(provider$env$tools)) {
-    body$tools <- provider$env$tools
+    body$tools <- x$env$tools
   }
 
   req <- httr2::request(provider$url) |>
@@ -165,41 +177,47 @@ request.provider_openai <- function(provider, message) {
 
 #' Handle response from an LLM provider
 #'
-#' @param provider An object of class `provider`.
+#' @param x An object of class `provider`.
+#' @param agent An object of class `agent`.
 #' @param response A response object from the LLM provider.
 #' @param loop Whether to loop the request or not..
 #'
 #' @return A response object
 #' @export
-handle_response <- function(provider, response, loop = TRUE)
+handle_response <- function(x, agent, response, loop = TRUE) {
   UseMethod("handle_response")
+}
 
 #' @method handle_response provider_anthropic
 #' @export
 handle_response.provider_anthropic <- function(
-  provider,
+  x,
+  agent,
   response,
   loop = TRUE
 ) {
   if (length(response$stop_reason) && response$stop_reason == "tool_use") {
-    tool_response <- handle_tool_use(provider, response)
+    tool_response <- handle_tool_use(x, response, tools = agent$env$tools)
 
-    if (!length(tool_response)) return(response)
+    if (!length(tool_response)) {
+      return(response)
+    }
 
     if (!loop) {
       return(tool_response)
     }
 
-    return(request(provider, new_message(tool_response, role = "user")))
+    return(request(agent, new_message(tool_response, role = "user")))
   }
 
-  response
+  agent
 }
 
 #' @method handle_response provider_openai
 #' @export
 handle_response.provider_openai <- function(
-  provider,
+  x,
+  agent,
   response,
   loop = TRUE
 ) {
@@ -209,19 +227,17 @@ handle_response.provider_openai <- function(
       response$choices[[1]]$finish_reason == "tool_calls"
   ) {
     # Process tool calls
-    tool_responses <- handle_tool_use(provider, response)
+    tool_responses <- handle_tool_use(x, response, tools = agent$env$tools)
 
-    if (length(tool_responses) == 0) return(response)
+    if (length(tool_responses) == 0) {
+      return(response)
+    }
 
     # Add each tool response to the provider's messages
     for (tool_response in tool_responses) {
-      provider <- append_message(
-        provider,
-        new_message(
-          content = tool_response$content,
-          role = "tool",
-          tool_call_id = tool_response$tool_call_id
-        )
+      agent <- append_message(
+        agent,
+        tool_response
       )
     }
 
@@ -231,10 +247,10 @@ handle_response.provider_openai <- function(
 
     # Continue the conversation with the LLM by sending an empty message
     # with all current messages (including tool responses)
-    return(request(provider, new_message("", role = "user")))
+    return(request(agent))
   }
 
-  response
+  agent
 }
 
 #' Handle tool use in a response
@@ -243,21 +259,31 @@ handle_response.provider_openai <- function(
 #' @param response A response object from the LLM provider.
 #'
 #' @return A formatted tool response
-handle_tool_use <- function(provider, response) UseMethod("handle_tool_use")
+handle_tool_use <- function(provider, response, tools) {
+  UseMethod("handle_tool_use")
+}
 
 #' @export
 #' @method handle_tool_use provider_anthropic
-handle_tool_use.provider_anthropic <- function(provider, response) {
+handle_tool_use.provider_anthropic <- function(
+  provider,
+  response,
+  tools = NULL
+) {
   results <- lapply(response$content, function(message) {
-    if (!length(message$type)) return()
+    if (!length(message$type)) {
+      return()
+    }
 
-    if (message$type != "tool_use") return()
+    if (message$type != "tool_use") {
+      return()
+    }
 
     tool_call <- message
     tool_name <- tool_call$name
 
     if (!grepl("__", tool_name)) {
-      tool <- Filter(function(tool) tool$name == tool_name, provider$env$tools)
+      tool <- Filter(function(tool) tool$name == tool_name, tools)
       if (!length(tool)) {
         warning(sprintf("Tool '%s' not found", tool_name))
         return(list(
@@ -357,7 +383,7 @@ handle_tool_use.provider_anthropic <- function(provider, response) {
 
 #' @export
 #' @method handle_tool_use provider_openai
-handle_tool_use.provider_openai <- function(provider, response) {
+handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
   # Extract the tool calls from the OpenAI response
   tool_calls <- response$choices[[1]]$message$tool_calls
 
@@ -377,7 +403,7 @@ handle_tool_use.provider_openai <- function(provider, response) {
     # Handle namespaced tools (MCP)
     if (grepl("__", tool_name)) {
       parts <- strsplit(tool_name, "__")[[1]]
-      
+
       # If not a properly formatted namespaced tool, return error
       if (length(parts) != 2) {
         return(list(
@@ -386,14 +412,14 @@ handle_tool_use.provider_openai <- function(provider, response) {
           content = sprintf("Error: Tool '%s' not found", tool_name)
         ))
       }
-      
+
       # Extract namespace parts
       mcp_name <- parts[1]
       actual_tool_name <- parts[2]
-      
+
       # Find the appropriate MCP
       mcp <- find_mcp_by_name(provider, mcp_name)
-      
+
       # If MCP not found, return error
       if (is.null(mcp)) {
         warning(sprintf("MCP '%s' not found", mcp_name))
@@ -403,13 +429,13 @@ handle_tool_use.provider_openai <- function(provider, response) {
           content = sprintf("Error: MCP '%s' not found", mcp_name)
         ))
       }
-      
+
       # Set up parameters for MCP tool call
       params <- list(
         name = actual_tool_name,
         arguments = arguments
       )
-      
+
       # Call the tool via MCP and return result
       return(tryCatch(
         {
@@ -418,7 +444,7 @@ handle_tool_use.provider_openai <- function(provider, response) {
             params,
             tool_id
           )
-          
+
           list(
             role = "tool",
             tool_call_id = tool_id,
@@ -434,7 +460,7 @@ handle_tool_use.provider_openai <- function(provider, response) {
         }
       ))
     }
-    
+
     # Direct tool call (not namespaced)
     tool <- Filter(
       function(t) {
@@ -443,9 +469,9 @@ handle_tool_use.provider_openai <- function(provider, response) {
         }
         return(FALSE)
       },
-      provider$env$tools
+      tools
     )
-    
+
     # If tool not found, return error
     if (!length(tool)) {
       warning(sprintf("Tool '%s' not found", tool_name))
@@ -455,16 +481,16 @@ handle_tool_use.provider_openai <- function(provider, response) {
         content = sprintf("Error: Tool '%s' not found", tool_name)
       ))
     }
-    
+
     # Extract tool and handler
     tool <- tool[[1]]$`function` # Use backticks for reserved R keyword
     handler <- attr(tool, "handler")
-    
+
     # Call the tool handler and return result
     return(tryCatch(
       {
         result <- handler(arguments)
-        
+
         list(
           role = "tool",
           tool_call_id = tool_id,
@@ -500,4 +526,3 @@ find_mcp_by_name <- function(provider, name) {
   }
   NULL
 }
-

@@ -3,20 +3,25 @@
 #' Creates a new agent with the specified name
 #'
 #' @param name Character string specifying the agent name
+#' @param provider An object of class `provider`.
 #'
 #' @return An object of class "agent"
 #' @export
-new_agent <- function(name) {
+new_agent <- function(name, provider) {
   stopifnot(is.character(name), length(name) == 1)
+  stopifnot(!missing(provider), inherits(provider, "provider"))
 
   # Create a new environment for the agent
   env <- new.env(parent = emptyenv())
   env$tools <- list()
+  env$messages <- list()
+  env$mcps <- list()
 
   # Create the agent structure
   agent <- structure(
     list(
-      env = env
+      env = env,
+      provider = provider
     ),
     name = name,
     class = c("agent")
@@ -42,37 +47,7 @@ add_tool.agent <- function(x, tool, ...) {
   stopifnot(inherits(tool, c("capability", "tool")))
 
   # Add the tool to the agent's tool registry
-  x$env$tools <- c(x$env$tools, list(tool))
+  x$env$tools <- c(x$env$tools, mcp_to_provider_tools(x$provider, list(tool)))
 
   invisible(x)
-}
-
-#' Register an agent with a provider
-#'
-#' @param provider An object of class `provider`
-#' @param agent An object of class `agent`
-#' @param ... Additional arguments passed to methods
-#'
-#' @return The modified provider object (invisibly)
-#' @export
-#' @name register_agent
-register_agent <- function(provider, agent, ...) UseMethod("register_agent")
-
-#' @method register_agent provider
-#' @export
-register_agent.provider <- function(provider, agent, ...) {
-  stopifnot(inherits(agent, "agent"))
-
-  # Get tools from the agent
-  tools <- agent$env$tools
-
-  # Add all tools to the provider
-  if (length(tools) > 0) {
-    provider$env$tools <- c(
-      provider$env$tools,
-      mcp_to_provider_tools(provider, tools)
-    )
-  }
-
-  invisible(provider)
 }

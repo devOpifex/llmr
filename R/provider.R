@@ -11,12 +11,13 @@
 #' provider <- new_anthropic()
 #' @name provider
 new_provider <- function(name, url, ...) {
+  if (grepl(" ", name)) {
+    stop("Provider name cannot contain spaces")
+  }
+
   cls <- paste0("provider_", name)
 
-  env <- new.env()
-  env$messages <- list()
-  env$mcps <- list()
-  env$tools <- list()
+  env <- new.env(parent = emptyenv())
 
   p <- structure(
     list(
@@ -31,6 +32,11 @@ new_provider <- function(name, url, ...) {
   )
 
   invisible(p)
+}
+
+#' @export
+print.provider <- function(x, ...) {
+  cat(sprintf("<%s> %s\n", x$name, x$url))
 }
 
 #' @rdname provider

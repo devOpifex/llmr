@@ -4,10 +4,10 @@
 \alias{register_mcp}
 \title{Register a memory client provider}
 \usage{
-register_mcp(provider, mcp)
+register_mcp(x, mcp)
 }
 \arguments{
-\item{provider}{An object of class \code{provider}.}
+\item{x}{An object of class \code{agent}.}
 
 \item{mcp}{An object of class \code{client} from the "mcpr" package.}
 }

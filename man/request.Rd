@@ -4,10 +4,10 @@
 \alias{request}
 \title{Make a request to an LLM provider}
 \usage{
-request(provider, message)
+request(x, message = NULL, ...)
 }
 \arguments{
-\item{provider}{An object of class \code{provider}.}
+\item{x}{An object of class \code{provider} or \code{agent}.}
 
 \item{message}{A message object.}
 }

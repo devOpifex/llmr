@@ -4,10 +4,12 @@
 \alias{handle_response}
 \title{Handle response from an LLM provider}
 \usage{
-handle_response(provider, response, loop = TRUE)
+handle_response(x, agent, response, loop = TRUE)
 }
 \arguments{
-\item{provider}{An object of class \code{provider}.}
+\item{x}{An object of class \code{provider}.}
+
+\item{agent}{An object of class \code{agent}.}
 
 \item{response}{A response object from the LLM provider.}
 

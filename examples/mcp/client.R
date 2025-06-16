@@ -1,6 +1,7 @@
 devtools::load_all()
 
 provider <- new_openai()
+set_retry(provider, max_tries = 5)
 
 client <- mcpr::new_client_io(
   command = "Rscript",
@@ -8,9 +9,9 @@ client <- mcpr::new_client_io(
   name = "calculator"
 )
 
-register_mcp(provider, client)
+agent <- new_agent("Weather forecaster", provider)
 
-agent <- new_agent("Weather forecaster")
+register_mcp(agent, client)
 
 add_tool(
   agent,
@@ -32,8 +33,6 @@ add_tool(
   )
 )
 
-provider <- register_agent(provider, agent)
 
-set_retry(provider, max_tries = 5)
-
-request(provider, new_message("What's the weather like in New York?"))
+request(agent, new_message("What's the weather like in New York?"))
+get_messages(agent)

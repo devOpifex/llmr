@@ -4,10 +4,12 @@
 \alias{new_agent}
 \title{Create a new agent}
 \usage{
-new_agent(name)
+new_agent(name, provider)
 }
 \arguments{
 \item{name}{Character string specifying the agent name}
+
+\item{provider}{An object of class \code{provider}.}
 }
 \value{
 An object of class "agent"

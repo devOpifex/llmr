@@ -4,12 +4,12 @@
 \alias{append_message}
 \title{Add a message to the list}
 \usage{
-append_message(provider, message)
+append_message(x, message)
 }
 \arguments{
-\item{provider}{An object of class \code{provider}.}
-
 \item{message}{A message object.}
+
+\item{provider}{An object of class \code{provider}.}
 }
 \description{
 Add a message to the list
