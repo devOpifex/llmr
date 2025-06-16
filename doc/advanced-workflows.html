@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Advanced Workflows: Conditional and Dynamic Patterns</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Advanced Workflows: Conditional and Dynamic
+Patterns</h1>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>While linear workflows are powerful, real-world data processing often
+requires more sophisticated patterns. The <strong>llmr</strong> package
+provides advanced workflow capabilities including conditional branching,
+parallel processing, and dynamic routing.</p>
+<p>This vignette explores these advanced patterns, showing how to build
+intelligent workflows that adapt their behavior based on data
+characteristics and processing requirements.</p>
+<div id="what-youll-learn" class="section level2">
+<h2>What You’ll Learn</h2>
+<p>By the end of this guide, you’ll understand how to:</p>
+<ul>
+<li>Use <code>when()</code> for conditional branching</li>
+<li>Implement preprocessors for data preparation</li>
+<li>Create parallel processing workflows</li>
+<li>Build dynamic routing based on data characteristics</li>
+<li>Combine multiple advanced patterns</li>
+<li>Design fault-tolerant workflows</li>
+</ul>
+</div>
+<div id="prerequisites" class="section level2">
+<h2>Prerequisites</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(llmr)</span></code></pre></div>
+<p>For examples using agents:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set_api_key</span>(<span class="st">&quot;your-anthropic-api-key-here&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>provider <span class="ot">&lt;-</span> <span class="fu">new_anthropic</span>()</span></code></pre></div>
+</div>
+<div id="understanding-when-conditional-branching" class="section level2">
+<h2>Understanding <code>when()</code>: Conditional Branching</h2>
+<p>The <code>when()</code> function enables conditional branching in
+workflows. It takes a condition function and multiple named branches,
+executing the appropriate branch based on the condition’s result.</p>
+<div id="basic-conditional-workflow" class="section level3">
+<h3>Basic Conditional Workflow</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Define condition function</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>classify_number <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="cf">if</span> (x <span class="sc">&gt;</span> <span class="dv">100</span>) {</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>    <span class="st">&quot;large&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (x <span class="sc">&gt;</span> <span class="dv">10</span>) {</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>    <span class="st">&quot;medium&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>    <span class="st">&quot;small&quot;</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  }</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>}</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co"># Define branch-specific processing</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>process_large <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing large number:&quot;</span>, x, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  x <span class="sc">/</span> <span class="dv">10</span>  <span class="co"># Scale down large numbers</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>}</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>process_medium <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing medium number:&quot;</span>, x, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>  x <span class="sc">*</span> <span class="dv">2</span>   <span class="co"># Double medium numbers</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>}</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>process_small <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing small number:&quot;</span>, x, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  x <span class="sc">+</span> <span class="dv">100</span> <span class="co"># Boost small numbers</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>}</span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co"># Create conditional workflow</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>number_processor <span class="ot">&lt;-</span> <span class="fu">when</span>(</span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>  classify_number,</span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>  <span class="at">large =</span> <span class="fu">step</span>(process_large, <span class="at">name =</span> <span class="st">&quot;scale_down&quot;</span>),</span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>  <span class="at">medium =</span> <span class="fu">step</span>(process_medium, <span class="at">name =</span> <span class="st">&quot;double&quot;</span>),</span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>  <span class="at">small =</span> <span class="fu">step</span>(process_small, <span class="at">name =</span> <span class="st">&quot;boost&quot;</span>)</span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a>)</span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co"># View the workflow structure</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="fu">print</span>(number_processor)</span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co"># Test with different values</span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a>test_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">50</span>, <span class="dv">500</span>)</span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="cf">for</span> (val <span class="cf">in</span> test_values) {</span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">--- Processing:&quot;</span>, val, <span class="st">&quot;---</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">execute</span>(number_processor, val)</span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Result:&quot;</span>, result, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="preprocessing-with-conditional-branching" class="section level3">
+<h3>Preprocessing with Conditional Branching</h3>
+<p>Combine preprocessing steps with conditional logic:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Preprocessor function</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>validate_and_prepare <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Validating input:&quot;</span>, x, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.numeric</span>(x)) {</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">&quot;Input must be numeric&quot;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  }</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="fu">abs</span>(x)  <span class="co"># Ensure positive values</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>}</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co"># Create workflow with preprocessing</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>robust_processor <span class="ot">&lt;-</span> <span class="fu">step</span>(validate_and_prepare, <span class="at">name =</span> <span class="st">&quot;validate&quot;</span>) <span class="sc">%-&gt;%</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>                   <span class="fu">when</span>(</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>                     classify_number,</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>                     <span class="at">large =</span> <span class="fu">step</span>(process_large, <span class="at">name =</span> <span class="st">&quot;scale_down&quot;</span>),</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>                     <span class="at">medium =</span> <span class="fu">step</span>(process_medium, <span class="at">name =</span> <span class="st">&quot;double&quot;</span>),</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>                     <span class="at">small =</span> <span class="fu">step</span>(process_small, <span class="at">name =</span> <span class="st">&quot;boost&quot;</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>                   )</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="fu">print</span>(robust_processor)</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co"># Test with various inputs</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>test_inputs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">25</span>, <span class="dv">15</span>, <span class="dv">150</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="cf">for</span> (input <span class="cf">in</span> test_inputs) {</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">--- Processing:&quot;</span>, input, <span class="st">&quot;---</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">execute</span>(robust_processor, input)</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Final result:&quot;</span>, result, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+</div>
+<div id="parallel-processing-with-when" class="section level2">
+<h2>Parallel Processing with <code>when()</code></h2>
+<p>Use <code>when()</code> to execute multiple branches in parallel by
+returning multiple branch names:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Define analysis functions</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>sentiment_analysis <span class="ot">&lt;-</span> <span class="cf">function</span>(text) {</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Analyzing sentiment...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="co"># Simulate sentiment analysis</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  sentiments <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;positive&quot;</span>, <span class="st">&quot;negative&quot;</span>, <span class="st">&quot;neutral&quot;</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="fu">sample</span>(sentiments, <span class="dv">1</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>}</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>word_count <span class="ot">&lt;-</span> <span class="cf">function</span>(text) {</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Counting words...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  <span class="fu">length</span>(<span class="fu">strsplit</span>(text, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">s+&quot;</span>)[[<span class="dv">1</span>]])</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>}</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>extract_keywords <span class="ot">&lt;-</span> <span class="cf">function</span>(text) {</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Extracting keywords...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>  words <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(<span class="fu">tolower</span>(text), <span class="st">&quot;</span><span class="sc">\\</span><span class="st">s+&quot;</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>  <span class="co"># Return top 3 unique words</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>  unique_words <span class="ot">&lt;-</span> <span class="fu">unique</span>(words)</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>  <span class="fu">sample</span>(unique_words, <span class="fu">min</span>(<span class="dv">3</span>, <span class="fu">length</span>(unique_words)))</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>}</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>readability_score <span class="ot">&lt;-</span> <span class="cf">function</span>(text) {</span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Calculating readability...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>  <span class="co"># Simple readability metric</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>  words <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(text, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">s+&quot;</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>  avg_word_length <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">nchar</span>(words))</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>  <span class="fu">round</span>(avg_word_length, <span class="dv">2</span>)</span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>}</span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co"># Function to combine parallel results</span></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a>combine_analysis <span class="ot">&lt;-</span> <span class="cf">function</span>(results) {</span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Combining analysis results...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a>    <span class="at">sentiment =</span> results<span class="sc">$</span>sentiment,</span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a>    <span class="at">word_count =</span> results<span class="sc">$</span>word_count,</span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>    <span class="at">keywords =</span> results<span class="sc">$</span>keywords,</span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a>    <span class="at">readability =</span> results<span class="sc">$</span>readability,</span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a>    <span class="at">summary =</span> <span class="fu">paste</span>(</span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>      <span class="st">&quot;Text analysis:&quot;</span>, results<span class="sc">$</span>word_count, <span class="st">&quot;words,&quot;</span>,</span>
+<span id="cb5-40"><a href="#cb5-40" tabindex="-1"></a>      results<span class="sc">$</span>sentiment, <span class="st">&quot;sentiment,&quot;</span>,</span>
+<span id="cb5-41"><a href="#cb5-41" tabindex="-1"></a>      <span class="st">&quot;readability score:&quot;</span>, results<span class="sc">$</span>readability</span>
+<span id="cb5-42"><a href="#cb5-42" tabindex="-1"></a>    )</span>
+<span id="cb5-43"><a href="#cb5-43" tabindex="-1"></a>  )</span>
+<span id="cb5-44"><a href="#cb5-44" tabindex="-1"></a>}</span>
+<span id="cb5-45"><a href="#cb5-45" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" tabindex="-1"></a><span class="co"># Create parallel analysis workflow</span></span>
+<span id="cb5-47"><a href="#cb5-47" tabindex="-1"></a>text_analyzer <span class="ot">&lt;-</span> <span class="fu">when</span>(</span>
+<span id="cb5-48"><a href="#cb5-48" tabindex="-1"></a>  <span class="cf">function</span>(text) <span class="fu">c</span>(<span class="st">&quot;sentiment&quot;</span>, <span class="st">&quot;word_count&quot;</span>, <span class="st">&quot;keywords&quot;</span>, <span class="st">&quot;readability&quot;</span>),</span>
+<span id="cb5-49"><a href="#cb5-49" tabindex="-1"></a>  <span class="at">sentiment =</span> <span class="fu">step</span>(sentiment_analysis, <span class="at">name =</span> <span class="st">&quot;sentiment&quot;</span>),</span>
+<span id="cb5-50"><a href="#cb5-50" tabindex="-1"></a>  <span class="at">word_count =</span> <span class="fu">step</span>(word_count, <span class="at">name =</span> <span class="st">&quot;count_words&quot;</span>),</span>
+<span id="cb5-51"><a href="#cb5-51" tabindex="-1"></a>  <span class="at">keywords =</span> <span class="fu">step</span>(extract_keywords, <span class="at">name =</span> <span class="st">&quot;extract_keys&quot;</span>),</span>
+<span id="cb5-52"><a href="#cb5-52" tabindex="-1"></a>  <span class="at">readability =</span> <span class="fu">step</span>(readability_score, <span class="at">name =</span> <span class="st">&quot;readability&quot;</span>)</span>
+<span id="cb5-53"><a href="#cb5-53" tabindex="-1"></a>) <span class="sc">%-&gt;%</span></span>
+<span id="cb5-54"><a href="#cb5-54" tabindex="-1"></a><span class="fu">step</span>(combine_analysis, <span class="at">name =</span> <span class="st">&quot;combine&quot;</span>)</span>
+<span id="cb5-55"><a href="#cb5-55" tabindex="-1"></a></span>
+<span id="cb5-56"><a href="#cb5-56" tabindex="-1"></a><span class="fu">print</span>(text_analyzer)</span>
+<span id="cb5-57"><a href="#cb5-57" tabindex="-1"></a></span>
+<span id="cb5-58"><a href="#cb5-58" tabindex="-1"></a><span class="co"># Test parallel processing</span></span>
+<span id="cb5-59"><a href="#cb5-59" tabindex="-1"></a>sample_text <span class="ot">&lt;-</span> <span class="st">&quot;The advanced workflow capabilities in llmr enable sophisticated data processing patterns.&quot;</span></span>
+<span id="cb5-60"><a href="#cb5-60" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">execute</span>(text_analyzer, sample_text)</span>
+<span id="cb5-61"><a href="#cb5-61" tabindex="-1"></a><span class="fu">str</span>(result)</span></code></pre></div>
+</div>
+<div id="dynamic-routing-based-on-data-characteristics" class="section level2">
+<h2>Dynamic Routing Based on Data Characteristics</h2>
+<p>Create workflows that route data based on its characteristics:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Data type classifier</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>classify_data_type <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.character</span>(data)) {</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">nchar</span>(data) <span class="sc">&gt;</span> <span class="dv">100</span>) {</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>      <span class="st">&quot;long_text&quot;</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>      <span class="st">&quot;short_text&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>    }</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (<span class="fu">is.numeric</span>(data)) {</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">length</span>(data) <span class="sc">&gt;</span> <span class="dv">1</span>) {</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>      <span class="st">&quot;numeric_vector&quot;</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>      <span class="st">&quot;single_number&quot;</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>    }</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>    <span class="st">&quot;other&quot;</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>  }</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>}</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co"># Specialized processors for different data types</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>process_long_text <span class="ot">&lt;-</span> <span class="cf">function</span>(text) {</span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing long text (&quot;</span>, <span class="fu">nchar</span>(text), <span class="st">&quot;characters)</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>  <span class="co"># Summarize long text</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>  words <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(text, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">s+&quot;</span>)[[<span class="dv">1</span>]]</span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="st">&quot;Summary:&quot;</span>, <span class="fu">length</span>(words), <span class="st">&quot;words starting with:&quot;</span>, </span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>        <span class="fu">paste</span>(<span class="fu">head</span>(words, <span class="dv">3</span>), <span class="at">collapse =</span> <span class="st">&quot; &quot;</span>))</span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>}</span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>process_short_text <span class="ot">&lt;-</span> <span class="cf">function</span>(text) {</span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing short text:&quot;</span>, text, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a>  <span class="co"># Simple transformation for short text</span></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a>  <span class="fu">toupper</span>(text)</span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a>}</span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a>process_numeric_vector <span class="ot">&lt;-</span> <span class="cf">function</span>(vec) {</span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing numeric vector of length&quot;</span>, <span class="fu">length</span>(vec), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a>    <span class="at">mean =</span> <span class="fu">mean</span>(vec),</span>
+<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a>    <span class="at">sd =</span> <span class="fu">sd</span>(vec),</span>
+<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a>    <span class="at">range =</span> <span class="fu">range</span>(vec)</span>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a>  )</span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a>}</span>
+<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a>process_single_number <span class="ot">&lt;-</span> <span class="cf">function</span>(num) {</span>
+<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing single number:&quot;</span>, num, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a>    <span class="at">value =</span> num,</span>
+<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a>    <span class="at">squared =</span> num<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a>    <span class="at">sqrt =</span> <span class="fu">sqrt</span>(<span class="fu">abs</span>(num))</span>
+<span id="cb6-50"><a href="#cb6-50" tabindex="-1"></a>  )</span>
+<span id="cb6-51"><a href="#cb6-51" tabindex="-1"></a>}</span>
+<span id="cb6-52"><a href="#cb6-52" tabindex="-1"></a></span>
+<span id="cb6-53"><a href="#cb6-53" tabindex="-1"></a>process_other <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb6-54"><a href="#cb6-54" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing other data type:&quot;</span>, <span class="fu">class</span>(data), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb6-55"><a href="#cb6-55" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="st">&quot;Unsupported data type:&quot;</span>, <span class="fu">class</span>(data)[<span class="dv">1</span>])</span>
+<span id="cb6-56"><a href="#cb6-56" tabindex="-1"></a>}</span>
+<span id="cb6-57"><a href="#cb6-57" tabindex="-1"></a></span>
+<span id="cb6-58"><a href="#cb6-58" tabindex="-1"></a><span class="co"># Create dynamic routing workflow</span></span>
+<span id="cb6-59"><a href="#cb6-59" tabindex="-1"></a>data_router <span class="ot">&lt;-</span> <span class="fu">when</span>(</span>
+<span id="cb6-60"><a href="#cb6-60" tabindex="-1"></a>  classify_data_type,</span>
+<span id="cb6-61"><a href="#cb6-61" tabindex="-1"></a>  <span class="at">long_text =</span> <span class="fu">step</span>(process_long_text, <span class="at">name =</span> <span class="st">&quot;long_text_processor&quot;</span>),</span>
+<span id="cb6-62"><a href="#cb6-62" tabindex="-1"></a>  <span class="at">short_text =</span> <span class="fu">step</span>(process_short_text, <span class="at">name =</span> <span class="st">&quot;short_text_processor&quot;</span>),</span>
+<span id="cb6-63"><a href="#cb6-63" tabindex="-1"></a>  <span class="at">numeric_vector =</span> <span class="fu">step</span>(process_numeric_vector, <span class="at">name =</span> <span class="st">&quot;vector_processor&quot;</span>),</span>
+<span id="cb6-64"><a href="#cb6-64" tabindex="-1"></a>  <span class="at">single_number =</span> <span class="fu">step</span>(process_single_number, <span class="at">name =</span> <span class="st">&quot;number_processor&quot;</span>),</span>
+<span id="cb6-65"><a href="#cb6-65" tabindex="-1"></a>  <span class="at">other =</span> <span class="fu">step</span>(process_other, <span class="at">name =</span> <span class="st">&quot;fallback_processor&quot;</span>)</span>
+<span id="cb6-66"><a href="#cb6-66" tabindex="-1"></a>)</span>
+<span id="cb6-67"><a href="#cb6-67" tabindex="-1"></a></span>
+<span id="cb6-68"><a href="#cb6-68" tabindex="-1"></a><span class="fu">print</span>(data_router)</span>
+<span id="cb6-69"><a href="#cb6-69" tabindex="-1"></a></span>
+<span id="cb6-70"><a href="#cb6-70" tabindex="-1"></a><span class="co"># Test with different data types</span></span>
+<span id="cb6-71"><a href="#cb6-71" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb6-72"><a href="#cb6-72" tabindex="-1"></a>  <span class="st">&quot;Hello World&quot;</span>,</span>
+<span id="cb6-73"><a href="#cb6-73" tabindex="-1"></a>  <span class="st">&quot;This is a much longer text that contains many words and should be classified as long text for processing purposes.&quot;</span>,</span>
+<span id="cb6-74"><a href="#cb6-74" tabindex="-1"></a>  <span class="dv">42</span>,</span>
+<span id="cb6-75"><a href="#cb6-75" tabindex="-1"></a>  <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>),</span>
+<span id="cb6-76"><a href="#cb6-76" tabindex="-1"></a>  <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>))</span>
+<span id="cb6-77"><a href="#cb6-77" tabindex="-1"></a>)</span>
+<span id="cb6-78"><a href="#cb6-78" tabindex="-1"></a></span>
+<span id="cb6-79"><a href="#cb6-79" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(test_data)) {</span>
+<span id="cb6-80"><a href="#cb6-80" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">--- Test&quot;</span>, i, <span class="st">&quot;---</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb6-81"><a href="#cb6-81" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">execute</span>(data_router, test_data[[i]])</span>
+<span id="cb6-82"><a href="#cb6-82" tabindex="-1"></a>  <span class="fu">print</span>(result)</span>
+<span id="cb6-83"><a href="#cb6-83" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="agent-based-conditional-workflows" class="section level2">
+<h2>Agent-Based Conditional Workflows</h2>
+<p>Combine AI agents with conditional logic for intelligent
+processing:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Create specialized agents</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>technical_writer <span class="ot">&lt;-</span> <span class="fu">new_agent</span>(<span class="st">&quot;technical_writer&quot;</span>, provider)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>creative_writer <span class="ot">&lt;-</span> <span class="fu">new_agent</span>(<span class="st">&quot;creative_writer&quot;</span>, provider)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>data_analyst <span class="ot">&lt;-</span> <span class="fu">new_agent</span>(<span class="st">&quot;data_analyst&quot;</span>, provider)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co"># Configure agents</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="fu">set_system_prompt</span>(</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  technical_writer<span class="sc">$</span>provider,</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="st">&quot;You are a technical writer. Analyze text for technical accuracy and clarity. Provide structured feedback.&quot;</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>)</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="fu">set_system_prompt</span>(</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>  creative_writer<span class="sc">$</span>provider,</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  <span class="st">&quot;You are a creative writing expert. Analyze text for creativity, style, and emotional impact.&quot;</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>)</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="fu">set_system_prompt</span>(</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  data_analyst<span class="sc">$</span>provider,</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="st">&quot;You are a data analyst. Extract quantitative insights and patterns from text.&quot;</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>)</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co"># Content classifier</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>classify_content <span class="ot">&lt;-</span> <span class="cf">function</span>(text) {</span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>  <span class="co"># Simple heuristic classification</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>  technical_keywords <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;algorithm&quot;</span>, <span class="st">&quot;function&quot;</span>, <span class="st">&quot;data&quot;</span>, <span class="st">&quot;analysis&quot;</span>, <span class="st">&quot;method&quot;</span>, <span class="st">&quot;system&quot;</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>  creative_keywords <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;story&quot;</span>, <span class="st">&quot;character&quot;</span>, <span class="st">&quot;emotion&quot;</span>, <span class="st">&quot;beautiful&quot;</span>, <span class="st">&quot;imagine&quot;</span>, <span class="st">&quot;dream&quot;</span>)</span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a>  </span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a>  text_lower <span class="ot">&lt;-</span> <span class="fu">tolower</span>(text)</span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>  technical_score <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">sapply</span>(technical_keywords, <span class="cf">function</span>(kw) <span class="fu">grepl</span>(kw, text_lower)))</span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a>  creative_score <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">sapply</span>(creative_keywords, <span class="cf">function</span>(kw) <span class="fu">grepl</span>(kw, text_lower)))</span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a>  </span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a>  <span class="cf">if</span> (technical_score <span class="sc">&gt;</span> creative_score) {</span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a>    <span class="st">&quot;technical&quot;</span></span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (creative_score <span class="sc">&gt;</span> technical_score) {</span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a>    <span class="st">&quot;creative&quot;</span></span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a>    <span class="st">&quot;general&quot;</span></span>
+<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a>  }</span>
+<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a>}</span>
+<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a></span>
+<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a><span class="co"># Create intelligent content processor</span></span>
+<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a>content_processor <span class="ot">&lt;-</span> <span class="fu">when</span>(</span>
+<span id="cb7-43"><a href="#cb7-43" tabindex="-1"></a>  classify_content,</span>
+<span id="cb7-44"><a href="#cb7-44" tabindex="-1"></a>  <span class="at">technical =</span> <span class="fu">step</span>(technical_writer, <span class="at">name =</span> <span class="st">&quot;technical_analysis&quot;</span>),</span>
+<span id="cb7-45"><a href="#cb7-45" tabindex="-1"></a>  <span class="at">creative =</span> <span class="fu">step</span>(creative_writer, <span class="at">name =</span> <span class="st">&quot;creative_analysis&quot;</span>),</span>
+<span id="cb7-46"><a href="#cb7-46" tabindex="-1"></a>  <span class="at">general =</span> <span class="fu">step</span>(data_analyst, <span class="at">name =</span> <span class="st">&quot;general_analysis&quot;</span>)</span>
+<span id="cb7-47"><a href="#cb7-47" tabindex="-1"></a>)</span>
+<span id="cb7-48"><a href="#cb7-48" tabindex="-1"></a></span>
+<span id="cb7-49"><a href="#cb7-49" tabindex="-1"></a><span class="fu">print</span>(content_processor)</span>
+<span id="cb7-50"><a href="#cb7-50" tabindex="-1"></a></span>
+<span id="cb7-51"><a href="#cb7-51" tabindex="-1"></a><span class="co"># Test with different content types</span></span>
+<span id="cb7-52"><a href="#cb7-52" tabindex="-1"></a>technical_text <span class="ot">&lt;-</span> <span class="st">&quot;The algorithm processes data using advanced statistical methods to optimize system performance.&quot;</span></span>
+<span id="cb7-53"><a href="#cb7-53" tabindex="-1"></a>creative_text <span class="ot">&lt;-</span> <span class="st">&quot;The beautiful story unfolds as the character embarks on an emotional journey through imagination.&quot;</span></span>
+<span id="cb7-54"><a href="#cb7-54" tabindex="-1"></a>general_text <span class="ot">&lt;-</span> <span class="st">&quot;The quarterly report shows steady growth across all business segments.&quot;</span></span>
+<span id="cb7-55"><a href="#cb7-55" tabindex="-1"></a></span>
+<span id="cb7-56"><a href="#cb7-56" tabindex="-1"></a>test_texts <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb7-57"><a href="#cb7-57" tabindex="-1"></a>  <span class="at">technical =</span> technical_text,</span>
+<span id="cb7-58"><a href="#cb7-58" tabindex="-1"></a>  <span class="at">creative =</span> creative_text,</span>
+<span id="cb7-59"><a href="#cb7-59" tabindex="-1"></a>  <span class="at">general =</span> general_text</span>
+<span id="cb7-60"><a href="#cb7-60" tabindex="-1"></a>)</span>
+<span id="cb7-61"><a href="#cb7-61" tabindex="-1"></a></span>
+<span id="cb7-62"><a href="#cb7-62" tabindex="-1"></a><span class="cf">for</span> (type <span class="cf">in</span> <span class="fu">names</span>(test_texts)) {</span>
+<span id="cb7-63"><a href="#cb7-63" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">--- Analyzing&quot;</span>, type, <span class="st">&quot;content ---</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb7-64"><a href="#cb7-64" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">execute</span>(content_processor, test_texts[[type]])</span>
+<span id="cb7-65"><a href="#cb7-65" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Analysis result:&quot;</span>, <span class="fu">substr</span>(result, <span class="dv">1</span>, <span class="dv">100</span>), <span class="st">&quot;...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb7-66"><a href="#cb7-66" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="complex-multi-stage-workflows" class="section level2">
+<h2>Complex Multi-Stage Workflows</h2>
+<p>Combine multiple advanced patterns for sophisticated processing:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Multi-stage document processor</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>document_preprocessor <span class="ot">&lt;-</span> <span class="cf">function</span>(doc) {</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Preprocessing document...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="co"># Clean and prepare document</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  cleaned <span class="ot">&lt;-</span> <span class="fu">trimws</span>(doc)</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    <span class="at">content =</span> cleaned,</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    <span class="at">length =</span> <span class="fu">nchar</span>(cleaned),</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="at">word_count =</span> <span class="fu">length</span>(<span class="fu">strsplit</span>(cleaned, <span class="st">&quot;</span><span class="sc">\\</span><span class="st">s+&quot;</span>)[[<span class="dv">1</span>]])</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  )</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>}</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co"># Document classifier based on length and content</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>classify_document <span class="ot">&lt;-</span> <span class="cf">function</span>(doc_info) {</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  <span class="cf">if</span> (doc_info<span class="sc">$</span>word_count <span class="sc">&gt;</span> <span class="dv">100</span>) {</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>    <span class="st">&quot;long_document&quot;</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (doc_info<span class="sc">$</span>word_count <span class="sc">&gt;</span> <span class="dv">20</span>) {</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>    <span class="st">&quot;medium_document&quot;</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>    <span class="st">&quot;short_document&quot;</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>  }</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>}</span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co"># Specialized processors for different document lengths</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a>process_long_document <span class="ot">&lt;-</span> <span class="cf">function</span>(doc_info) {</span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing long document...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a>  <span class="co"># For long documents, do parallel analysis</span></span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a>  <span class="fu">execute</span>(</span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a>    <span class="fu">when</span>(</span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a>      <span class="cf">function</span>(x) <span class="fu">c</span>(<span class="st">&quot;summary&quot;</span>, <span class="st">&quot;keywords&quot;</span>, <span class="st">&quot;sentiment&quot;</span>),</span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a>      <span class="at">summary =</span> <span class="fu">step</span>(<span class="cf">function</span>(x) <span class="fu">paste</span>(<span class="st">&quot;Summary of&quot;</span>, x<span class="sc">$</span>word_count, <span class="st">&quot;words&quot;</span>), <span class="at">name =</span> <span class="st">&quot;summarize&quot;</span>),</span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a>      <span class="at">keywords =</span> <span class="fu">step</span>(<span class="cf">function</span>(x) <span class="fu">c</span>(<span class="st">&quot;key1&quot;</span>, <span class="st">&quot;key2&quot;</span>, <span class="st">&quot;key3&quot;</span>), <span class="at">name =</span> <span class="st">&quot;extract_keywords&quot;</span>),</span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a>      <span class="at">sentiment =</span> <span class="fu">step</span>(<span class="cf">function</span>(x) <span class="st">&quot;neutral&quot;</span>, <span class="at">name =</span> <span class="st">&quot;analyze_sentiment&quot;</span>)</span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a>    ),</span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a>    doc_info</span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a>  )</span>
+<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a>}</span>
+<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a>process_medium_document <span class="ot">&lt;-</span> <span class="cf">function</span>(doc_info) {</span>
+<span id="cb8-40"><a href="#cb8-40" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing medium document...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb8-41"><a href="#cb8-41" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb8-42"><a href="#cb8-42" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">&quot;medium&quot;</span>,</span>
+<span id="cb8-43"><a href="#cb8-43" tabindex="-1"></a>    <span class="at">analysis =</span> <span class="fu">paste</span>(<span class="st">&quot;Medium document with&quot;</span>, doc_info<span class="sc">$</span>word_count, <span class="st">&quot;words&quot;</span>),</span>
+<span id="cb8-44"><a href="#cb8-44" tabindex="-1"></a>    <span class="at">recommendation =</span> <span class="st">&quot;Consider expanding or condensing&quot;</span></span>
+<span id="cb8-45"><a href="#cb8-45" tabindex="-1"></a>  )</span>
+<span id="cb8-46"><a href="#cb8-46" tabindex="-1"></a>}</span>
+<span id="cb8-47"><a href="#cb8-47" tabindex="-1"></a></span>
+<span id="cb8-48"><a href="#cb8-48" tabindex="-1"></a>process_short_document <span class="ot">&lt;-</span> <span class="cf">function</span>(doc_info) {</span>
+<span id="cb8-49"><a href="#cb8-49" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing short document...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb8-50"><a href="#cb8-50" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb8-51"><a href="#cb8-51" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">&quot;short&quot;</span>,</span>
+<span id="cb8-52"><a href="#cb8-52" tabindex="-1"></a>    <span class="at">analysis =</span> <span class="fu">paste</span>(<span class="st">&quot;Short document with&quot;</span>, doc_info<span class="sc">$</span>word_count, <span class="st">&quot;words&quot;</span>),</span>
+<span id="cb8-53"><a href="#cb8-53" tabindex="-1"></a>    <span class="at">recommendation =</span> <span class="st">&quot;Consider expanding content&quot;</span></span>
+<span id="cb8-54"><a href="#cb8-54" tabindex="-1"></a>  )</span>
+<span id="cb8-55"><a href="#cb8-55" tabindex="-1"></a>}</span>
+<span id="cb8-56"><a href="#cb8-56" tabindex="-1"></a></span>
+<span id="cb8-57"><a href="#cb8-57" tabindex="-1"></a><span class="co"># Final formatter</span></span>
+<span id="cb8-58"><a href="#cb8-58" tabindex="-1"></a>format_results <span class="ot">&lt;-</span> <span class="cf">function</span>(analysis) {</span>
+<span id="cb8-59"><a href="#cb8-59" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Formatting final results...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb8-60"><a href="#cb8-60" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb8-61"><a href="#cb8-61" tabindex="-1"></a>    <span class="at">timestamp =</span> <span class="fu">Sys.time</span>(),</span>
+<span id="cb8-62"><a href="#cb8-62" tabindex="-1"></a>    <span class="at">analysis =</span> analysis,</span>
+<span id="cb8-63"><a href="#cb8-63" tabindex="-1"></a>    <span class="at">status =</span> <span class="st">&quot;complete&quot;</span></span>
+<span id="cb8-64"><a href="#cb8-64" tabindex="-1"></a>  )</span>
+<span id="cb8-65"><a href="#cb8-65" tabindex="-1"></a>}</span>
+<span id="cb8-66"><a href="#cb8-66" tabindex="-1"></a></span>
+<span id="cb8-67"><a href="#cb8-67" tabindex="-1"></a><span class="co"># Create complex multi-stage workflow</span></span>
+<span id="cb8-68"><a href="#cb8-68" tabindex="-1"></a>document_pipeline <span class="ot">&lt;-</span> <span class="fu">step</span>(document_preprocessor, <span class="at">name =</span> <span class="st">&quot;preprocess&quot;</span>) <span class="sc">%-&gt;%</span></span>
+<span id="cb8-69"><a href="#cb8-69" tabindex="-1"></a>                    <span class="fu">when</span>(</span>
+<span id="cb8-70"><a href="#cb8-70" tabindex="-1"></a>                      classify_document,</span>
+<span id="cb8-71"><a href="#cb8-71" tabindex="-1"></a>                      <span class="at">long_document =</span> <span class="fu">step</span>(process_long_document, <span class="at">name =</span> <span class="st">&quot;process_long&quot;</span>),</span>
+<span id="cb8-72"><a href="#cb8-72" tabindex="-1"></a>                      <span class="at">medium_document =</span> <span class="fu">step</span>(process_medium_document, <span class="at">name =</span> <span class="st">&quot;process_medium&quot;</span>),</span>
+<span id="cb8-73"><a href="#cb8-73" tabindex="-1"></a>                      <span class="at">short_document =</span> <span class="fu">step</span>(process_short_document, <span class="at">name =</span> <span class="st">&quot;process_short&quot;</span>)</span>
+<span id="cb8-74"><a href="#cb8-74" tabindex="-1"></a>                    ) <span class="sc">%-&gt;%</span></span>
+<span id="cb8-75"><a href="#cb8-75" tabindex="-1"></a>                    <span class="fu">step</span>(format_results, <span class="at">name =</span> <span class="st">&quot;format&quot;</span>)</span>
+<span id="cb8-76"><a href="#cb8-76" tabindex="-1"></a></span>
+<span id="cb8-77"><a href="#cb8-77" tabindex="-1"></a><span class="fu">print</span>(document_pipeline)</span>
+<span id="cb8-78"><a href="#cb8-78" tabindex="-1"></a></span>
+<span id="cb8-79"><a href="#cb8-79" tabindex="-1"></a><span class="co"># Test with documents of different lengths</span></span>
+<span id="cb8-80"><a href="#cb8-80" tabindex="-1"></a>test_documents <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb8-81"><a href="#cb8-81" tabindex="-1"></a>  <span class="at">short =</span> <span class="st">&quot;Brief note.&quot;</span>,</span>
+<span id="cb8-82"><a href="#cb8-82" tabindex="-1"></a>  <span class="at">medium =</span> <span class="st">&quot;This is a medium-length document that contains several sentences and provides a reasonable amount of content for analysis purposes.&quot;</span>,</span>
+<span id="cb8-83"><a href="#cb8-83" tabindex="-1"></a>  <span class="at">long =</span> <span class="fu">paste</span>(<span class="fu">rep</span>(<span class="st">&quot;This is a very long document with many repeated sentences to simulate a lengthy piece of content.&quot;</span>, <span class="dv">10</span>), <span class="at">collapse =</span> <span class="st">&quot; &quot;</span>)</span>
+<span id="cb8-84"><a href="#cb8-84" tabindex="-1"></a>)</span>
+<span id="cb8-85"><a href="#cb8-85" tabindex="-1"></a></span>
+<span id="cb8-86"><a href="#cb8-86" tabindex="-1"></a><span class="cf">for</span> (doc_type <span class="cf">in</span> <span class="fu">names</span>(test_documents)) {</span>
+<span id="cb8-87"><a href="#cb8-87" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">--- Processing&quot;</span>, doc_type, <span class="st">&quot;document ---</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb8-88"><a href="#cb8-88" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">execute</span>(document_pipeline, test_documents[[doc_type]])</span>
+<span id="cb8-89"><a href="#cb8-89" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Processing complete. Result type:&quot;</span>, <span class="fu">class</span>(result), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb8-90"><a href="#cb8-90" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="error-handling-and-fault-tolerance" class="section level2">
+<h2>Error Handling and Fault Tolerance</h2>
+<p>Build robust workflows with error handling:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Safe processor with error handling</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>safe_processor <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.character</span>(data) <span class="sc">&amp;&amp;</span> <span class="fu">nchar</span>(data) <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>      <span class="fu">stop</span>(<span class="st">&quot;Empty string not allowed&quot;</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>    }</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.numeric</span>(data) <span class="sc">&amp;&amp;</span> data <span class="sc">&lt;</span> <span class="dv">0</span>) {</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>      <span class="fu">stop</span>(<span class="st">&quot;Negative numbers not supported&quot;</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>    }</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>    <span class="co"># Normal processing</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>    <span class="fu">paste</span>(<span class="st">&quot;Processed:&quot;</span>, data)</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&quot;Error occurred:&quot;</span>, e<span class="sc">$</span>message, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>    <span class="fu">paste</span>(<span class="st">&quot;Error:&quot;</span>, e<span class="sc">$</span>message)</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>  })</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>}</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="co"># Fallback processor</span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>fallback_processor <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Using fallback processing...</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="st">&quot;Fallback result for:&quot;</span>, <span class="fu">as.character</span>(data))</span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a>}</span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a><span class="co"># Workflow with error handling</span></span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a>robust_workflow <span class="ot">&lt;-</span> <span class="fu">step</span>(safe_processor, <span class="at">name =</span> <span class="st">&quot;safe_process&quot;</span>) <span class="sc">%-&gt;%</span></span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a>                  <span class="fu">when</span>(</span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a>                    <span class="cf">function</span>(result) {</span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a>                      <span class="cf">if</span> (<span class="fu">grepl</span>(<span class="st">&quot;^Error:&quot;</span>, result)) {</span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a>                        <span class="st">&quot;error&quot;</span></span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a>                      } <span class="cf">else</span> {</span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a>                        <span class="st">&quot;success&quot;</span></span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a>                      }</span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a>                    },</span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a>                    <span class="at">error =</span> <span class="fu">step</span>(fallback_processor, <span class="at">name =</span> <span class="st">&quot;fallback&quot;</span>),</span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a>                    <span class="at">success =</span> <span class="fu">step</span>(<span class="cf">function</span>(x) <span class="fu">paste</span>(<span class="st">&quot;Success:&quot;</span>, x), <span class="at">name =</span> <span class="st">&quot;finalize&quot;</span>)</span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1"></a>                  )</span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a></span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a><span class="fu">print</span>(robust_workflow)</span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a></span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a><span class="co"># Test error handling</span></span>
+<span id="cb9-41"><a href="#cb9-41" tabindex="-1"></a>test_inputs <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;valid input&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="sc">-</span><span class="dv">5</span>, <span class="dv">42</span>)</span>
+<span id="cb9-42"><a href="#cb9-42" tabindex="-1"></a><span class="cf">for</span> (input <span class="cf">in</span> test_inputs) {</span>
+<span id="cb9-43"><a href="#cb9-43" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">--- Testing input:&quot;</span>, <span class="fu">as.character</span>(input), <span class="st">&quot;---</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb9-44"><a href="#cb9-44" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">execute</span>(robust_workflow, input)</span>
+<span id="cb9-45"><a href="#cb9-45" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">&quot;Result:&quot;</span>, result, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb9-46"><a href="#cb9-46" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="best-practices-for-advanced-workflows" class="section level2">
+<h2>Best Practices for Advanced Workflows</h2>
+<div id="design-clear-condition-functions" class="section level3">
+<h3>1. Design Clear Condition Functions</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Good: Clear, single-purpose condition</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>classify_by_size <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(data) <span class="sc">&gt;</span> <span class="dv">1000</span>) <span class="st">&quot;large&quot;</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span> (<span class="fu">length</span>(data) <span class="sc">&gt;</span> <span class="dv">100</span>) <span class="st">&quot;medium&quot;</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="cf">else</span> <span class="st">&quot;small&quot;</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>}</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co"># Good: Descriptive branch names</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>size_router <span class="ot">&lt;-</span> <span class="fu">when</span>(</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>  classify_by_size,</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>  <span class="at">large =</span> <span class="fu">step</span>(batch_processor, <span class="at">name =</span> <span class="st">&quot;batch_process&quot;</span>),</span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  <span class="at">medium =</span> <span class="fu">step</span>(standard_processor, <span class="at">name =</span> <span class="st">&quot;standard_process&quot;</span>),</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>  <span class="at">small =</span> <span class="fu">step</span>(quick_processor, <span class="at">name =</span> <span class="st">&quot;quick_process&quot;</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="handle-edge-cases" class="section level3">
+<h3>2. Handle Edge Cases</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># Always include fallback branches</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>robust_classifier <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(data)) <span class="fu">return</span>(<span class="st">&quot;null&quot;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(data) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="st">&quot;empty&quot;</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.character</span>(data)) <span class="fu">return</span>(<span class="st">&quot;text&quot;</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.numeric</span>(data)) <span class="fu">return</span>(<span class="st">&quot;number&quot;</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="st">&quot;unknown&quot;</span>  <span class="co"># Fallback for unexpected types</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="use-meaningful-names" class="section level3">
+<h3>3. Use Meaningful Names</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Good: Descriptive workflow and step names</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>data_pipeline <span class="ot">&lt;-</span> <span class="fu">step</span>(validate_input, <span class="at">name =</span> <span class="st">&quot;validate&quot;</span>) <span class="sc">%-&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>                <span class="fu">when</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>                  classify_data_complexity,</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>                  <span class="at">simple =</span> <span class="fu">step</span>(fast_processor, <span class="at">name =</span> <span class="st">&quot;fast_track&quot;</span>),</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>                  <span class="at">complex =</span> <span class="fu">step</span>(thorough_processor, <span class="at">name =</span> <span class="st">&quot;deep_analysis&quot;</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>                ) <span class="sc">%-&gt;%</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>                <span class="fu">step</span>(format_output, <span class="at">name =</span> <span class="st">&quot;finalize&quot;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>Advanced workflows in llmr provide powerful capabilities for building
+sophisticated data processing systems:</p>
+<ul>
+<li><strong><code>when()</code> enables conditional branching</strong>
+based on data characteristics</li>
+<li><strong>Parallel processing</strong> executes multiple branches
+simultaneously</li>
+<li><strong>Dynamic routing</strong> adapts workflow behavior to input
+data</li>
+<li><strong>Multi-stage patterns</strong> combine preprocessing,
+analysis, and post-processing</li>
+<li><strong>Error handling</strong> creates robust, fault-tolerant
+workflows</li>
+<li><strong>Agent integration</strong> adds intelligent decision-making
+capabilities</li>
+</ul>
+<p>These patterns can be combined to create highly sophisticated,
+adaptive processing systems that handle complex real-world scenarios
+with intelligence and resilience.</p>
+</div>
+<div id="whats-next" class="section level2">
+<h2>What’s Next?</h2>
+<p>With these advanced patterns, you can build: - <strong>Intelligent
+document processing systems</strong> - <strong>Adaptive data analysis
+pipelines</strong> - <strong>Multi-modal content processors</strong> -
+<strong>Fault-tolerant production workflows</strong> -
+<strong>AI-powered decision trees</strong></p>
+<p>The combination of conditional logic, parallel processing, and AI
+agents makes llmr workflows incredibly powerful for tackling complex,
+real-world data processing challenges.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

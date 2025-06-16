@@ -44,9 +44,7 @@
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/message.html</loc></url>
 <url><loc>/reference/new_agent.html</loc></url>
-<url><loc>/reference/new_anthropic.html</loc></url>
 <url><loc>/reference/new_anthropic_config.html</loc></url>
-<url><loc>/reference/new_openai.html</loc></url>
 <url><loc>/reference/new_openai_config.html</loc></url>
 <url><loc>/reference/new_provider_config.html</loc></url>
 <url><loc>/reference/nullOrValue.html</loc></url>
