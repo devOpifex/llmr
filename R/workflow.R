@@ -99,12 +99,19 @@ print.workflow_step <- function(x, ...) {
   if (inherits(lhs, "workflow_step") && inherits(rhs, "workflow_step")) {
     # step %->% step: create new workflow
     create_workflow_from_steps(lhs, rhs)
+  } else if (inherits(lhs, "workflow_step") && inherits(rhs, "workflow_when")) {
+    # step %->% when(): create workflow with step, then add branch
+    workflow <- create_workflow_from_step(lhs)
+    add_branch_to_workflow(workflow, rhs)
   } else if (inherits(lhs, "workflow") && inherits(rhs, "workflow_step")) {
     # workflow %->% step: add step to workflow
     add_step_to_workflow(lhs, rhs)
   } else if (inherits(lhs, "workflow") && inherits(rhs, "workflow_when")) {
     # workflow %->% when(): handle branching
     add_branch_to_workflow(lhs, rhs)
+  } else if (inherits(lhs, "workflow_when") && inherits(rhs, "workflow_step")) {
+    # when() %->% step: this should not happen directly, but handle gracefully
+    stop("Cannot directly connect when() to step. Use: step %->% when(...) %->% step")
   } else {
     stop("Invalid workflow pipe operation: cannot connect ", 
          class(lhs)[1], " to ", class(rhs)[1])
@@ -117,6 +124,12 @@ create_workflow_from_steps <- function(step1, step2) {
   workflow <- new_workflow()
   workflow <- add_step_to_workflow(workflow, step1)
   workflow <- add_step_to_workflow(workflow, step2)
+  workflow
+}
+
+create_workflow_from_step <- function(step) {
+  workflow <- new_workflow()
+  workflow <- add_step_to_workflow(workflow, step)
   workflow
 }
 
@@ -218,7 +231,9 @@ add_branch_to_workflow <- function(workflow, when_obj) {
     
     if (inherits(branch_content, "workflow_step")) {
       # Single step branch
-      step_id <- add_step_to_empty_workflow(workflow, branch_content)
+      result <- add_step_to_empty_workflow(workflow, branch_content)
+      workflow <- result$workflow
+      step_id <- result$step_id
       workflow$edges <- append(workflow$edges, 
         list(list(from = condition_id, to = step_id, branch = branch_name)))
       branch_exits <- c(branch_exits, step_id)
@@ -245,7 +260,7 @@ generate_condition_id <- function(workflow) {
 add_step_to_empty_workflow <- function(workflow, step) {
   step_id <- generate_step_id(workflow, step)
   workflow$nodes[[step_id]] <- step
-  step_id
+  list(workflow = workflow, step_id = step_id)
 }
 
 merge_branch_workflow <- function(main_workflow, branch_workflow, condition_id, branch_name) {
