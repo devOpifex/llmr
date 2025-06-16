@@ -474,10 +474,16 @@ execute_node <- function(workflow, node_id, input) {
   }
 
   node <- workflow$nodes[[node_id]]
+  
+  # Log node execution start
+  node_name <- if (!is.null(node$name)) node$name else node_id
+  log("workflow", "Executing node: %s", node_name)
 
   if (inherits(node, "workflow_condition_node")) {
     # Handle condition node - execute branches and return named list
     selected_branches <- node$condition_fn(input)
+    log("workflow", "Condition node '%s' selected branches: %s", 
+        node_name, paste(selected_branches, collapse = ", "))
 
     # Get edges for selected branches
     condition_edges <- get_conditional_edges(
@@ -487,6 +493,7 @@ execute_node <- function(workflow, node_id, input) {
     )
 
     if (length(condition_edges) == 0) {
+      log("workflow", "No branches selected for condition node '%s'", node_name)
       return(list()) # No branches selected, return empty named list
     }
 
@@ -495,6 +502,7 @@ execute_node <- function(workflow, node_id, input) {
     for (edge in condition_edges) {
       branch_name <- edge$branch
       next_node_id <- edge$to
+      log("workflow", "Executing branch '%s' -> node '%s'", branch_name, next_node_id)
       branch_results[[branch_name]] <- execute_node(
         workflow,
         next_node_id,
@@ -555,7 +563,14 @@ execute_step.agent_step <- function(step, input) {
       }
 
       response <- request(step$handler, message)
-      response$content
+      # Extract content from the last message in the agent's conversation
+      messages <- response$env$messages
+      if (length(messages) > 0) {
+        last_message <- messages[[length(messages)]]
+        last_message$content
+      } else {
+        NULL
+      }
     },
     error = function(e) {
       stop("Error in agent step '", step$name, "': ", e$message)
