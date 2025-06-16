@@ -7,7 +7,7 @@
 lhs \%->\% rhs
 }
 \arguments{
-\item{lhs}{Left-hand side (step or workflow)}
+\item{lhs}{Left-hand side (step, workflow, or when)}
 
 \item{rhs}{Right-hand side (step, workflow, or when)}
 }
@@ -16,5 +16,6 @@ A workflow object
 }
 \description{
 Chains workflow steps together to create execution flows. Can connect
-steps to steps, steps to workflows, or workflows to steps.
+steps to steps, steps to workflows, workflows to steps, or start workflows
+with conditional branching.
 }

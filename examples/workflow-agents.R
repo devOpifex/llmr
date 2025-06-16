@@ -27,16 +27,20 @@ set_system_prompt(
   "You are a formatter. Format text into structured output."
 )
 
-# Create workflow steps from agents
-summary_step <- step(summarizer, name = "summarize")
-analysis_step <- step(analyzer, name = "analyze_sentiment")
-format_step <- step(formatter, name = "format_output")
-
 # Create a linear workflow: summarize -> analyze -> format
-agent_workflow <- summary_step %->% analysis_step %->% format_step
+agent_workflow <- step(summarizer, name = "summarize") %->%
+  step(analyzer, name = "analyze_sentiment") %->%
+  step(formatter, name = "format_output")
 
 cat("Created agent workflow:\n")
 print(agent_workflow)
+
+result <- execute(
+  agent_workflow,
+  "This is some nice text about the Napoleonic and the French Revolution."
+)
+
+print(result)
 
 # Example with conditional branching based on text length
 text_router <- function(text) {
@@ -79,16 +83,7 @@ branching_workflow <- step(preprocessor, name = "preprocess") %->%
 cat("\nCreated branching agent workflow:\n")
 print(branching_workflow)
 
-# Example execution (commented out since it requires API key)
-# sample_text <- "This is a sample text for processing through our agent workflow."
-# cat("\nExecuting workflow with sample text...\n")
-# result <- execute(agent_workflow, sample_text)
-# cat("Result:", result, "\n")
-
-cat("\nTo run this example:\n")
-cat("1. Set your API key: set_api_key('your-key')\n")
-cat("2. Execute: result <- execute(agent_workflow, 'your text here')\n")
-
-result <- execute(agent_workflow, "This is some text")
-
-print(result)
+result <- execute(
+  branching_workflow,
+  "This is some nice text about the Napoleonic and the French Revolution."
+)
