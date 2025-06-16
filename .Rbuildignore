@@ -5,3 +5,7 @@
 ^CONTEXT\.md$
 ^\.opencode$
 ^examples$
+^docs$
+^pkgdown$
+^doc$
+^Meta$

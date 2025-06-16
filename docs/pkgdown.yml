@@ -1,5 +1,9 @@
 pandoc: 3.1.3
 pkgdown: 2.1.2
 pkgdown_sha: ~
-articles: {}
-last_built: 2025-06-16T19:15Z
+articles:
+  advanced-workflows: advanced-workflows.html
+  get-started: get-started.html
+  mcp-integration: mcp-integration.html
+  workflow-basics: workflow-basics.html
+last_built: 2025-06-16T21:16Z

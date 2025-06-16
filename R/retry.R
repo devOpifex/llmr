@@ -4,6 +4,7 @@
 #'
 #' @param x An object of class `provider` or `agent`.
 #' @param max_tries Maximum number of retry attempts (default: 3).
+#' @param ... Additional retry parameters.
 #'
 #' @return The provider object with updated retry settings.
 #'

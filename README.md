@@ -136,6 +136,28 @@ response <- request(
 cat(response$content)
 ```
 
+## Workflows
+
+Chain together processing steps and agents into workflows:
+
+```r
+library(llmr)
+
+# Define processing functions
+add_ten <- function(x) x + 10
+multiply_two <- function(x) x * 2
+
+# Create workflow steps
+step1 <- step(add_ten)
+step2 <- step(multiply_two)
+
+# Chain steps together
+workflow <- step1 %->% step2
+
+# Execute workflow
+result <- execute(workflow, 5)  # Returns 30: (5 + 10) * 2
+```
+
 ## Configuration
 
 ```r
