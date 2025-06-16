@@ -85,7 +85,7 @@ format_result <- function(x) {
 # Create branching workflow
 branching_workflow <- step(generate_random_value) %->%
   when(
-    check_value,  # Use check_value as the condition function
+    check_value, # Use check_value as the condition function
     high = step(process_high),
     medium = step(process_medium),
     low = step(process_low)
@@ -145,8 +145,13 @@ combine_analysis <- function(results) {
   )
 }
 
+generate_string <- function(x) {
+  cat("Generating random string\n")
+  paste(sample(letters, 10), collapse = "")
+}
+
 # Create parallel workflow
-text_analysis_workflow <- step(identity) %->% # Pass through input
+text_analysis_workflow <- step(generate_string) %->% # Pass through input
   when(
     function(text) c("sentiment", "word_count", "keywords"), # Execute all branches
     sentiment = step(sentiment_analysis),
@@ -297,4 +302,3 @@ cat("\n=== Workflow Examples Complete ===\n")
 # #
 # # result <- execute(mixed_workflow, "Hello world")
 # # cat("Mixed workflow result:", result, "\n")
-
