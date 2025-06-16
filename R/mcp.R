@@ -35,7 +35,7 @@ register_mcp.agent <- function(x, mcp) {
 
 namespace <- function(mcp, tools) {
   lapply(tools, function(tool) {
-    tool$name <- sprintf("%s__%s", attr(mcp, "name"), tool$name)
+    tool$name <- sprintf("%s__%s", mcpr::get_name(mcp), tool$name)
     tool
   })
 }

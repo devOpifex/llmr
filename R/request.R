@@ -170,7 +170,12 @@ handle_response.provider_anthropic <- function(
   )
 
   if (length(response$stop_reason) && response$stop_reason == "tool_use") {
-    tool_response <- handle_tool_use(x, response, tools = agent$env$tools)
+    tool_response <- handle_tool_use(
+      x,
+      response,
+      tools = agent$env$tools,
+      mcps = agent$env$mcps
+    )
 
     if (!length(tool_response)) {
       return(response)
@@ -224,7 +229,12 @@ handle_response.provider_openai <- function(
       response$choices[[1]]$finish_reason == "tool_calls"
   ) {
     # Process tool calls
-    tool_responses <- handle_tool_use(x, response, tools = agent$env$tools)
+    tool_responses <- handle_tool_use(
+      x,
+      response,
+      tools = agent$env$tools,
+      mcps = agent$env$mcps
+    )
 
     if (length(tool_responses) == 0) {
       return(response)
@@ -256,7 +266,7 @@ handle_response.provider_openai <- function(
 #'
 #' @return A formatted tool response
 #' @export
-handle_tool_use <- function(provider, response, tools) {
+handle_tool_use <- function(provider, response, tools, mcps) {
   UseMethod("handle_tool_use")
 }
 
@@ -265,7 +275,8 @@ handle_tool_use <- function(provider, response, tools) {
 handle_tool_use.provider_anthropic <- function(
   provider,
   response,
-  tools = NULL
+  tools = NULL,
+  mcps = NULL
 ) {
   results <- lapply(response$content, function(message) {
     if (!length(message$type)) {
@@ -326,7 +337,7 @@ handle_tool_use.provider_anthropic <- function(
         actual_tool_name <- parts[2]
 
         # Find the appropriate MCP
-        mcp <- find_mcp_by_name(provider, mcp_name)
+        mcp <- find_mcp_by_name(mcps, mcp_name)
 
         if (is.null(mcp)) {
           warning(sprintf("MCP '%s' not found", mcp_name))
@@ -350,7 +361,7 @@ handle_tool_use.provider_anthropic <- function(
             result <- mcpr::tools_call(
               mcp,
               params,
-              tool_call$id
+              id = tool_call$id
             )
 
             # Return the tool result
@@ -384,7 +395,12 @@ handle_tool_use.provider_anthropic <- function(
 
 #' @export
 #' @method handle_tool_use provider_openai
-handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
+handle_tool_use.provider_openai <- function(
+  provider,
+  response,
+  tools = NULL,
+  mcps = NULL
+) {
   # Extract the tool calls from the OpenAI response
   if (
     length(response$choices) == 0 ||
@@ -426,7 +442,7 @@ handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
       actual_tool_name <- parts[2]
 
       # Find the appropriate MCP
-      mcp <- find_mcp_by_name(provider$env, mcp_name)
+      mcp <- find_mcp_by_name(mcps, mcp_name)
 
       # If MCP not found, return error
       if (is.null(mcp)) {
@@ -499,7 +515,7 @@ handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
     handler <- attr(tool, "handler")
 
     # Call the tool handler and return result
-    return(tryCatch(
+    tryCatch(
       {
         result <- handler(arguments)
 
@@ -517,7 +533,7 @@ handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
           content = sprintf("Error calling tool: %s", e$message)
         )
       }
-    ))
+    )
   })
 
   # Return list of tool results
@@ -530,13 +546,13 @@ handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
 #' @param name The name of the MCP to find.
 #'
 #' @return An MCP object or NULL if not found
-find_mcp_by_name <- function(env, name) {
-  if (is.null(env$mcps)) {
+find_mcp_by_name <- function(mcps, name) {
+  if (!length(mcps)) {
     return(NULL)
   }
 
-  for (mcp in env$mcps) {
-    if (attr(mcp, "name") == name) {
+  for (mcp in mcps) {
+    if (mcpr::get_name(mcp) == name) {
       return(mcp)
     }
   }

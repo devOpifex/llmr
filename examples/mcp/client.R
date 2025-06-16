@@ -1,6 +1,6 @@
 devtools::load_all()
 
-provider <- new_openai()
+provider <- new_anthropic()
 set_retry(provider, max_tries = 5)
 
 client <- mcpr::new_client_io(
@@ -9,7 +9,7 @@ client <- mcpr::new_client_io(
   name = "calculator"
 )
 
-agent <- new_agent("Weather forecaster", provider)
+agent <- new_agent("Weather forecaster and calculator", provider)
 
 register_mcp(agent, client)
 
@@ -34,5 +34,6 @@ add_tool(
 )
 
 
-request(agent, new_message("What's the weather like in New York?"))
+#request(agent, new_message("What's the weather like in New York?"))
+request(agent, new_message("Subtract 5 from 10"))
 get_messages(agent)
