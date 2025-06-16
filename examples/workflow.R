@@ -1,7 +1,5 @@
 devtools::load_all()
 
-# Example 1: Basic Linear Workflow with Functions ===========================
-
 cat("=== Example 1: Basic Linear Workflow ===\n")
 
 # Define some simple processing functions
@@ -160,6 +158,9 @@ text_analysis_workflow <- step(generate_string) %->% # Pass through input
   ) %->%
   step(combine_analysis)
 
+cat("Created text analysis workflow:\n")
+print(text_analysis_workflow)
+
 # Test parallel processing
 sample_text <- "This is a wonderful example of text analysis using workflows in R"
 cat("Analyzing text:", sample_text, "\n")
@@ -168,137 +169,3 @@ cat("Analysis complete:\n")
 str(analysis_result)
 
 # Example 4: Complex Multi-Stage Workflow ===================================
-
-cat("\n=== Example 4: Complex Multi-Stage Workflow ===\n")
-
-# Data validation function
-validate_data <- function(data) {
-  cat("Validating data...\n")
-  if (is.numeric(data) && length(data) > 0) {
-    list(data = data, valid = TRUE, needs_cleaning = any(is.na(data)))
-  } else {
-    list(data = data, valid = FALSE, needs_cleaning = TRUE)
-  }
-}
-
-# Data cleaning function
-clean_data <- function(result) {
-  cat("Cleaning data...\n")
-  if (result$valid) {
-    cleaned_data <- result$data[!is.na(result$data)]
-    list(data = cleaned_data, valid = TRUE, needs_cleaning = FALSE)
-  } else {
-    result
-  }
-}
-
-# Statistical analysis functions
-basic_stats <- function(result) {
-  cat("Computing basic statistics...\n")
-  if (result$valid && length(result$data) > 0) {
-    list(
-      mean = mean(result$data),
-      median = median(result$data),
-      sd = sd(result$data),
-      min = min(result$data),
-      max = max(result$data)
-    )
-  } else {
-    list(error = "Invalid data for analysis")
-  }
-}
-
-advanced_stats <- function(result) {
-  cat("Computing advanced statistics...\n")
-  if (result$valid && length(result$data) > 2) {
-    list(
-      mean = mean(result$data),
-      median = median(result$data),
-      sd = sd(result$data),
-      skewness = sum((result$data - mean(result$data))^3) /
-        (length(result$data) * sd(result$data)^3),
-      kurtosis = sum((result$data - mean(result$data))^4) /
-        (length(result$data) * sd(result$data)^4) -
-        3
-    )
-  } else {
-    basic_stats(result)
-  }
-}
-
-# Report generation
-generate_report <- function(stats) {
-  cat("Generating report...\n")
-  if ("error" %in% names(stats)) {
-    paste("Analysis failed:", stats$error)
-  } else {
-    paste(
-      "Statistical Report:",
-      sprintf("Mean: %.2f", stats$mean),
-      sprintf("Median: %.2f", stats$median),
-      sprintf("SD: %.2f", stats$sd),
-      sep = "\n"
-    )
-  }
-}
-
-# Create complex workflow with multiple decision points
-data_analysis_workflow <- step(validate_data) %->%
-  when(
-    function(result) if (result$needs_cleaning) "clean" else "process",
-    clean = step(clean_data),
-    process = step(identity) # Pass through unchanged
-  ) %->%
-  when(
-    function(result) {
-      if (!result$valid) {
-        return("error")
-      }
-      if (length(result$data) > 10) "advanced" else "basic"
-    },
-    error = step(function(x) list(error = "Cannot analyze invalid data")),
-    basic = step(basic_stats),
-    advanced = step(advanced_stats)
-  ) %->%
-  step(generate_report)
-
-# Test with different datasets
-cat("Testing complex workflow:\n")
-
-# Test 1: Clean data, large dataset
-test_data1 <- rnorm(20, mean = 50, sd = 10)
-cat("\n--- Test 1: Clean large dataset ---\n")
-result1 <- execute(data_analysis_workflow, test_data1)
-cat(result1, "\n")
-
-# Test 2: Data with missing values, small dataset
-test_data2 <- c(1, 2, NA, 4, 5)
-cat("\n--- Test 2: Small dataset with missing values ---\n")
-result2 <- execute(data_analysis_workflow, test_data2)
-cat(result2, "\n")
-
-# Test 3: Invalid data
-test_data3 <- "invalid data"
-cat("\n--- Test 3: Invalid data ---\n")
-result3 <- execute(data_analysis_workflow, test_data3)
-cat(result3, "\n")
-
-cat("\n=== Workflow Examples Complete ===\n")
-
-# Example 5: Workflow with Agent Integration (commented out - requires API key)
-#
-# cat("\n=== Example 5: Agent Integration ===\n")
-#
-# # This example shows how to integrate agents into workflows
-# # Uncomment and set API key to test
-#
-# # set_api_key("your-api-key-here")
-# # text_agent <- new_agent("text_processor")
-# #
-# # # Create workflow mixing functions and agents
-# # mixed_workflow <- step(function(x) paste("Process this text:", x)) %->%
-# #   step(text_agent) %->%
-# #   step(function(x) paste("Agent response:", x))
-# #
-# # result <- execute(mixed_workflow, "Hello world")
-# # cat("Mixed workflow result:", result, "\n")

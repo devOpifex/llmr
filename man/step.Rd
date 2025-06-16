@@ -10,8 +10,6 @@ step(x, ...)
 \item{x}{An agent or function to use as a step}
 
 \item{...}{Additional arguments}
-
-\item{name}{Optional name for the step}
 }
 \value{
 A workflow step object

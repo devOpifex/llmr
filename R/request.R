@@ -310,6 +310,7 @@ handle_tool_use.provider_anthropic <- function(
       # Call the tool handler
       tryCatch(
         {
+          cat("[TOOL] Calling tool:", tool_name, "\n")
           result <- handler(tool_call$input)
 
           # Return the tool result
@@ -359,6 +360,11 @@ handle_tool_use.provider_anthropic <- function(
         # Call the tool
         tryCatch(
           {
+            cat(sprintf(
+              "[TOOL] Calling MCP (%s) tool: %s\n",
+              mcp_name,
+              actual_tool_name
+            ))
             result <- mcpr::tools_call(
               mcp,
               params,
@@ -469,6 +475,11 @@ handle_tool_use.provider_openai <- function(
       # Call the tool via MCP and return result
       return(tryCatch(
         {
+          cat(sprintf(
+            "[TOOL] Calling MCP (%s) tool: %s\n",
+            mcp_name,
+            actual_tool_name
+          ))
           result <- mcpr::tools_call(
             mcp,
             params,
@@ -524,6 +535,7 @@ handle_tool_use.provider_openai <- function(
     # Call the tool handler and return result
     tryCatch(
       {
+        cat("[TOOL] Calling tool:", tool_name, "\n")
         result <- handler(arguments)
 
         list(
