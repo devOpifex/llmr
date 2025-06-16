@@ -15,7 +15,9 @@ new_message <- function(
   content,
   role = "user",
   tool_calls = NULL,
-  tool_call_id = NULL
+  tool_call_id = NULL,
+  tool_use_id = NULL,
+  type = NULL
 ) {
   message <- list(
     role = role,
@@ -32,10 +34,23 @@ new_message <- function(
     message$tool_call_id <- tool_call_id
   }
 
+  if (!is.null(tool_use_id)) {
+    message$tool_use_id <- tool_use_id
+  }
+
+  if (!is.null(type)) {
+    message$type <- type
+  }
+
   structure(
     message,
     class = c("message", "list")
   )
+}
+
+as_message <- function(x) {
+  class(x) <- c("message", "list")
+  x
 }
 
 #' Clear messages

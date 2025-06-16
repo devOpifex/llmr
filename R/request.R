@@ -22,11 +22,6 @@ request.agent <- function(x, message = NULL, ...) {
     tools = x$env$tools
   )
 
-  x <- append_message(
-    x,
-    new_message(response$content, role = "assistant")
-  )
-
   # Handle the response (for tool_use etc.)
   handle_response(x$provider, x, response)
 
@@ -99,7 +94,7 @@ request.provider_openai <- function(x, message, tools = NULL) {
   body <- list(
     model = attr(x, "model"),
     max_tokens = attr(x, "max_tokens"),
-    messages = x$env$messages
+    messages = message
   )
 
   # Add temperature if available
@@ -108,8 +103,8 @@ request.provider_openai <- function(x, message, tools = NULL) {
   }
 
   # Add tools if available
-  if (length(provider$env$tools)) {
-    body$tools <- x$env$tools
+  if (length(tools)) {
+    body$tools <- tools
   }
 
   req <- httr2::request(provider$url) |>
@@ -123,7 +118,7 @@ request.provider_openai <- function(x, message, tools = NULL) {
 
   # Apply retry configuration if available
   if (length(provider$env$retry)) {
-    req <- req |> httr2::req_retry(max_tries = provider$env$retry$max_tries)
+    req <- req |> httr2::req_retry(max_tries = x$env$retry$max_tries)
   }
 
   response <- tryCatch(
@@ -144,35 +139,7 @@ request.provider_openai <- function(x, message, tools = NULL) {
     )
   }
 
-  response <- httr2::resp_body_json(response)
-
-  # Extract the assistant's message from OpenAI response
-  assistant_message <- response$choices[[1]]$message
-
-  # Add the assistant message to the conversation history
-  if (
-    !is.null(assistant_message$tool_calls) &&
-      length(assistant_message$tool_calls) > 0
-  ) {
-    # For messages with tool calls
-    provider <- append_message(
-      provider,
-      new_message(
-        content = assistant_message$content,
-        role = "assistant",
-        tool_calls = assistant_message$tool_calls
-      )
-    )
-  } else if (!is.null(assistant_message$content)) {
-    # For regular text responses
-    provider <- append_message(
-      provider,
-      new_message(assistant_message$content, role = "assistant")
-    )
-  }
-
-  # Handle the response (for tool_use etc.)
-  handle_response(provider, response)
+  httr2::resp_body_json(response)
 }
 
 #' Handle response from an LLM provider
@@ -196,6 +163,11 @@ handle_response.provider_anthropic <- function(
   response,
   loop = TRUE
 ) {
+  agent <- append_message(
+    agent,
+    new_message(response$content, role = "assistant")
+  )
+
   if (length(response$stop_reason) && response$stop_reason == "tool_use") {
     tool_response <- handle_tool_use(x, response, tools = agent$env$tools)
 
@@ -221,6 +193,26 @@ handle_response.provider_openai <- function(
   response,
   loop = TRUE
 ) {
+  if (
+    !is.null(response$tool_calls) &&
+      length(response$tool_calls) > 0
+  ) {
+    # For messages with tool calls
+    agent <- append_message(
+      agent,
+      new_message(
+        content = response$content,
+        role = "assistant",
+        tool_calls = response$tool_calls
+      )
+    )
+  } else if (!is.null(response$content)) {
+    agent <- append_message(
+      agent,
+      new_message(response$content, role = "assistant")
+    )
+  }
+
   # Check if the response contains tool calls
   if (
     length(response$choices) > 0 &&
@@ -237,7 +229,7 @@ handle_response.provider_openai <- function(
     for (tool_response in tool_responses) {
       agent <- append_message(
         agent,
-        tool_response
+        as_message(tool_response)
       )
     }
 
@@ -245,8 +237,6 @@ handle_response.provider_openai <- function(
       return(tool_responses)
     }
 
-    # Continue the conversation with the LLM by sending an empty message
-    # with all current messages (including tool responses)
     return(request(agent))
   }
 
@@ -286,11 +276,13 @@ handle_tool_use.provider_anthropic <- function(
       tool <- Filter(function(tool) tool$name == tool_name, tools)
       if (!length(tool)) {
         warning(sprintf("Tool '%s' not found", tool_name))
-        return(list(
-          type = "tool_result",
-          tool_use_id = tool_call$id,
-          content = sprintf("Error: Tool '%s' not found", tool_name)
-        ))
+        return(
+          list(
+            type = "tool_result",
+            tool_use_id = tool_call$id,
+            content = sprintf("Error: Tool '%s' not found", tool_name)
+          )
+        )
       }
 
       tool <- tool[[1]]
@@ -331,11 +323,13 @@ handle_tool_use.provider_anthropic <- function(
 
         if (is.null(mcp)) {
           warning(sprintf("MCP '%s' not found", mcp_name))
-          return(list(
-            type = "tool_result",
-            tool_use_id = tool_call$id,
-            content = sprintf("Error: MCP '%s' not found", mcp_name)
-          ))
+          return(
+            list(
+              type = "tool_result",
+              tool_use_id = tool_call$id,
+              content = sprintf("Error: MCP '%s' not found", mcp_name)
+            )
+          )
         }
 
         params <- list(
@@ -423,11 +417,13 @@ handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
       # If MCP not found, return error
       if (is.null(mcp)) {
         warning(sprintf("MCP '%s' not found", mcp_name))
-        return(list(
-          role = "tool",
-          tool_call_id = tool_id,
-          content = sprintf("Error: MCP '%s' not found", mcp_name)
-        ))
+        return(
+          list(
+            role = "tool",
+            tool_call_id = tool_id,
+            content = sprintf("Error: MCP '%s' not found", mcp_name)
+          )
+        )
       }
 
       # Set up parameters for MCP tool call
@@ -475,11 +471,13 @@ handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
     # If tool not found, return error
     if (!length(tool)) {
       warning(sprintf("Tool '%s' not found", tool_name))
-      return(list(
-        role = "tool",
-        tool_call_id = tool_id,
-        content = sprintf("Error: Tool '%s' not found", tool_name)
-      ))
+      return(
+        list(
+          role = "tool",
+          tool_call_id = tool_id,
+          content = sprintf("Error: Tool '%s' not found", tool_name)
+        )
+      )
     }
 
     # Extract tool and handler
