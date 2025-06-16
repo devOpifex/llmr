@@ -44,7 +44,7 @@ request.provider_anthropic <- function(x, message, ..., tools = NULL) {
 
   # Add temperature if available
   if (!is.null(attr(x, "temperature"))) {
-    body$temperature <- attr(x, "temperature")
+    body$temperature <- attr(x$provider, "temperature")
   }
 
   # Add tools if available
@@ -98,8 +98,8 @@ request.provider_openai <- function(x, message, tools = NULL) {
   )
 
   # Add temperature if available
-  if (!is.null(attr(x$provider, "temperature"))) {
-    body$temperature <- attr(x$provider, "temperature")
+  if (!is.null(attr(x, "temperature"))) {
+    body$temperature <- attr(x, "temperature")
   }
 
   # Add tools if available
@@ -107,17 +107,17 @@ request.provider_openai <- function(x, message, tools = NULL) {
     body$tools <- tools
   }
 
-  req <- httr2::request(provider$url) |>
+  req <- httr2::request(x$url) |>
     httr2::req_url_path(path = "v1/chat/completions") |>
     httr2::req_headers(
       "Content-Type" = "application/json",
-      "Authorization" = sprintf("Bearer %s", attr(provider, "key"))
+      "Authorization" = sprintf("Bearer %s", attr(x, "key"))
     ) |>
     httr2::req_body_json(body) |>
     httr2::req_method("POST")
 
   # Apply retry configuration if available
-  if (length(provider$env$retry)) {
+  if (length(x$env$retry)) {
     req <- req |> httr2::req_retry(max_tries = x$env$retry$max_tries)
   }
 
@@ -193,24 +193,27 @@ handle_response.provider_openai <- function(
   response,
   loop = TRUE
 ) {
-  if (
-    !is.null(response$tool_calls) &&
-      length(response$tool_calls) > 0
-  ) {
+  # Extract the message from the OpenAI response
+  if (length(response$choices) > 0) {
+    message_content <- response$choices[[1]]$message$content
+    tool_calls <- response$choices[[1]]$message$tool_calls
+
     # For messages with tool calls
-    agent <- append_message(
-      agent,
-      new_message(
-        content = response$content,
-        role = "assistant",
-        tool_calls = response$tool_calls
+    if (!is.null(tool_calls) && length(tool_calls) > 0) {
+      agent <- append_message(
+        agent,
+        new_message(
+          content = message_content,
+          role = "assistant",
+          tool_calls = tool_calls
+        )
       )
-    )
-  } else if (!is.null(response$content)) {
-    agent <- append_message(
-      agent,
-      new_message(response$content, role = "assistant")
-    )
+    } else if (!is.null(message_content)) {
+      agent <- append_message(
+        agent,
+        new_message(message_content, role = "assistant")
+      )
+    }
   }
 
   # Check if the response contains tool calls
@@ -379,6 +382,13 @@ handle_tool_use.provider_anthropic <- function(
 #' @method handle_tool_use provider_openai
 handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
   # Extract the tool calls from the OpenAI response
+  if (
+    length(response$choices) == 0 ||
+      is.null(response$choices[[1]]$message$tool_calls)
+  ) {
+    return(list())
+  }
+
   tool_calls <- response$choices[[1]]$message$tool_calls
 
   # Process each tool call
@@ -412,7 +422,7 @@ handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
       actual_tool_name <- parts[2]
 
       # Find the appropriate MCP
-      mcp <- find_mcp_by_name(provider, mcp_name)
+      mcp <- find_mcp_by_name(provider$env, mcp_name)
 
       # If MCP not found, return error
       if (is.null(mcp)) {
@@ -512,12 +522,16 @@ handle_tool_use.provider_openai <- function(provider, response, tools = NULL) {
 
 #' Find an MCP by name
 #'
-#' @param provider An object of class `provider`.
+#' @param env An environment containing MCPs
 #' @param name The name of the MCP to find.
 #'
 #' @return An MCP object or NULL if not found
-find_mcp_by_name <- function(provider, name) {
-  for (mcp in provider$env$mcps) {
+find_mcp_by_name <- function(env, name) {
+  if (is.null(env$mcps)) {
+    return(NULL)
+  }
+
+  for (mcp in env$mcps) {
     if (attr(mcp, "name") == name) {
       return(mcp)
     }

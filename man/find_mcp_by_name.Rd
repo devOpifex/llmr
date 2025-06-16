@@ -4,10 +4,10 @@
 \alias{find_mcp_by_name}
 \title{Find an MCP by name}
 \usage{
-find_mcp_by_name(provider, name)
+find_mcp_by_name(env, name)
 }
 \arguments{
-\item{provider}{An object of class \code{provider}.}
+\item{env}{An environment containing MCPs}
 
 \item{name}{The name of the MCP to find.}
 }

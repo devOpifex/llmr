@@ -5,7 +5,14 @@
 \alias{new_message}
 \title{Create a message}
 \usage{
-new_message(content, role = "user", tool_calls = NULL, tool_call_id = NULL)
+new_message(
+  content,
+  role = "user",
+  tool_calls = NULL,
+  tool_call_id = NULL,
+  tool_use_id = NULL,
+  type = NULL
+)
 }
 \arguments{
 \item{content}{Content of the message}

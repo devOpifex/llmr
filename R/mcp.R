@@ -30,7 +30,7 @@ register_mcp.agent <- function(x, mcp) {
   tools <- namespace(mcp, tools)
   x$env$tools <- c(x$env$tools, tools)
 
-  invisible(provider)
+  invisible(x)
 }
 
 namespace <- function(mcp, tools) {
