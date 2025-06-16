@@ -4,12 +4,14 @@
 \alias{set_retry}
 \title{Set Retry Parameters for LLM Provider}
 \usage{
-set_retry(x, max_tries = 3)
+set_retry(x, max_tries = 3, ...)
 }
 \arguments{
 \item{x}{An object of class \code{provider} or \code{agent}.}
 
 \item{max_tries}{Maximum number of retry attempts (default: 3).}
+
+\item{...}{Additional retry parameters.}
 }
 \value{
 The provider object with updated retry settings.

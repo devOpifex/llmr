@@ -1,0 +1,160 @@
+---
+title: "Get Started with llmr"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get Started with llmr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Introduction
+
+The **llmr** package provides a flexible R interface to large language models (LLMs) with support for multiple providers, conversation management, and tool use. This vignette will get you started with the basics: creating an agent and equipping it with a simple calculator tool.
+
+## What You'll Learn
+
+By the end of this guide, you'll understand how to:
+
+- Set up an LLM provider (Anthropic's Claude)
+- Create an AI agent
+- Add a calculator tool to your agent
+- Have a conversation where the agent can perform calculations
+
+## Prerequisites
+
+Before you begin, you'll need:
+
+1. **An API key** from a supported LLM provider (we'll use Anthropic's Claude in this example)
+2. **The mcpr package** installed (for creating tools)
+
+```{r setup}
+library(llmr)
+library(mcpr)
+```
+
+## Step 1: Set Up Your Provider
+
+First, you need to configure your LLM provider. We'll use Anthropic's Claude, but llmr also supports OpenAI.
+
+```{r provider-setup}
+# Create a provider instance
+provider <- new_anthropic()
+```
+
+**Important:** Replace `"your-anthropic-api-key-here"` with your actual Anthropic API key. You can get one from [Anthropic's website](https://console.anthropic.com/).
+
+## Step 2: Create Your First Agent
+
+An agent is an AI assistant that can use tools to help solve problems. Let's create a simple calculator agent:
+
+```{r create-agent}
+# Create an agent with a descriptive name
+agent <- new_agent("calculator", provider)
+```
+
+That's it! You now have a basic agent, but it can't do much yet. Let's give it some capabilities.
+
+## Step 3: Create a Calculator Tool
+
+Tools allow your agent to perform specific actions. We'll create a calculator tool that can perform basic arithmetic operations:
+
+```{r create-calculator}
+# Create a calculator tool
+calculator <- new_tool(
+  name = "calculator",
+  description = "Performs basic arithmetic operations",
+  input_schema = schema(
+    properties = properties(
+      operation = property_enum(
+        "Operation",
+        "Math operation to perform",
+        values = c("add", "subtract", "multiply", "divide"),
+        required = TRUE
+      ),
+      a = property_number("First number", "First operand", required = TRUE),
+      b = property_number("Second number", "Second operand", required = TRUE)
+    )
+  ),
+  handler = function(params) {
+    result <- switch(
+      params$operation,
+      "add" = params$a + params$b,
+      "subtract" = params$a - params$b,
+      "multiply" = params$a * params$b,
+      "divide" = params$a / params$b
+    )
+    response_text(result)
+  }
+)
+```
+
+Let's break down what this tool does:
+
+- **Name and description**: Identifies the tool and explains its purpose
+- **Input schema**: Defines what parameters the tool expects:
+  - `operation`: Must be one of "add", "subtract", "multiply", or "divide"
+  - `a` and `b`: The two numbers to operate on
+- **Handler function**: The actual R code that performs the calculation
+
+## Step 4: Add the Tool to Your Agent
+
+Now we need to give our agent access to the calculator tool:
+
+```{r add-tool}
+# Add the calculator tool to the agent
+agent <- add_tool(agent, calculator)
+```
+
+Your agent is now equipped with calculation capabilities!
+
+## Step 5: Have a Conversation
+
+Let's test our calculator agent by asking it to perform some calculations:
+
+```{r conversation}
+# Ask the agent to perform a calculation
+response <- request(agent, "What is 15 multiplied by 7?")
+print(response)
+
+# Ask for a more complex calculation
+response <- request(agent, "I have 100 dollars and spend 23.50 on groceries and 15.75 on gas. How much do I have left?")
+print(response)
+```
+
+## How It Works
+
+When you ask the agent a question that requires calculation:
+
+1. **The agent analyzes your request** and determines it needs to perform math
+2. **It calls the calculator tool** with the appropriate operation and numbers
+3. **The tool performs the calculation** and returns the result
+4. **The agent incorporates the result** into a natural language response
+
+This happens automatically - you don't need to explicitly tell the agent to use the calculator tool.
+
+## What's Next?
+
+Now that you understand the basics, you can:
+
+- **Explore other providers**: Try using OpenAI instead of Anthropic
+- **Create custom tools**: Build tools for your specific use cases
+- **Combine multiple tools**: Give your agent access to several different capabilities
+- **Use workflows**: Chain multiple agents together for complex tasks
+
+## Key Concepts Summary
+
+- **Provider**: The LLM service (Anthropic, OpenAI, etc.)
+- **Agent**: An AI assistant that can use tools
+- **Tool**: A function that extends your agent's capabilities
+- **Schema**: Defines the structure of tool inputs
+- **Handler**: The R function that actually performs the tool's work
+
+The llmr package makes it easy to create powerful AI agents that can interact with your R environment and perform real work. Start simple with tools like our calculator, then gradually build more sophisticated capabilities as you become comfortable with the framework.
