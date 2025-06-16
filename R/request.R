@@ -263,6 +263,7 @@ handle_response.provider_openai <- function(
 #' @param provider An object of class `provider`.
 #' @param response A response object from the LLM provider.
 #' @param tools A list of available tools.
+#' @param mcps A list of available memory context providers.
 #'
 #' @return A formatted tool response
 #' @export
@@ -368,7 +369,10 @@ handle_tool_use.provider_anthropic <- function(
             list(
               type = "tool_result",
               tool_use_id = tool_call$id,
-              content = result$content
+              content = yyjsonr::write_json_str(
+                result$result$content,
+                list(auto_unbox = TRUE)
+              )
             )
           },
           error = function(e) {
@@ -474,7 +478,10 @@ handle_tool_use.provider_openai <- function(
           list(
             role = "tool",
             tool_call_id = tool_id,
-            content = result$content
+            content = yyjsonr::write_json_str(
+              result$result$content,
+              list(auto_unbox = TRUE)
+            )
           )
         },
         error = function(e) {
@@ -542,7 +549,7 @@ handle_tool_use.provider_openai <- function(
 
 #' Find an MCP by name
 #'
-#' @param env An environment containing MCPs
+#' @param mcps An environment containing MCPs
 #' @param name The name of the MCP to find.
 #'
 #' @return An MCP object or NULL if not found

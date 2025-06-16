@@ -4,7 +4,7 @@
 \alias{handle_tool_use}
 \title{Handle tool use in a response}
 \usage{
-handle_tool_use(provider, response, tools)
+handle_tool_use(provider, response, tools, mcps)
 }
 \arguments{
 \item{provider}{An object of class \code{provider}.}
@@ -12,6 +12,8 @@ handle_tool_use(provider, response, tools)
 \item{response}{A response object from the LLM provider.}
 
 \item{tools}{A list of available tools.}
+
+\item{mcps}{A list of available memory context providers.}
 }
 \value{
 A formatted tool response
