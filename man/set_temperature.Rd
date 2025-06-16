@@ -7,7 +7,7 @@
 set_temperature(x, temperature, ...)
 }
 \arguments{
-\item{x}{A provider object}
+\item{x}{An object of class \code{provider} or \code{agent}}
 
 \item{temperature}{Numeric value specifying the temperature (typically between 0 and 1)}
 

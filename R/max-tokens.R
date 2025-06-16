@@ -18,3 +18,10 @@ set_max_tokens.provider <- function(x, max, ...) {
 
   invisible(x)
 }
+
+#' @method set_max_tokens agent
+#' @export
+set_max_tokens.agent <- function(x, max, ...) {
+  x$provider <- set_max_tokens(x$provider, max)
+  invisible(x)
+}

@@ -18,3 +18,10 @@ set_api_key.provider <- function(x, key, ...) {
 
   invisible(x)
 }
+
+#' @export
+#' @method set_api_key agent
+set_api_key.agent <- function(x, key, ...) {
+  x$provider <- set_api_key(x$provider, key)
+  invisible(x)
+}

@@ -2,7 +2,7 @@
 #'
 #' Configure retry behavior for API requests made by the provider.
 #'
-#' @param provider Provider object created with `new_provider()` or a specific provider constructor.
+#' @param x An object of class `provider` or `agent`.
 #' @param max_tries Maximum number of retry attempts (default: 3).
 #'
 #' @return The provider object with updated retry settings.
@@ -13,7 +13,7 @@
 #'   set_retry(max_tries = 5)
 #' }
 set_retry <- function(
-  provider,
+  x,
   max_tries = 3
 ) {
   UseMethod("set_retry")
@@ -22,15 +22,24 @@ set_retry <- function(
 #' @method set_retry provider
 #' @export
 set_retry.provider <- function(
-  provider,
+  x,
   max_tries = 3
 ) {
   stopifnot(inherits(provider, "provider"))
 
-  # Store retry parameters in the provider's environment
-  provider$env$retry <- list(
+  x$env$retry <- list(
     max_tries = max_tries
   )
 
   invisible(provider)
+}
+
+#' @method set_retry agent
+#' @export
+set_retry.agent <- function(
+  x,
+  max_tries = 3
+) {
+  set_retry(x$provider, max_tries)
+  invisible(x)
 }

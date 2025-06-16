@@ -18,3 +18,10 @@ set_model.provider <- function(x, name, ...) {
 
   x
 }
+
+#' @method set_model agent
+#' @export
+set_model.agent <- function(x, name, ...) {
+  x$provider <- set_model(x$provider, name)
+  invisible(x)
+}

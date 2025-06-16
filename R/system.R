@@ -28,3 +28,9 @@ set_system_prompt.provider_openai <- function(x, prompt, ...) {
 
   x
 }
+
+#' @method set_system_prompt agent
+#' @export
+set_system_prompt.agent <- function(x, prompt, ...) {
+  set_system_prompt(x$provider, prompt)
+}
