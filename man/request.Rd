@@ -10,6 +10,8 @@ request(x, message = NULL, ...)
 \item{x}{An object of class \code{provider} or \code{agent}.}
 
 \item{message}{A message object.}
+
+\item{...}{Additional arguments passed to methods.}
 }
 \value{
 A response object

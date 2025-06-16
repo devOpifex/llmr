@@ -5,23 +5,12 @@
 \alias{new_message}
 \title{Create a message}
 \usage{
-new_message(
-  content,
-  role = "user",
-  tool_calls = NULL,
-  tool_call_id = NULL,
-  tool_use_id = NULL,
-  type = NULL
-)
+new_message(content, role = "user")
 }
 \arguments{
 \item{content}{Content of the message}
 
 \item{role}{Role of the message}
-
-\item{tool_calls}{Optional tool calls for OpenAI}
-
-\item{tool_call_id}{Optional tool call ID for OpenAI tool responses}
 }
 \value{
 A message object

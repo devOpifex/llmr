@@ -10,6 +10,8 @@ handle_tool_use(provider, response, tools)
 \item{provider}{An object of class \code{provider}.}
 
 \item{response}{A response object from the LLM provider.}
+
+\item{tools}{A list of available tools.}
 }
 \value{
 A formatted tool response

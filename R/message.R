@@ -2,8 +2,6 @@
 #'
 #' @param content Content of the message
 #' @param role Role of the message
-#' @param tool_calls Optional tool calls for OpenAI
-#' @param tool_call_id Optional tool call ID for OpenAI tool responses
 #'
 #' @return A message object
 #' @export
@@ -13,34 +11,12 @@
 #' @name message
 new_message <- function(
   content,
-  role = "user",
-  tool_calls = NULL,
-  tool_call_id = NULL,
-  tool_use_id = NULL,
-  type = NULL
+  role = "user"
 ) {
   message <- list(
     role = role,
     content = content
   )
-
-  # Add tool_calls if provided (for OpenAI)
-  if (!is.null(tool_calls)) {
-    message$tool_calls <- tool_calls
-  }
-
-  # Add tool_call_id if provided (for OpenAI tool responses)
-  if (!is.null(tool_call_id)) {
-    message$tool_call_id <- tool_call_id
-  }
-
-  if (!is.null(tool_use_id)) {
-    message$tool_use_id <- tool_use_id
-  }
-
-  if (!is.null(type)) {
-    message$type <- type
-  }
 
   structure(
     message,
@@ -51,6 +27,11 @@ new_message <- function(
 as_message <- function(x) {
   class(x) <- c("message", "list")
   x
+}
+
+#' @export
+print.message <- function(x, ...) {
+  cat(sprintf("%s: %s\n", x$role, x$content))
 }
 
 #' Clear messages
@@ -68,8 +49,9 @@ clear_messages <- function(provider) {
 
 #' Add a message to the list
 #'
-#' @param provider An object of class `provider`.
+#' @param x An object of class `agent`.
 #' @param message A message object.
+#' @export
 append_message <- function(x, message) UseMethod("append_message")
 
 #' @method append_message agent

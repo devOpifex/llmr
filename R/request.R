@@ -2,6 +2,7 @@
 #'
 #' @param x An object of class `provider` or `agent`.
 #' @param message A message object.
+#' @param ... Additional arguments passed to methods.
 #'
 #' @return A response object
 #' @export
@@ -90,7 +91,7 @@ request.provider_anthropic <- function(x, message, ..., tools = NULL) {
 
 #' @method request provider_openai
 #' @export
-request.provider_openai <- function(x, message, tools = NULL) {
+request.provider_openai <- function(x, message, ..., tools = NULL) {
   body <- list(
     model = attr(x, "model"),
     max_tokens = attr(x, "max_tokens"),
@@ -202,11 +203,12 @@ handle_response.provider_openai <- function(
     if (!is.null(tool_calls) && length(tool_calls) > 0) {
       agent <- append_message(
         agent,
-        new_message(
+        list(
           content = message_content,
           role = "assistant",
           tool_calls = tool_calls
-        )
+        ) |>
+          as_message()
       )
     } else if (!is.null(message_content)) {
       agent <- append_message(
@@ -250,8 +252,10 @@ handle_response.provider_openai <- function(
 #'
 #' @param provider An object of class `provider`.
 #' @param response A response object from the LLM provider.
+#' @param tools A list of available tools.
 #'
 #' @return A formatted tool response
+#' @export
 handle_tool_use <- function(provider, response, tools) {
   UseMethod("handle_tool_use")
 }

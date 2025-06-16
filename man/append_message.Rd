@@ -7,9 +7,9 @@
 append_message(x, message)
 }
 \arguments{
-\item{message}{A message object.}
+\item{x}{An object of class \code{agent}.}
 
-\item{provider}{An object of class \code{provider}.}
+\item{message}{A message object.}
 }
 \description{
 Add a message to the list
