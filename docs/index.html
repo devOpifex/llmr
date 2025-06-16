@@ -48,6 +48,21 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/get-started.html">Get Started with llmr</a>
+    </li>
+    <li>
+      <a href="articles/mcp-integration.html">MCP Integration: From Development to Production</a>
+    </li>
+  </ul>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
 </div>
@@ -94,7 +109,7 @@
 <span><span class="co"># Or use ANTHROPIC_API_KEY environment variable</span></span>
 <span></span>
 <span><span class="co"># Create a provider</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/llmr/man/new_anthropic.html" class="external-link">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># defaults to user role</span></span>
 <span><span class="va">message</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"Explain quantum computing in simple terms"</span><span class="op">)</span></span>
@@ -124,7 +139,7 @@
 <span><span class="fu"><a href="reference/set_api_key.html">set_api_key</a></span><span class="op">(</span><span class="st">"your_anthropic_api_key"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create a provider (default is Anthropic)</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/llmr/man/new_anthropic.html" class="external-link">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create a simple agent</span></span>
 <span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span><span class="op">)</span></span>
@@ -174,7 +189,7 @@
 <span><span class="fu"><a href="reference/set_api_key.html">set_api_key</a></span><span class="op">(</span><span class="st">"your_anthropic_api_key"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create a provider</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/llmr/man/new_anthropic.html" class="external-link">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create an MCP client that connects to an external calculator service</span></span>
 <span><span class="va">client</span> <span class="op">&lt;-</span> <span class="fu">mcpr</span><span class="fu">::</span><span class="fu">new_client</span><span class="op">(</span></span>
@@ -196,9 +211,30 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">response</span><span class="op">$</span><span class="va">content</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="workflows">Workflows<a class="anchor" aria-label="anchor" href="#workflows"></a>
+</h2>
+<p>Chain together processing steps and agents into workflows:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define processing functions</span></span>
+<span><span class="va">add_ten</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">10</span></span>
+<span><span class="va">multiply_two</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">*</span> <span class="fl">2</span></span>
+<span></span>
+<span><span class="co"># Create workflow steps</span></span>
+<span><span class="va">step1</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/step.html">step</a></span><span class="op">(</span><span class="va">add_ten</span><span class="op">)</span></span>
+<span><span class="va">step2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/step.html">step</a></span><span class="op">(</span><span class="va">multiply_two</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Chain steps together</span></span>
+<span><span class="va">workflow</span> <span class="op">&lt;-</span> <span class="va">step1</span> <span class="op"><a href="reference/grapes-greater-than-grapes.html">%-&gt;%</a></span> <span class="va">step2</span></span>
+<span></span>
+<span><span class="co"># Execute workflow</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/execute.html">execute</a></span><span class="op">(</span><span class="va">workflow</span>, <span class="fl">5</span><span class="op">)</span>  <span class="co"># Returns 30: (5 + 10) * 2</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="configuration">Configuration<a class="anchor" aria-label="anchor" href="#configuration"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Set a different model</span></span>
 <span><span class="fu"><a href="reference/set_model.html">set_model</a></span><span class="op">(</span><span class="va">provider</span>, <span class="st">"claude-3-haiku-20240307"</span><span class="op">)</span></span>
 <span></span>

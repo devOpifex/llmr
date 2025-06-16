@@ -3,6 +3,9 @@
 <url><loc>/CLAUDE.html</loc></url>
 <url><loc>/CONTEXT.html</loc></url>
 <url><loc>/LICENSE.html</loc></url>
+<url><loc>/articles/get-started.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/mcp-integration.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/reference/add_tool.html</loc></url>
@@ -15,6 +18,7 @@
 <url><loc>/reference/create_tool_error.provider_anthropic.html</loc></url>
 <url><loc>/reference/create_tool_error.provider_openai.html</loc></url>
 <url><loc>/reference/dot-provider_registry.html</loc></url>
+<url><loc>/reference/execute.html</loc></url>
 <url><loc>/reference/extract_anthropic_message_content.html</loc></url>
 <url><loc>/reference/extract_anthropic_tool_calls.html</loc></url>
 <url><loc>/reference/extract_message_content.default.html</loc></url>
@@ -33,6 +37,7 @@
 <url><loc>/reference/format_tool_result.provider_openai.html</loc></url>
 <url><loc>/reference/generate_id.html</loc></url>
 <url><loc>/reference/get_messages.html</loc></url>
+<url><loc>/reference/grapes-greater-than-grapes.html</loc></url>
 <url><loc>/reference/grapes-or-or-grapes.html</loc></url>
 <url><loc>/reference/handle_llm_request.html</loc></url>
 <url><loc>/reference/handle_mcp_tool.html</loc></url>
@@ -44,11 +49,10 @@
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/message.html</loc></url>
 <url><loc>/reference/new_agent.html</loc></url>
-<url><loc>/reference/new_anthropic.html</loc></url>
 <url><loc>/reference/new_anthropic_config.html</loc></url>
-<url><loc>/reference/new_openai.html</loc></url>
 <url><loc>/reference/new_openai_config.html</loc></url>
 <url><loc>/reference/new_provider_config.html</loc></url>
+<url><loc>/reference/new_workflow.html</loc></url>
 <url><loc>/reference/nullOrValue.html</loc></url>
 <url><loc>/reference/parse_anthropic_response.html</loc></url>
 <url><loc>/reference/parse_openai_response.html</loc></url>
@@ -67,6 +71,8 @@
 <url><loc>/reference/set_system_prompt.html</loc></url>
 <url><loc>/reference/set_temperature.html</loc></url>
 <url><loc>/reference/set_version.html</loc></url>
+<url><loc>/reference/step.html</loc></url>
 <url><loc>/reference/update_provider_config.html</loc></url>
+<url><loc>/reference/when.html</loc></url>
 </urlset>
 

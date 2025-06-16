@@ -7,3 +7,5 @@
 ^examples$
 ^docs$
 ^pkgdown$
+^doc$
+^Meta$
