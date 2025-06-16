@@ -14,7 +14,8 @@
 #' }
 set_retry <- function(
   x,
-  max_tries = 3
+  max_tries = 3,
+  ...
 ) {
   UseMethod("set_retry")
 }
@@ -23,22 +24,25 @@ set_retry <- function(
 #' @export
 set_retry.provider <- function(
   x,
-  max_tries = 3
+  max_tries = 3,
+  ...
 ) {
-  stopifnot(inherits(provider, "provider"))
+  stopifnot(inherits(x, "provider"))
 
   x$env$retry <- list(
-    max_tries = max_tries
+    max_tries = max_tries,
+    ...
   )
 
-  invisible(provider)
+  invisible(x)
 }
 
 #' @method set_retry agent
 #' @export
 set_retry.agent <- function(
   x,
-  max_tries = 3
+  max_tries = 3,
+  ...
 ) {
   set_retry(x$provider, max_tries)
   invisible(x)
