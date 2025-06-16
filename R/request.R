@@ -65,7 +65,7 @@ request.provider_anthropic <- function(x, message, ..., tools = NULL) {
 
   # Apply retry configuration if available
   if (length(x$env$retry)) {
-    req <- req |> httr2::req_retry(max_tries = x$env$retry$max_tries)
+    req <- req |> do.call(httr2::req_retry, x$env$retry)
   }
 
   response <- tryCatch(
@@ -119,7 +119,7 @@ request.provider_openai <- function(x, message, ..., tools = NULL) {
 
   # Apply retry configuration if available
   if (length(x$env$retry)) {
-    req <- req |> httr2::req_retry(max_tries = x$env$retry$max_tries)
+    req <- req |> do.call(httr2::req_retry, x$env$retry)
   }
 
   response <- tryCatch(
