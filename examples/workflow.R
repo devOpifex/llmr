@@ -42,6 +42,13 @@ cat("Expected: ((5 + 10) * 2) - 5 =", ((5 + 10) * 2) - 5, "\n\n")
 
 cat("=== Example 2: Conditional Branching ===\n")
 
+# Define preprocessing function that generates random values
+generate_random_value <- function(x) {
+  value <- runif(1, 0, 30)
+  cat("Generated random value:", round(value, 2), "\n")
+  value
+}
+
 # Define condition function
 check_value <- function(x) {
   cat("Checking value:", x, "\n")
@@ -76,9 +83,9 @@ format_result <- function(x) {
 }
 
 # Create branching workflow
-branching_workflow <- step(check_value) %->%
+branching_workflow <- step(generate_random_value) %->%
   when(
-    function(result) result, # The condition function returns the branch name
+    check_value,  # Use check_value as the condition function
     high = step(process_high),
     medium = step(process_medium),
     low = step(process_low)

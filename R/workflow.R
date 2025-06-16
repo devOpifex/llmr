@@ -319,36 +319,93 @@ execute.workflow <- function(workflow, input) {
 }
 
 execute_workflow_graph <- function(workflow, input) {
-  visited <- character()
-  current_data <- input
-  current_nodes <- workflow$entry_point
-  
-  while (length(current_nodes) > 0) {
-    next_nodes <- character()
-    
-    for (node_id in current_nodes) {
-      if (node_id %in% visited) next
-      visited <- c(visited, node_id)
-      
-      node <- workflow$nodes[[node_id]]
-      
-      if (inherits(node, "workflow_condition_node")) {
-        # Execute condition and determine next paths
-        selected_branches <- node$condition_fn(current_data)
-        next_edges <- get_conditional_edges(workflow$edges, node_id, selected_branches)
-        next_nodes <- c(next_nodes, sapply(next_edges, function(e) e$to))
-      } else {
-        # Regular step execution
-        current_data <- execute_step(node, current_data)
-        next_edges <- get_outgoing_edges(workflow$edges, node_id)
-        next_nodes <- c(next_nodes, sapply(next_edges, function(e) e$to))
-      }
-    }
-    
-    current_nodes <- unique(next_nodes)
+  # Use recursive execution starting from entry point
+  execute_node(workflow, workflow$entry_point, input)
+}
+
+execute_node <- function(workflow, node_id, input) {
+  if (is.null(node_id) || length(node_id) == 0) {
+    return(input)
   }
   
-  current_data
+  node <- workflow$nodes[[node_id]]
+  
+  if (inherits(node, "workflow_condition_node")) {
+    # Handle condition node - execute branches and collect results
+    selected_branches <- node$condition_fn(input)
+    
+    # Get edges for selected branches
+    condition_edges <- get_conditional_edges(workflow$edges, node_id, selected_branches)
+    
+    if (length(condition_edges) == 0) {
+      return(input)  # No branches selected
+    }
+    
+    if (length(condition_edges) == 1) {
+      # Single branch - continue with original input
+      next_node_id <- condition_edges[[1]]$to
+      return(execute_node(workflow, next_node_id, input))
+    } else {
+      # Multiple branches - parallel execution
+      branch_results <- list()
+      for (edge in condition_edges) {
+        branch_name <- edge$branch
+        next_node_id <- edge$to
+        branch_results[[branch_name]] <- execute_node(workflow, next_node_id, input)
+      }
+      
+      # Find the merge point (nodes that all branches lead to)
+      merge_nodes <- find_merge_nodes(workflow, sapply(condition_edges, function(e) e$to))
+      
+      if (length(merge_nodes) > 0) {
+        # Continue execution from merge point with combined results
+        return(execute_node(workflow, merge_nodes[1], branch_results))
+      } else {
+        # No merge point, return branch results
+        return(branch_results)
+      }
+    }
+  } else {
+    # Regular step execution
+    result <- execute_step(node, input)
+    
+    # Find next nodes
+    next_edges <- get_outgoing_edges(workflow$edges, node_id)
+    
+    if (length(next_edges) == 0) {
+      # End of workflow
+      return(result)
+    } else if (length(next_edges) == 1) {
+      # Single next node
+      next_node_id <- next_edges[[1]]$to
+      return(execute_node(workflow, next_node_id, result))
+    } else {
+      # Multiple outgoing edges (shouldn't happen for regular steps)
+      stop("Regular step has multiple outgoing edges: ", node_id)
+    }
+  }
+}
+
+find_merge_nodes <- function(workflow, branch_exit_nodes) {
+  # Find nodes that all branch exits lead to
+  all_next_nodes <- character()
+  
+  for (exit_node in branch_exit_nodes) {
+    next_edges <- get_outgoing_edges(workflow$edges, exit_node)
+    next_nodes <- sapply(next_edges, function(e) e$to)
+    all_next_nodes <- c(all_next_nodes, next_nodes)
+  }
+  
+  # Find common nodes (merge points)
+  if (length(all_next_nodes) == 0) {
+    return(character())
+  }
+  
+  # Count occurrences and find nodes that appear for all branches
+  node_counts <- table(all_next_nodes)
+  merge_candidates <- names(node_counts)[node_counts == length(branch_exit_nodes)]
+  
+  return(merge_candidates)
 }
 
 execute_step <- function(step, input) {
