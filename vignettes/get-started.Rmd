@@ -167,7 +167,7 @@ Now our agent has two tools at its disposal: a calculator and a text formatter. 
 
 ```{r multi-tool-request}
 # Ask a question that requires both calculation and text formatting
-request(agent, "Calculate 25 times 4, and convert the result to Roman numerals.")
+request(agent, "Calculate 25 times 12, and convert the result to Roman numerals.")
 get_last_message(agent)
 ```
 
