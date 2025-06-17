@@ -120,12 +120,12 @@ as steps.</p>
 <h3 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span></code></pre></div>
-<p>For examples using agents, you’ll also need an API key
-configured:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Only needed for agent examples</span></span>
-<span><span class="fu"><a href="../reference/set_api_key.html">set_api_key</a></span><span class="op">(</span><span class="st">"your-anthropic-api-key-here"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'llmr'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     step</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="basic-workflow-concepts">Basic Workflow Concepts<a class="anchor" aria-label="anchor" href="#basic-workflow-concepts"></a>
@@ -156,7 +156,7 @@ data, passing results through each step in sequence.</p>
 <h3 id="example-1-function-based-linear-workflow">Example 1: Function-Based Linear Workflow<a class="anchor" aria-label="anchor" href="#example-1-function-based-linear-workflow"></a>
 </h3>
 <p>Let’s start with a simple workflow using regular R functions:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define simple processing functions</span></span>
 <span><span class="va">add_ten</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Adding 10 to"</span>, <span class="va">x</span>, <span class="st">"\n"</span><span class="op">)</span></span>
@@ -175,16 +175,31 @@ data, passing results through each step in sequence.</p>
 <span></span>
 <span><span class="co"># Create workflow steps and chain them together inline</span></span>
 <span><span class="va">math_workflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">add_ten</span>, name <span class="op">=</span> <span class="st">"add_ten"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                 <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">multiply_by_two</span>, name <span class="op">=</span> <span class="st">"multiply_two"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                 <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">subtract_five</span>, name <span class="op">=</span> <span class="st">"subtract_five"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">multiply_by_two</span>, name <span class="op">=</span> <span class="st">"multiply_two"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">subtract_five</span>, name <span class="op">=</span> <span class="st">"subtract_five"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View the workflow structure</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">math_workflow</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Workflow: &lt;unnamed&gt; </span></span>
+<span><span class="co">#&gt; Nodes: 3 | Edges: 2 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ┌─ ⚙️ add_ten</span></span>
+<span><span class="co">#&gt; │</span></span>
+<span><span class="co">#&gt; ├─ ⚙️ multiply_two</span></span>
+<span><span class="co">#&gt; │</span></span>
+<span><span class="co">#&gt; └─ ⚙️ subtract_five</span></span>
 <span></span>
 <span><span class="co"># Execute the workflow</span></span>
 <span><span class="va">input_value</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/execute.html">execute</a></span><span class="op">(</span><span class="va">math_workflow</span>, <span class="va">input_value</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>  <span class="co"># Should be 25: ((5 + 10) * 2) - 5 = 25</span></span></code></pre></div>
+<span><span class="co">#&gt; &gt; 2025-06-17 11:39:46 [WORKFLOW] Executing node: add_ten </span></span>
+<span><span class="co">#&gt; Adding 10 to 5 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 11:39:46 [WORKFLOW] Executing node: multiply_two </span></span>
+<span><span class="co">#&gt; Multiplying 15 by 2</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 11:39:46 [WORKFLOW] Executing node: subtract_five </span></span>
+<span><span class="co">#&gt; Subtracting 5 from 30</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>  <span class="co"># Should be 25: ((5 + 10) * 2) - 5 = 25</span></span>
+<span><span class="co">#&gt; [1] 25</span></span></code></pre></div>
 <p><strong>Key Points:</strong> - Each function takes one input and
 returns one output - The <code><a href="../reference/step.html">step()</a></code> function wraps your
 function for use in workflows - The <code>%-&gt;%</code> operator chains
@@ -195,7 +210,7 @@ workflow</p>
 <h3 id="example-2-agent-based-linear-workflow">Example 2: Agent-Based Linear Workflow<a class="anchor" aria-label="anchor" href="#example-2-agent-based-linear-workflow"></a>
 </h3>
 <p>Now let’s create a workflow using AI agents for text processing:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create provider and agents</span></span>
 <span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -206,28 +221,29 @@ workflow</p>
 <span></span>
 <span><span class="co"># Configure each agent with specific instructions</span></span>
 <span><span class="fu"><a href="../reference/set_system_prompt.html">set_system_prompt</a></span><span class="op">(</span></span>
-<span>  <span class="va">summarizer</span><span class="op">$</span><span class="va">provider</span>,</span>
+<span>  <span class="va">summarizer</span>,</span>
 <span>  <span class="st">"You are a text summarizer. Provide concise, one-sentence summaries."</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/set_system_prompt.html">set_system_prompt</a></span><span class="op">(</span></span>
-<span>  <span class="va">analyzer</span><span class="op">$</span><span class="va">provider</span>,</span>
+<span>  <span class="va">analyzer</span>,</span>
 <span>  <span class="st">"You are a sentiment analyzer. Analyze the emotional tone and return just the sentiment (positive/negative/neutral)."</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/set_system_prompt.html">set_system_prompt</a></span><span class="op">(</span></span>
-<span>  <span class="va">formatter</span><span class="op">$</span><span class="va">provider</span>,</span>
+<span>  <span class="va">formatter</span>,</span>
 <span>  <span class="st">"You are a formatter. Take the previous analysis and format it as: 'Summary: [summary] | Sentiment: [sentiment]'"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create workflow by chaining agent steps inline</span></span>
 <span><span class="va">text_workflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">summarizer</span>, name <span class="op">=</span> <span class="st">"summarize"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                 <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">analyzer</span>, name <span class="op">=</span> <span class="st">"analyze_sentiment"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                 <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">formatter</span>, name <span class="op">=</span> <span class="st">"format_output"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">analyzer</span>, name <span class="op">=</span> <span class="st">"analyze_sentiment"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">formatter</span>, name <span class="op">=</span> <span class="st">"format_output"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View the workflow structure</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">text_workflow</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Execute the workflow</span></span>
-<span><span class="va">input_text</span> <span class="op">&lt;-</span> <span class="st">"The new product launch was incredibly successful, exceeding all our expectations. Customers are thrilled with the innovative features and the team is celebrating this major milestone."</span></span>
+<span><span class="va">input_text</span> <span class="op">&lt;-</span> <span class="st">"The new product launch was incredibly successful, exceeding all our expectations.</span></span>
+<span><span class="st">  Customers are thrilled with the innovative features and the team is celebrating this major milestone."</span></span>
 <span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/execute.html">execute</a></span><span class="op">(</span><span class="va">text_workflow</span>, <span class="va">input_text</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
@@ -241,7 +257,7 @@ a sophisticated text processing pipeline</p>
 </h3>
 <p>The real power comes from mixing functions and agents in the same
 workflow:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Function to preprocess text</span></span>
 <span><span class="va">clean_text</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">text</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Remove extra whitespace and convert to lowercase</span></span>
@@ -269,14 +285,14 @@ workflow:</p>
 <span><span class="co"># Create an agent for the core analysis</span></span>
 <span><span class="va">analyzer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"text_analyzer"</span>, <span class="va">provider</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/set_system_prompt.html">set_system_prompt</a></span><span class="op">(</span></span>
-<span>  <span class="va">analyzer</span><span class="op">$</span><span class="va">provider</span>,</span>
+<span>  <span class="va">analyzer</span>,</span>
 <span>  <span class="st">"Analyze the given text and provide insights about its main themes, tone, and key messages. Be concise but thorough."</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create mixed workflow: function -&gt; agent -&gt; function</span></span>
 <span><span class="va">mixed_workflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">clean_text</span>, name <span class="op">=</span> <span class="st">"preprocess"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">analyzer</span>, name <span class="op">=</span> <span class="st">"analyze"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">add_metadata</span>, name <span class="op">=</span> <span class="st">"finalize"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">analyzer</span>, name <span class="op">=</span> <span class="st">"analyze"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">add_metadata</span>, name <span class="op">=</span> <span class="st">"finalize"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View the workflow structure</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mixed_workflow</span><span class="op">)</span></span>
@@ -296,17 +312,17 @@ interpretation - This creates powerful hybrid processing pipelines</p>
 <div class="section level4">
 <h4 id="data-flow">Data Flow<a class="anchor" aria-label="anchor" href="#data-flow"></a>
 </h4>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Input -&gt; Step 1 -&gt; Step 2 -&gt; Step 3 -&gt; Output</span></span>
 <span><span class="co">#   5   -&gt;   15   -&gt;   30   -&gt;   25   -&gt; Final Result</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="step-naming">Step Naming<a class="anchor" aria-label="anchor" href="#step-naming"></a>
 </h4>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Steps can be named for clarity</span></span>
 <span><span class="va">my_workflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">my_function</span>, name <span class="op">=</span> <span class="st">"descriptive_name"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>               <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">another_function</span>, name <span class="op">=</span> <span class="st">"another_step"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">another_function</span>, name <span class="op">=</span> <span class="st">"another_step"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Names appear in workflow output and debugging</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">my_workflow</span><span class="op">)</span>  <span class="co"># Shows step names and visual diagram</span></span></code></pre></div>
@@ -315,7 +331,7 @@ interpretation - This creates powerful hybrid processing pipelines</p>
 <h4 id="error-handling">Error Handling<a class="anchor" aria-label="anchor" href="#error-handling"></a>
 </h4>
 <p>If any step fails, the entire workflow stops:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Function that might fail</span></span>
 <span><span class="va">risky_function</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Cannot process negative numbers"</span><span class="op">)</span></span>
@@ -333,7 +349,7 @@ interpretation - This creates powerful hybrid processing pipelines</p>
 <h4 id="keep-steps-simple">1. Keep Steps Simple<a class="anchor" aria-label="anchor" href="#keep-steps-simple"></a>
 </h4>
 <p>Each step should have a single, clear responsibility:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Good: Single responsibility</span></span>
 <span><span class="va">validate_input</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">is.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"Input must be numeric"</span><span class="op">)</span></span>
@@ -348,16 +364,16 @@ interpretation - This creates powerful hybrid processing pipelines</p>
 <div class="section level4">
 <h4 id="use-descriptive-names">2. Use Descriptive Names<a class="anchor" aria-label="anchor" href="#use-descriptive-names"></a>
 </h4>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Good: Clear what each step does</span></span>
 <span><span class="va">workflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">validate_input</span>, name <span class="op">=</span> <span class="st">"validate"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>           <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">double_value</span>, name <span class="op">=</span> <span class="st">"double"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>           <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">format_output</span>, name <span class="op">=</span> <span class="st">"format"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">double_value</span>, name <span class="op">=</span> <span class="st">"double"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">format_output</span>, name <span class="op">=</span> <span class="st">"format"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="design-for-reusability">3. Design for Reusability<a class="anchor" aria-label="anchor" href="#design-for-reusability"></a>
 </h4>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create reusable steps</span></span>
 <span><span class="va">validation_step</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">validate_input</span>, name <span class="op">=</span> <span class="st">"validate"</span><span class="op">)</span></span>
 <span><span class="va">doubling_step</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">double_value</span>, name <span class="op">=</span> <span class="st">"double"</span><span class="op">)</span></span>
@@ -366,21 +382,6 @@ interpretation - This creates powerful hybrid processing pipelines</p>
 <span><span class="va">workflow_a</span> <span class="op">&lt;-</span> <span class="va">validation_step</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span> <span class="va">doubling_step</span></span>
 <span><span class="va">workflow_b</span> <span class="op">&lt;-</span> <span class="va">validation_step</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span> <span class="va">other_step</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span> <span class="va">doubling_step</span></span></code></pre></div>
 </div>
-<div class="section level4">
-<h4 id="mix-functions-and-agents-strategically">4. Mix Functions and Agents Strategically<a class="anchor" aria-label="anchor" href="#mix-functions-and-agents-strategically"></a>
-</h4>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Use functions for:</span></span>
-<span><span class="co"># - Data validation and cleaning</span></span>
-<span><span class="co"># - Mathematical operations</span></span>
-<span><span class="co"># - Formatting and output preparation</span></span>
-<span></span>
-<span><span class="co"># Use agents for:</span></span>
-<span><span class="co"># - Text analysis and interpretation</span></span>
-<span><span class="co"># - Decision making</span></span>
-<span><span class="co"># - Creative tasks</span></span>
-<span><span class="co"># - Context-dependent processing</span></span></code></pre></div>
-</div>
 </div>
 <div class="section level3">
 <h3 id="common-patterns">Common Patterns<a class="anchor" aria-label="anchor" href="#common-patterns"></a>
@@ -388,23 +389,23 @@ interpretation - This creates powerful hybrid processing pipelines</p>
 <div class="section level4">
 <h4 id="preprocessing-pipeline">Preprocessing Pipeline<a class="anchor" aria-label="anchor" href="#preprocessing-pipeline"></a>
 </h4>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">preprocessing</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">validate_data</span>, name <span class="op">=</span> <span class="st">"validate"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">clean_data</span>, name <span class="op">=</span> <span class="st">"clean"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">normalize_data</span>, name <span class="op">=</span> <span class="st">"normalize"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">clean_data</span>, name <span class="op">=</span> <span class="st">"clean"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">normalize_data</span>, name <span class="op">=</span> <span class="st">"normalize"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="analysis-pipeline">Analysis Pipeline<a class="anchor" aria-label="anchor" href="#analysis-pipeline"></a>
 </h4>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">analysis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">analyzer_agent</span>, name <span class="op">=</span> <span class="st">"analyze"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>           <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">extract_insights</span>, name <span class="op">=</span> <span class="st">"extract"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>           <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">format_results</span>, name <span class="op">=</span> <span class="st">"format"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">extract_insights</span>, name <span class="op">=</span> <span class="st">"extract"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">format_results</span>, name <span class="op">=</span> <span class="st">"format"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="full-processing-pipeline">Full Processing Pipeline<a class="anchor" aria-label="anchor" href="#full-processing-pipeline"></a>
 </h4>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">complete_pipeline</span> <span class="op">&lt;-</span> <span class="va">preprocessing</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span> <span class="va">analysis</span></span></code></pre></div>
 </div>
 </div>

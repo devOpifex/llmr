@@ -3,8 +3,8 @@ default: install
 document:
 	R -s -e "devtools::document()"
 
-check: site 
-	R -s -e "devtools::check()"
+check: document 
+	R -s -e "devtools::check(document = FALSE)"
 
 install: check
 	R -s -e "devtools::install()"

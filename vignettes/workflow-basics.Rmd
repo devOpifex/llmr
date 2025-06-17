@@ -95,7 +95,7 @@ print(result)  # Should be 25: ((5 + 10) * 2) - 5 = 25
 
 Now let's create a workflow using AI agents for text processing:
 
-```{r agent-workflow}
+```{r agent-workflow, eval = FALSE}
 # Create provider and agents
 provider <- new_anthropic()
 
@@ -144,7 +144,7 @@ print(result)
 
 The real power comes from mixing functions and agents in the same workflow:
 
-```{r mixed-workflow}
+```{r mixed-workflow, eval = FALSE}
 # Function to preprocess text
 clean_text <- function(text) {
   # Remove extra whitespace and convert to lowercase
@@ -205,7 +205,7 @@ print(result)
 ```
 
 ### Step Naming
-```{r step-naming}
+```{r step-naming, eval = FALSE}
 # Steps can be named for clarity
 my_workflow <- step(my_function, name = "descriptive_name") %->%
   step(another_function, name = "another_step")
@@ -247,7 +247,7 @@ double_value <- function(x) x * 2
 ```
 
 ### 2. Use Descriptive Names
-```{r descriptive-names}
+```{r descriptive-names, eval = FALSE}
 # Good: Clear what each step does
 workflow <- step(validate_input, name = "validate") %->%
   step(double_value, name = "double") %->%
@@ -255,7 +255,7 @@ workflow <- step(validate_input, name = "validate") %->%
 ```
 
 ### 3. Design for Reusability
-```{r reusability}
+```{r reusability, eval = FALSE}
 # Create reusable steps
 validation_step <- step(validate_input, name = "validate")
 doubling_step <- step(double_value, name = "double")
@@ -263,20 +263,6 @@ doubling_step <- step(double_value, name = "double")
 # Use in multiple workflows
 workflow_a <- validation_step %->% doubling_step
 workflow_b <- validation_step %->% other_step %->% doubling_step
-```
-
-### 4. Mix Functions and Agents Strategically
-```{r strategic-mixing}
-# Use functions for:
-# - Data validation and cleaning
-# - Mathematical operations
-# - Formatting and output preparation
-
-# Use agents for:
-# - Text analysis and interpretation
-# - Decision making
-# - Creative tasks
-# - Context-dependent processing
 ```
 
 ## Common Patterns
