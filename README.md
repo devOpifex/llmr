@@ -2,7 +2,8 @@
 <img src="man/figures/logo.png" />
 </div>
 
-An R package for interacting with Large Language Models (LLMs) with support for tools and agents.
+An R package for interacting with Large Language Models (LLMs) with support for agents, workflows, and MCPs:
+[Get Started](https://llmr.opifex.org/articles/get-started)
 
 ## Overview
 
@@ -35,16 +36,6 @@ request(provider, message)
 
 # Print the last message
 get_last_message(provider)
-
-# Continue the conversation
-message <- new_message("Now give me a simple code example")
-request(provider, message)
-
-# get all clear_messages
-get_messages(provider)
-
-# Clear conversation history
-clear_messages(provider)
 ```
 
 ## Creating a Simple Agent

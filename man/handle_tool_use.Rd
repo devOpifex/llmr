@@ -21,3 +21,4 @@ A formatted tool response
 \description{
 Handle tool use in a response
 }
+\keyword{internal}

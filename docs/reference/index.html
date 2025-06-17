@@ -36,9 +36,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="core-components">Core Components<a class="anchor" aria-label="anchor" href="#core-components"></a></h2>
 
-
+      <div class="section-desc"><p>Essential functions for creating and managing agents and workflows</p></div>
 
 
     </div><div class="section level2">
@@ -47,72 +47,6 @@
 
 
       <dl><dt>
-
-          <code><a href="add_tool.html">add_tool()</a></code>
-
-        </dt>
-        <dd>Add a tool to an agent</dd>
-      </dl><dl><dt>
-
-          <code><a href="append_message.html">append_message()</a></code>
-
-        </dt>
-        <dd>Add a message to the list</dd>
-      </dl><dl><dt>
-
-          <code><a href="clear_messages.html">clear_messages()</a></code>
-
-        </dt>
-        <dd>Clear messages</dd>
-      </dl><dl><dt>
-
-          <code><a href="execute.html">execute()</a></code>
-
-        </dt>
-        <dd>Execute a workflow</dd>
-      </dl><dl><dt>
-
-          <code><a href="find_mcp_by_name.html">find_mcp_by_name()</a></code>
-
-        </dt>
-        <dd>Find an MCP by name</dd>
-      </dl><dl><dt>
-
-          <code><a href="get_last_message.html">get_last_message()</a></code>
-
-        </dt>
-        <dd>Get last message</dd>
-      </dl><dl><dt>
-
-          <code><a href="get_messages.html">get_messages()</a></code>
-
-        </dt>
-        <dd>Get messages</dd>
-      </dl><dl><dt>
-
-          <code><a href="grapes-greater-than-grapes.html">`%-&gt;%`</a></code>
-
-        </dt>
-        <dd>Workflow pipe operator</dd>
-      </dl><dl><dt>
-
-          <code><a href="handle_response.html">handle_response()</a></code>
-
-        </dt>
-        <dd>Handle response from an LLM provider</dd>
-      </dl><dl><dt>
-
-          <code><a href="handle_tool_use.html">handle_tool_use()</a></code>
-
-        </dt>
-        <dd>Handle tool use in a response</dd>
-      </dl><dl><dt>
-
-          <code><a href="message.html">new_message()</a></code>
-
-        </dt>
-        <dd>Create a message</dd>
-      </dl><dl><dt>
 
           <code><a href="new_agent.html">new_agent()</a></code>
 
@@ -132,17 +66,115 @@
         <dd>Create a provider</dd>
       </dl><dl><dt>
 
-          <code><a href="register_mcp.html">register_mcp()</a></code>
+          <code><a href="message.html">new_message()</a></code>
 
         </dt>
-        <dd>Register a memory client provider</dd>
+        <dd>Create a message</dd>
       </dl><dl><dt>
+
+          <code><a href="add_tool.html">add_tool()</a></code>
+
+        </dt>
+        <dd>Add a tool to an agent</dd>
+      </dl></div><div class="section level2">
+      <h2 id="request-response-handling">Request &amp; Response Handling<a class="anchor" aria-label="anchor" href="#request-response-handling"></a></h2>
+
+      <div class="section-desc"><p>Functions for making requests and handling responses</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="request.html">request()</a></code>
 
         </dt>
         <dd>Make a request to an LLM provider</dd>
+      </dl></div><div class="section level2">
+      <h2 id="workflow-management">Workflow Management<a class="anchor" aria-label="anchor" href="#workflow-management"></a></h2>
+
+      <div class="section-desc"><p>Functions for building and executing workflows</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="execute.html">execute()</a></code>
+
+        </dt>
+        <dd>Execute a workflow</dd>
       </dl><dl><dt>
+
+          <code><a href="step.html">step()</a></code>
+
+        </dt>
+        <dd>Create a workflow step</dd>
+      </dl><dl><dt>
+
+          <code><a href="when.html">when()</a></code>
+
+        </dt>
+        <dd>Create conditional branching in workflows</dd>
+      </dl><dl><dt>
+
+          <code><a href="grapes-greater-than-grapes.html">`%-&gt;%`</a></code>
+
+        </dt>
+        <dd>Workflow pipe operator</dd>
+      </dl></div><div class="section level2">
+      <h2 id="message-management">Message Management<a class="anchor" aria-label="anchor" href="#message-management"></a></h2>
+
+      <div class="section-desc"><p>Functions for working with messages</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="append_message.html">append_message()</a></code>
+
+        </dt>
+        <dd>Add a message to the list</dd>
+      </dl><dl><dt>
+
+          <code><a href="clear_messages.html">clear_messages()</a></code>
+
+        </dt>
+        <dd>Clear messages</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_messages.html">get_messages()</a></code>
+
+        </dt>
+        <dd>Get messages</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_last_message.html">get_last_message()</a></code>
+
+        </dt>
+        <dd>Get last message</dd>
+      </dl></div><div class="section level2">
+      <h2 id="provider-configuration">Provider Configuration<a class="anchor" aria-label="anchor" href="#provider-configuration"></a></h2>
+
+      <div class="section-desc"><p>Functions for configuring LLM providers</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="set_api_key.html">set_api_key()</a></code>
 
@@ -154,6 +186,12 @@
 
         </dt>
         <dd>Set the token for an LLM provider</dd>
+      </dl><dl><dt>
+
+          <code><a href="set_max_tool_calls.html">set_max_tool_calls()</a></code>
+
+        </dt>
+        <dd>Set the maximum number of tool calls for an LLM provider</dd>
       </dl><dl><dt>
 
           <code><a href="set_model.html">set_model()</a></code>
@@ -184,20 +222,26 @@
 
         </dt>
         <dd>Set the version for an LLM provider</dd>
-      </dl><dl><dt>
+      </dl></div><div class="section level2">
+      <h2 id="mcp-integration">MCP Integration<a class="anchor" aria-label="anchor" href="#mcp-integration"></a></h2>
 
-          <code><a href="step.html">step()</a></code>
+      <div class="section-desc"><p>Functions for Memory Client Provider integration</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="register_mcp.html">register_mcp()</a></code>
 
         </dt>
-        <dd>Create a workflow step</dd>
-      </dl><dl><dt>
-
-          <code><a href="when.html">when()</a></code>
-
-        </dt>
-        <dd>Create conditional branching in workflows</dd>
+        <dd>Register a memory client provider</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

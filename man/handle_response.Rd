@@ -21,3 +21,4 @@ A response object
 \description{
 Handle response from an LLM provider
 }
+\keyword{internal}

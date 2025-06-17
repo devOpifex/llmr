@@ -11,3 +11,6 @@ install:
 
 site: document
 	R -s -e "pkgdown::build_site()"
+
+article:
+	R -s -e "pkgdown::build_article('$(a)')"

@@ -96,13 +96,10 @@ print(result)  # Should be 25: ((5 + 10) * 2) - 5 = 25
 Now let's create a workflow using AI agents for text processing:
 
 ```{r agent-workflow, eval = FALSE}
-# Create provider and agents
-provider <- new_anthropic()
-
-# Create specialized agents
-summarizer <- new_agent("summarizer", provider)
-analyzer <- new_agent("analyzer", provider)
-formatter <- new_agent("formatter", provider)
+# Create specialized agents using the factory pattern
+summarizer <- new_agent("summarizer", new_anthropic)
+analyzer <- new_agent("analyzer", new_anthropic)
+formatter <- new_agent("formatter", new_anthropic)
 
 # Configure each agent with specific instructions
 set_system_prompt(
@@ -170,7 +167,7 @@ add_metadata <- function(analysis) {
 }
 
 # Create an agent for the core analysis
-analyzer <- new_agent("text_analyzer", provider)
+analyzer <- new_agent("text_analyzer", new_anthropic)
 set_system_prompt(
   analyzer,
   "Analyze the given text and provide insights about its main themes, tone, and key messages. Be concise but thorough."

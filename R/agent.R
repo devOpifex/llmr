@@ -6,6 +6,12 @@
 #' @param provider An object of class `provider` or a function that returns a provider.
 #' @param ... Additional arguments passed to methods.
 #'
+#' @details
+#' The `provider` argument can be either a `provider` object or a function that returns a `provider` object.
+#' If a function is provided, it will be called with no arguments and the result will be used as the provider.
+#' This is recommended so agents are isolated from each other and do not share state as they would with
+#' an instance of a `provider`.
+#'
 #' @return An object of class "agent"
 #' @export
 new_agent <- function(name, provider, ...) {
@@ -15,6 +21,10 @@ new_agent <- function(name, provider, ...) {
 #' @method new_agent provider
 #' @export
 new_agent.provider <- function(name, provider, ...) {
+  warning(
+    "It is advised to pass the `provider` as a factory function, see details in ?new_agent."
+  )
+
   env <- new.env(parent = emptyenv())
   env$tools <- list()
   env$messages <- list()

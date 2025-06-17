@@ -17,3 +17,4 @@ An MCP object or NULL if not found
 \description{
 Find an MCP by name
 }
+\keyword{internal}

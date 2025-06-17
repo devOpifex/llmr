@@ -104,19 +104,19 @@ deployment</li>
 within our agent:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Development approach - tool embedded in agent</span></span>
-<span><span class="va">calculator</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/new_tool.html" class="external-link">new_tool</a></span><span class="op">(</span></span>
+<span><span class="va">calculator</span> <span class="op">&lt;-</span> <span class="fu">new_tool</span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"calculator"</span>,</span>
 <span>  description <span class="op">=</span> <span class="st">"Performs basic arithmetic operations"</span>,</span>
-<span>  input_schema <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/schema.html" class="external-link">schema</a></span><span class="op">(</span></span>
-<span>    properties <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/properties.html" class="external-link">properties</a></span><span class="op">(</span></span>
-<span>      operation <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/property_enum.html" class="external-link">property_enum</a></span><span class="op">(</span></span>
+<span>  input_schema <span class="op">=</span> <span class="fu">schema</span><span class="op">(</span></span>
+<span>    properties <span class="op">=</span> <span class="fu">properties</span><span class="op">(</span></span>
+<span>      operation <span class="op">=</span> <span class="fu">property_enum</span><span class="op">(</span></span>
 <span>        <span class="st">"Operation"</span>,</span>
 <span>        <span class="st">"Math operation to perform"</span>,</span>
 <span>        values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"add"</span>, <span class="st">"subtract"</span>, <span class="st">"multiply"</span>, <span class="st">"divide"</span><span class="op">)</span>,</span>
 <span>        required <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>      <span class="op">)</span>,</span>
-<span>      a <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/property_number.html" class="external-link">property_number</a></span><span class="op">(</span><span class="st">"First number"</span>, <span class="st">"First operand"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>      b <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/property_number.html" class="external-link">property_number</a></span><span class="op">(</span><span class="st">"Second number"</span>, <span class="st">"Second operand"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>      a <span class="op">=</span> <span class="fu">property_number</span><span class="op">(</span><span class="st">"First number"</span>, <span class="st">"First operand"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>      b <span class="op">=</span> <span class="fu">property_number</span><span class="op">(</span><span class="st">"Second number"</span>, <span class="st">"Second operand"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  handler <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">{</span></span>
@@ -127,7 +127,7 @@ within our agent:</p>
 <span>      <span class="st">"multiply"</span> <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">a</span> <span class="op">*</span> <span class="va">params</span><span class="op">$</span><span class="va">b</span>,</span>
 <span>      <span class="st">"divide"</span> <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">a</span> <span class="op">/</span> <span class="va">params</span><span class="op">$</span><span class="va">b</span></span>
 <span>    <span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://mcpr.opifex.org/reference/response.html" class="external-link">response_text</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span>    <span class="fu">response_text</span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_tool.html">add_tool</a></span><span class="op">(</span><span class="va">agent</span>, <span class="va">calculator</span><span class="op">)</span></span></code></pre></div>
@@ -142,7 +142,7 @@ tools</strong></p>
 logic into an MCP server:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Production approach - tool as external MCP server</span></span>
-<span><span class="va">client</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/client.html" class="external-link">new_client_io</a></span><span class="op">(</span>command <span class="op">=</span> <span class="st">"Rscript"</span>, args <span class="op">=</span> <span class="st">"calculator-server.R"</span><span class="op">)</span></span>
+<span><span class="va">client</span> <span class="op">&lt;-</span> <span class="fu">new_client_io</span><span class="op">(</span>command <span class="op">=</span> <span class="st">"Rscript"</span>, args <span class="op">=</span> <span class="st">"calculator-server.R"</span><span class="op">)</span></span>
 <span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/register_mcp.html">register_mcp</a></span><span class="op">(</span><span class="va">agent</span>, <span class="va">client</span><span class="op">)</span></span></code></pre></div>
 <p>This approach provides: - <strong>Scalability</strong> - Tools run as
 separate processes - <strong>Reusability</strong> - Multiple agents can
@@ -226,11 +226,10 @@ example:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     write</span></span>
 <span></span>
-<span><span class="co"># Set up your provider (same as before)</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create an agent</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="va">provider</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Create an agent with the Anthropic provider factory</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in new_agent.provider(name, instance, ...): It is advised to pass the</span></span>
+<span><span class="co">#&gt; `provider` as a factory function, see details in ?new_agent.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="step-3-connect-to-the-mcp-server">Step 3: Connect to the MCP Server<a class="anchor" aria-label="anchor" href="#step-3-connect-to-the-mcp-server"></a>
@@ -264,16 +263,16 @@ to the agent</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Same usage as the inline tool version</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 25 multiplied by 4?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:53:48 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-18 01:29:15 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
 <span><span class="co">#&gt; assistant: [{"type":"text","text":"25 multiplied by 4 equals 100."}]</span></span>
 <span></span>
 <span><span class="co"># Complex calculations work the same way</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"I have 150 dollars, spend 47.50 on dinner and 23.75 on a book. How much is left?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:53:57 [TOOL] Calling MCP (calculator) tool: calculator </span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:54:02 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-18 01:29:37 [TOOL] Calling MCP (calculator) tool: calculator </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-18 01:29:44 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
-<span><span class="co">#&gt; assistant: [{"type":"text","text":"You have $78.75 left after spending $47.50 on dinner and $23.75 on a book."}]</span></span></code></pre></div>
+<span><span class="co">#&gt; assistant: [{"type":"text","text":"After spending $47.50 on dinner and $23.75 on a book, you have **$78.75** left from your original $150."}]</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="the-lift-and-shift-advantage">The “Lift and Shift” Advantage<a class="anchor" aria-label="anchor" href="#the-lift-and-shift-advantage"></a>
@@ -303,9 +302,9 @@ changes</li>
 </h5>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Multiple agents can share the same calculator service</span></span>
-<span><span class="va">agent1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"financial_advisor"</span>, <span class="va">provider</span><span class="op">)</span></span>
-<span><span class="va">agent2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"math_tutor"</span>, <span class="va">provider</span><span class="op">)</span></span>
-<span><span class="va">agent3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"data_analyst"</span>, <span class="va">provider</span><span class="op">)</span></span>
+<span><span class="va">agent1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"financial_advisor"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
+<span><span class="va">agent2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"math_tutor"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
+<span><span class="va">agent3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"data_analyst"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># All connect to the same MCP server</span></span>
 <span><span class="fu"><a href="../reference/register_mcp.html">register_mcp</a></span><span class="op">(</span><span class="va">agent1</span>, <span class="va">calculator_client</span><span class="op">)</span></span>

@@ -19,3 +19,9 @@ An object of class "agent"
 \description{
 Creates a new agent with the specified name and provider.
 }
+\details{
+The \code{provider} argument can be either a \code{provider} object or a function that returns a \code{provider} object.
+If a function is provided, it will be called with no arguments and the result will be used as the provider.
+This is recommended so agents are isolated from each other and do not share state as they would with
+an instance of a \code{provider}.
+}

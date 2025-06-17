@@ -63,7 +63,7 @@
   <main id="main" class="col-md-9"><div align="center">
 <p><img src="reference/figures/logo.png"></p>
 </div>
-<p>An R package for interacting with Large Language Models (LLMs) with support for tools and agents.</p>
+<p>An R package for interacting with Large Language Models (LLMs) with support for agents, workflows, and MCPs: <a href="https://llmr.opifex.org/articles/get-started">Get Started</a></p>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
@@ -87,10 +87,6 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Set your Anthropic API key</span></span>
-<span><span class="fu"><a href="reference/set_api_key.html">set_api_key</a></span><span class="op">(</span><span class="st">"your-api-key"</span><span class="op">)</span> </span>
-<span><span class="co"># Or use ANTHROPIC_API_KEY environment variable</span></span>
-<span></span>
 <span><span class="co"># Create a provider</span></span>
 <span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -101,17 +97,7 @@
 <span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span><span class="va">provider</span>, <span class="va">message</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Print the last message</span></span>
-<span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Continue the conversation</span></span>
-<span><span class="va">message</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"Now give me a simple code example"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span><span class="va">provider</span>, <span class="va">message</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># get all clear_messages</span></span>
-<span><span class="fu"><a href="reference/get_messages.html">get_messages</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Clear conversation history</span></span>
-<span><span class="fu"><a href="reference/clear_messages.html">clear_messages</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="creating-a-simple-agent">Creating a Simple Agent<a class="anchor" aria-label="anchor" href="#creating-a-simple-agent"></a>
@@ -120,14 +106,8 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Set your API key</span></span>
-<span><span class="fu"><a href="reference/set_api_key.html">set_api_key</a></span><span class="op">(</span><span class="st">"your_anthropic_api_key"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create a provider (default is Anthropic)</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
 <span><span class="co"># Create a simple agent</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span><span class="op">)</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Add a calculator tool to the agent</span></span>
 <span><span class="fu"><a href="reference/add_tool.html">add_tool</a></span><span class="op">(</span></span>
@@ -150,17 +130,14 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Register the agent with the provider</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu">register_agent</span><span class="op">(</span><span class="va">provider</span>, <span class="va">agent</span><span class="op">)</span></span>
-<span></span>
 <span><span class="co"># Make a request to the LLM</span></span>
 <span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span></span>
-<span>  <span class="va">provider</span>,</span>
+<span>  <span class="va">agent</span>,</span>
 <span>  <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"What is 123 * 456? Please use the calculate tool."</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Print the response</span></span>
-<span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="integrating-with-mcp-model-context-protocol">Integrating with MCP (Model Context Protocol)<a class="anchor" aria-label="anchor" href="#integrating-with-mcp-model-context-protocol"></a>
@@ -170,11 +147,8 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mcpr.opifex.org/" class="external-link">mcpr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Set your API key</span></span>
-<span><span class="fu"><a href="reference/set_api_key.html">set_api_key</a></span><span class="op">(</span><span class="st">"your_anthropic_api_key"</span><span class="op">)</span></span>
-<span></span>
 <span><span class="co"># Create a provider</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"mcp"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create an MCP client that connects to an external calculator service</span></span>
 <span><span class="va">client</span> <span class="op">&lt;-</span> <span class="fu">mcpr</span><span class="fu">::</span><span class="fu">new_client</span><span class="op">(</span></span>
@@ -184,16 +158,16 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Register the MCP with the provider</span></span>
-<span><span class="fu"><a href="reference/register_mcp.html">register_mcp</a></span><span class="op">(</span><span class="va">provider</span>, <span class="va">client</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/register_mcp.html">register_mcp</a></span><span class="op">(</span><span class="va">agent</span>, <span class="va">client</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Make a request</span></span>
 <span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span></span>
-<span>  <span class="va">provider</span>, </span>
+<span>  <span class="va">agent</span>, </span>
 <span>  <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"Subtract 5 from 10."</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Print the response</span></span>
-<span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="workflows">Workflows<a class="anchor" aria-label="anchor" href="#workflows"></a>
@@ -219,6 +193,7 @@
 <div class="section level2">
 <h2 id="configuration">Configuration<a class="anchor" aria-label="anchor" href="#configuration"></a>
 </h2>
+<p>Methods for <code>agent</code> exists too.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Set a different model</span></span>
 <span><span class="fu"><a href="reference/set_model.html">set_model</a></span><span class="op">(</span><span class="va">provider</span>, <span class="st">"claude-3-haiku-20240307"</span><span class="op">)</span></span>

@@ -290,13 +290,10 @@ for (i in seq_along(test_data)) {
 Combine AI agents with conditional logic for intelligent processing:
 
 ```{r agent-conditional}
-# Create provider
-provider <- new_anthropic()
-
-# Create specialized agents
-technical_writer <- new_agent("technical_writer", provider)
-creative_writer <- new_agent("creative_writer", provider)
-data_analyst <- new_agent("data_analyst", provider)
+# Create specialized agents using the factory pattern
+technical_writer <- new_agent("technical_writer", new_anthropic)
+creative_writer <- new_agent("creative_writer", new_anthropic)
+data_analyst <- new_agent("data_analyst", new_anthropic)
 
 # Configure agents
 set_system_prompt(

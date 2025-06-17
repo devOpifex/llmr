@@ -1,3 +1,53 @@
 url: https://llmr.opifex.org
 template:
   bootstrap: 5
+
+reference:
+  - title: "Core Components"
+    desc: "Essential functions for creating and managing agents and workflows"
+    contents:
+      - new_agent
+      - new_workflow
+      - new_provider
+      - new_anthropic
+      - new_openai
+      - new_message
+      - add_tool
+      
+  - title: "Request & Response Handling"
+    desc: "Functions for making requests and handling responses"
+    contents:
+      - request
+      
+  - title: "Workflow Management"
+    desc: "Functions for building and executing workflows"
+    contents:
+      - execute
+      - step
+      - when
+      - "%->%"
+      
+  - title: "Message Management"
+    desc: "Functions for working with messages"
+    contents:
+      - append_message
+      - clear_messages
+      - get_messages
+      - get_last_message
+      
+  - title: "Provider Configuration"
+    desc: "Functions for configuring LLM providers"
+    contents:
+      - set_api_key
+      - set_max_tokens
+      - set_max_tool_calls
+      - set_model
+      - set_retry
+      - set_system_prompt
+      - set_temperature
+      - set_version
+      
+  - title: "MCP Integration"
+    desc: "Functions for Memory Client Provider integration"
+    contents:
+      - register_mcp

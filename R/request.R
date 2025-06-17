@@ -73,6 +73,7 @@ request.provider_anthropic <- function(x, message, ..., tools = NULL) {
       "x-api-key" = attr(x, "key"),
       "anthropic-version" = attr(x, "version")
     ) |>
+    httr2::req_user_agent("llmr") |>
     httr2::req_body_json(body) |>
     httr2::req_method("POST")
 
@@ -133,6 +134,7 @@ request.provider_openai <- function(x, message, ..., tools = NULL) {
       "Content-Type" = "application/json",
       "Authorization" = sprintf("Bearer %s", attr(x, "key"))
     ) |>
+    httr2::req_user_agent("llmr") |>
     httr2::req_body_json(body) |>
     httr2::req_method("POST")
 
@@ -170,7 +172,7 @@ request.provider_openai <- function(x, message, ..., tools = NULL) {
 #' @param loop Whether to loop the request or not..
 #'
 #' @return A response object
-#' @export
+#' @keywords internal
 handle_response <- function(x, agent, response, loop = TRUE) {
   UseMethod("handle_response")
 }
@@ -285,7 +287,7 @@ handle_response.provider_openai <- function(
 #' @param mcps A list of available memory context providers.
 #'
 #' @return A formatted tool response
-#' @export
+#' @keywords internal
 handle_tool_use <- function(provider, response, tools, mcps) {
   UseMethod("handle_tool_use")
 }
@@ -578,6 +580,7 @@ handle_tool_use.provider_openai <- function(
 #' @param mcps An environment containing MCPs
 #' @param name The name of the MCP to find.
 #'
+#' @keywords internal
 #' @return An MCP object or NULL if not found
 find_mcp_by_name <- function(mcps, name) {
   if (!length(mcps)) {

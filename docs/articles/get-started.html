@@ -120,34 +120,27 @@ tools)</li>
 <span><span class="co">#&gt;     write</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="step-1-set-up-your-provider">Step 1: Set Up Your Provider<a class="anchor" aria-label="anchor" href="#step-1-set-up-your-provider"></a>
-</h3>
-<p>First, you need to configure your LLM provider. We’ll use Anthropic’s
-Claude, but llmr also supports OpenAI.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create a provider instance</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><strong>Important:</strong> Replace
-<code>"your-anthropic-api-key-here"</code> with your actual Anthropic
-API key. You can get one from <a href="https://console.anthropic.com/" class="external-link">Anthropic’s website</a>.</p>
-</div>
-<div class="section level3">
-<h3 id="step-2-create-your-first-agent">Step 2: Create Your First Agent<a class="anchor" aria-label="anchor" href="#step-2-create-your-first-agent"></a>
+<h3 id="step-1-create-your-first-agent">Step 1: Create Your First Agent<a class="anchor" aria-label="anchor" href="#step-1-create-your-first-agent"></a>
 </h3>
 <p>An agent is an AI assistant that can use tools to help solve
-problems. Let’s create a simple calculator agent:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create an agent with a descriptive name</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="va">provider</span><span class="op">)</span></span></code></pre></div>
+problems. Let’s create a simple calculator agent using Anthropic’s
+Claude:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create an agent with a descriptive name and the Anthropic provider factory</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in new_agent.provider(name, instance, ...): It is advised to pass the</span></span>
+<span><span class="co">#&gt; `provider` as a factory function, see details in ?new_agent.</span></span></code></pre></div>
+<p><strong>Important:</strong> You’ll need an Anthropic API key for this
+to work. You can get one from <a href="https://console.anthropic.com/" class="external-link">Anthropic’s website</a>.</p>
 <p>That’s it! You now have a basic agent, but it can’t do much yet.
 Let’s give it some capabilities.</p>
 </div>
 <div class="section level3">
-<h3 id="step-3-create-a-calculator-tool">Step 3: Create a Calculator Tool<a class="anchor" aria-label="anchor" href="#step-3-create-a-calculator-tool"></a>
+<h3 id="step-2-create-a-calculator-tool">Step 2: Create a Calculator Tool<a class="anchor" aria-label="anchor" href="#step-2-create-a-calculator-tool"></a>
 </h3>
 <p>Tools allow your agent to perform specific actions. We’ll create a
 calculator tool that can perform basic arithmetic operations:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a calculator tool</span></span>
 <span><span class="va">calculator</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/new_tool.html" class="external-link">new_tool</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"calculator"</span>,</span>
@@ -201,7 +194,7 @@ the calculation</li>
 <h3 id="step-4-add-the-tool-to-your-agent">Step 4: Add the Tool to Your Agent<a class="anchor" aria-label="anchor" href="#step-4-add-the-tool-to-your-agent"></a>
 </h3>
 <p>Now we need to give our agent access to the calculator tool:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add the calculator tool to the agent</span></span>
 <span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_tool.html">add_tool</a></span><span class="op">(</span><span class="va">agent</span>, <span class="va">calculator</span><span class="op">)</span></span></code></pre></div>
 <p>Your agent is now equipped with calculation capabilities!</p>
@@ -211,10 +204,10 @@ the calculation</li>
 </h3>
 <p>Let’s test our calculator agent by asking it to perform some
 calculations:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask the agent to perform a calculation</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 15 multiplied by 7?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:53:25 [TOOL] Calling tool: calculator</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-18 01:24:32 [TOOL] Calling tool: calculator</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
 <span><span class="co">#&gt; assistant: [{"type":"text","text":"15 multiplied by 7 equals 105."}]</span></span></code></pre></div>
 </div>
@@ -246,7 +239,7 @@ agent to use the calculator tool.</p>
 capabilities by adding a simple text formatter tool. This will
 demonstrate how a single request can invoke multiple tools when
 needed.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a text formatter tool</span></span>
 <span><span class="va">formatter</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/new_tool.html" class="external-link">new_tool</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"convert"</span>,</span>
@@ -269,13 +262,13 @@ needed.</p>
 <span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_tool.html">add_tool</a></span><span class="op">(</span><span class="va">agent</span>, <span class="va">formatter</span><span class="op">)</span></span></code></pre></div>
 <p>Now our agent has two tools at its disposal: a calculator and a text
 formatter. Let’s ask it a question that requires both tools:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask a question that requires both calculation and text formatting</span></span>
-<span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"Calculate 25 times 4, and convert the result to Roman numerals."</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:53:35 [TOOL] Calling tool: calculator </span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:53:39 [TOOL] Calling tool: convert</span></span>
+<span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"Calculate 25 times 12, and convert the result to Roman numerals."</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-18 01:24:47 [TOOL] Calling tool: calculator </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-18 01:24:50 [TOOL] Calling tool: convert</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
-<span><span class="co">#&gt; assistant: [{"type":"text","text":"25 times 4 equals 100, which is **C** in Roman numerals."}]</span></span></code></pre></div>
+<span><span class="co">#&gt; assistant: [{"type":"text","text":"25 times 12 equals 300, which is CCC in Roman numerals."}]</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="how-multiple-tool-use-works">How Multiple Tool Use Works<a class="anchor" aria-label="anchor" href="#how-multiple-tool-use-works"></a>
