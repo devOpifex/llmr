@@ -11,7 +11,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE
+  eval = TRUE 
 )
 ```
 
@@ -36,13 +36,6 @@ By the end of this guide, you'll understand how to:
 
 ```{r setup}
 library(llmr)
-```
-
-For examples using agents:
-
-```{r api-setup, eval=FALSE}
-set_api_key("your-anthropic-api-key-here")
-provider <- new_anthropic()
 ```
 
 ## Understanding `when()`: Conditional Branching
@@ -95,7 +88,7 @@ test_values <- c(5, 50, 500)
 for (val in test_values) {
   cat("\n--- Processing:", val, "---\n")
   result <- execute(number_processor, val)
-  cat("Result:", result, "\n")
+  print(result)
 }
 ```
 
@@ -115,12 +108,12 @@ validate_and_prepare <- function(x) {
 
 # Create workflow with preprocessing
 robust_processor <- step(validate_and_prepare, name = "validate") %->%
-                   when(
-                     classify_number,
-                     large = step(process_large, name = "scale_down"),
-                     medium = step(process_medium, name = "double"),
-                     small = step(process_small, name = "boost")
-                   )
+  when(
+    classify_number,
+    large = step(process_large, name = "scale_down"),
+    medium = step(process_medium, name = "double"),
+    small = step(process_small, name = "boost")
+  )
 
 print(robust_processor)
 
@@ -129,7 +122,7 @@ test_inputs <- c(-25, 15, 150)
 for (input in test_inputs) {
   cat("\n--- Processing:", input, "---\n")
   result <- execute(robust_processor, input)
-  cat("Final result:", result, "\n")
+  print(result)
 }
 ```
 
@@ -191,14 +184,14 @@ text_analyzer <- when(
   keywords = step(extract_keywords, name = "extract_keys"),
   readability = step(readability_score, name = "readability")
 ) %->%
-step(combine_analysis, name = "combine")
+  step(combine_analysis, name = "combine")
 
 print(text_analyzer)
 
 # Test parallel processing
 sample_text <- "The advanced workflow capabilities in llmr enable sophisticated data processing patterns."
 result <- execute(text_analyzer, sample_text)
-str(result)
+print(result)
 ```
 
 ## Dynamic Routing Based on Data Characteristics
@@ -231,7 +224,8 @@ process_long_text <- function(text) {
   # Summarize long text
   words <- strsplit(text, "\\s+")[[1]]
   paste("Summary:", length(words), "words starting with:", 
-        paste(head(words, 3), collapse = " "))
+    paste(head(words, 3), collapse = " ")
+  )
 }
 
 process_short_text <- function(text) {
@@ -296,6 +290,9 @@ for (i in seq_along(test_data)) {
 Combine AI agents with conditional logic for intelligent processing:
 
 ```{r agent-conditional}
+# Create provider
+provider <- new_anthropic()
+
 # Create specialized agents
 technical_writer <- new_agent("technical_writer", provider)
 creative_writer <- new_agent("creative_writer", provider)
@@ -303,17 +300,17 @@ data_analyst <- new_agent("data_analyst", provider)
 
 # Configure agents
 set_system_prompt(
-  technical_writer$provider,
+  technical_writer,
   "You are a technical writer. Analyze text for technical accuracy and clarity. Provide structured feedback."
 )
 
 set_system_prompt(
-  creative_writer$provider,
+  creative_writer,
   "You are a creative writing expert. Analyze text for creativity, style, and emotional impact."
 )
 
 set_system_prompt(
-  data_analyst$provider,
+  data_analyst,
   "You are a data analyst. Extract quantitative insights and patterns from text."
 )
 
@@ -368,7 +365,7 @@ for (type in names(test_texts)) {
 
 Combine multiple advanced patterns for sophisticated processing:
 
-```{r complex-workflow}
+```{r complex-workflow, eval}
 # Multi-stage document processor
 document_preprocessor <- function(doc) {
   cat("Preprocessing document...\n")
@@ -437,21 +434,28 @@ format_results <- function(analysis) {
 
 # Create complex multi-stage workflow
 document_pipeline <- step(document_preprocessor, name = "preprocess") %->%
-                    when(
-                      classify_document,
-                      long_document = step(process_long_document, name = "process_long"),
-                      medium_document = step(process_medium_document, name = "process_medium"),
-                      short_document = step(process_short_document, name = "process_short")
-                    ) %->%
-                    step(format_results, name = "format")
+  when(
+    classify_document,
+    long_document = step(process_long_document, name = "process_long"),
+    medium_document = step(process_medium_document, name = "process_medium"),
+    short_document = step(process_short_document, name = "process_short")
+  ) %->%
+  step(format_results, name = "format")
 
 print(document_pipeline)
 
 # Test with documents of different lengths
 test_documents <- list(
   short = "Brief note.",
-  medium = "This is a medium-length document that contains several sentences and provides a reasonable amount of content for analysis purposes.",
-  long = paste(rep("This is a very long document with many repeated sentences to simulate a lengthy piece of content.", 10), collapse = " ")
+  medium = "This is a medium-length document that contains several sentences and 
+    provides a reasonable amount of content for analysis purposes.",
+  long = paste(
+    rep("This is a very long document with many repeated sentences to 
+      simulate a lengthy piece of content.", 
+      10
+    ), 
+    collapse = " "
+  )
 )
 
 for (doc_type in names(test_documents)) {
@@ -491,17 +495,17 @@ fallback_processor <- function(data) {
 
 # Workflow with error handling
 robust_workflow <- step(safe_processor, name = "safe_process") %->%
-                  when(
-                    function(result) {
-                      if (grepl("^Error:", result)) {
-                        "error"
-                      } else {
-                        "success"
-                      }
-                    },
-                    error = step(fallback_processor, name = "fallback"),
-                    success = step(function(x) paste("Success:", x), name = "finalize")
-                  )
+  when(
+    function(result) {
+      if (grepl("^Error:", result)) {
+        "error"
+      } else {
+        "success"
+      }
+    },
+    error = step(fallback_processor, name = "fallback"),
+    success = step(function(x) paste("Success:", x), name = "finalize")
+  )
 
 print(robust_workflow)
 
@@ -510,14 +514,14 @@ test_inputs <- list("valid input", "", -5, 42)
 for (input in test_inputs) {
   cat("\n--- Testing input:", as.character(input), "---\n")
   result <- execute(robust_workflow, input)
-  cat("Result:", result, "\n")
+  print(result)
 }
 ```
 
 ## Best Practices for Advanced Workflows
 
 ### 1. Design Clear Condition Functions
-```{r condition-best-practices}
+```{r condition-best-practices, eval=FALSE}
 # Good: Clear, single-purpose condition
 classify_by_size <- function(data) {
   if (length(data) > 1000) "large"
@@ -535,7 +539,7 @@ size_router <- when(
 ```
 
 ### 2. Handle Edge Cases
-```{r edge-cases}
+```{r edge-cases, eval=FALSE}
 # Always include fallback branches
 robust_classifier <- function(data) {
   if (is.null(data)) return("null")
@@ -547,15 +551,15 @@ robust_classifier <- function(data) {
 ```
 
 ### 3. Use Meaningful Names
-```{r meaningful-names}
+```{r meaningful-names, eval=FALSE}
 # Good: Descriptive workflow and step names
 data_pipeline <- step(validate_input, name = "validate") %->%
-                when(
-                  classify_data_complexity,
-                  simple = step(fast_processor, name = "fast_track"),
-                  complex = step(thorough_processor, name = "deep_analysis")
-                ) %->%
-                step(format_output, name = "finalize")
+  when(
+    classify_data_complexity,
+    simple = step(fast_processor, name = "fast_track"),
+    complex = step(thorough_processor, name = "deep_analysis")
+  ) %->%
+  step(format_output, name = "finalize")
 ```
 
 ## Summary

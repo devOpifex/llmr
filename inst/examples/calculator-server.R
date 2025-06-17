@@ -49,3 +49,4 @@ mcp_server <- add_capability(mcp_server, calculator)
 
 # Start the server (listening on stdin/stdout)
 serve_io(mcp_server)
+

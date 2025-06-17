@@ -35,15 +35,17 @@ provider <- new_anthropic()
 message <- new_message("Explain quantum computing in simple terms")
 
 # Send request and get response
-response <- request(provider, message)
+request(provider, message)
 
-# Print the response
-cat(response$content)
+# Print the last message
+get_last_message(provider)
 
 # Continue the conversation
 message <- new_message("Now give me a simple code example")
-response <- request(provider, message)
-cat(response$content)
+request(provider, message)
+
+# get all clear_messages
+get_messages(provider)
 
 # Clear conversation history
 clear_messages(provider)
@@ -92,13 +94,13 @@ add_tool(
 provider <- register_agent(provider, agent)
 
 # Make a request to the LLM
-response <- request(
+request(
   provider,
   new_message("What is 123 * 456? Please use the calculate tool.")
 )
 
 # Print the response
-cat(response$content)
+get_last_message(provider)
 ```
 
 ## Integrating with MCP (Model Context Protocol)
@@ -127,13 +129,13 @@ client <- mcpr::new_client(
 register_mcp(provider, client)
 
 # Make a request
-response <- request(
+request(
   provider, 
   new_message("Subtract 5 from 10.")
 )
 
 # Print the response
-cat(response$content)
+get_last_message(provider)
 ```
 
 ## Workflows

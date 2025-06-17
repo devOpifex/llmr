@@ -120,11 +120,12 @@ characteristics and processing requirements.</p>
 <h3 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span></code></pre></div>
-<p>For examples using agents:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/set_api_key.html">set_api_key</a></span><span class="op">(</span><span class="st">"your-anthropic-api-key-here"</span><span class="op">)</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'llmr'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     step</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="understanding-when-conditional-branching">Understanding <code>when()</code>: Conditional Branching<a class="anchor" aria-label="anchor" href="#understanding-when-conditional-branching"></a>
@@ -135,7 +136,7 @@ executing the appropriate branch based on the condition’s result.</p>
 <div class="section level4">
 <h4 id="basic-conditional-workflow">Basic Conditional Workflow<a class="anchor" aria-label="anchor" href="#basic-conditional-workflow"></a>
 </h4>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define condition function</span></span>
 <span><span class="va">classify_number</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">100</span><span class="op">)</span> <span class="op">{</span></span>
@@ -173,20 +174,39 @@ executing the appropriate branch based on the condition’s result.</p>
 <span></span>
 <span><span class="co"># View the workflow structure</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">number_processor</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Workflow conditional branch with 3 branches:</span></span>
+<span><span class="co">#&gt; Branches: large, medium, small</span></span>
 <span></span>
 <span><span class="co"># Test with different values</span></span>
 <span><span class="va">test_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">50</span>, <span class="fl">500</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">val</span> <span class="kw">in</span> <span class="va">test_values</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n--- Processing:"</span>, <span class="va">val</span>, <span class="st">"---\n"</span><span class="op">)</span></span>
 <span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/execute.html">execute</a></span><span class="op">(</span><span class="va">number_processor</span>, <span class="va">val</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Result:"</span>, <span class="va">result</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Processing: 5 ---</span></span>
+<span><span class="co">#&gt; Processing small number: 5 </span></span>
+<span><span class="co">#&gt; $small</span></span>
+<span><span class="co">#&gt; [1] 105</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Processing: 50 ---</span></span>
+<span><span class="co">#&gt; Processing medium number: 50 </span></span>
+<span><span class="co">#&gt; $medium</span></span>
+<span><span class="co">#&gt; [1] 100</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Processing: 500 ---</span></span>
+<span><span class="co">#&gt; Processing large number: 500 </span></span>
+<span><span class="co">#&gt; $large</span></span>
+<span><span class="co">#&gt; [1] 50</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="preprocessing-with-conditional-branching">Preprocessing with Conditional Branching<a class="anchor" aria-label="anchor" href="#preprocessing-with-conditional-branching"></a>
 </h4>
 <p>Combine preprocessing steps with conditional logic:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Preprocessor function</span></span>
 <span><span class="va">validate_and_prepare</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Validating input:"</span>, <span class="va">x</span>, <span class="st">"\n"</span><span class="op">)</span></span>
@@ -198,22 +218,66 @@ executing the appropriate branch based on the condition’s result.</p>
 <span></span>
 <span><span class="co"># Create workflow with preprocessing</span></span>
 <span><span class="va">robust_processor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">validate_and_prepare</span>, name <span class="op">=</span> <span class="st">"validate"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                   <span class="fu"><a href="../reference/when.html">when</a></span><span class="op">(</span></span>
-<span>                     <span class="va">classify_number</span>,</span>
-<span>                     large <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_large</span>, name <span class="op">=</span> <span class="st">"scale_down"</span><span class="op">)</span>,</span>
-<span>                     medium <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_medium</span>, name <span class="op">=</span> <span class="st">"double"</span><span class="op">)</span>,</span>
-<span>                     small <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_small</span>, name <span class="op">=</span> <span class="st">"boost"</span><span class="op">)</span></span>
-<span>                   <span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/when.html">when</a></span><span class="op">(</span></span>
+<span>    <span class="va">classify_number</span>,</span>
+<span>    large <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_large</span>, name <span class="op">=</span> <span class="st">"scale_down"</span><span class="op">)</span>,</span>
+<span>    medium <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_medium</span>, name <span class="op">=</span> <span class="st">"double"</span><span class="op">)</span>,</span>
+<span>    small <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_small</span>, name <span class="op">=</span> <span class="st">"boost"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">robust_processor</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Workflow: &lt;unnamed&gt; </span></span>
+<span><span class="co">#&gt; Nodes: 5 | Edges: 4 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ┌─ ⚙️ validate</span></span>
+<span><span class="co">#&gt; │</span></span>
+<span><span class="co">#&gt; ├─ 🔀 when(large, medium, small)</span></span>
+<span><span class="co">#&gt; │   ├─ large: ⚙️ scale_down</span></span>
+<span><span class="co">#&gt; │   ├─ medium: ⚙️ double</span></span>
+<span><span class="co">#&gt; │   └─ small: ⚙️ boost</span></span>
 <span></span>
 <span><span class="co"># Test with various inputs</span></span>
 <span><span class="va">test_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">25</span>, <span class="fl">15</span>, <span class="fl">150</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">input</span> <span class="kw">in</span> <span class="va">test_inputs</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n--- Processing:"</span>, <span class="va">input</span>, <span class="st">"---\n"</span><span class="op">)</span></span>
 <span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/execute.html">execute</a></span><span class="op">(</span><span class="va">robust_processor</span>, <span class="va">input</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Final result:"</span>, <span class="va">result</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Processing: -25 ---</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: validate </span></span>
+<span><span class="co">#&gt; Validating input: -25 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Condition node 'condition_1' selected branches: medium </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing branch 'medium' -&gt; node 'double_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: double </span></span>
+<span><span class="co">#&gt; Processing medium number: 25 </span></span>
+<span><span class="co">#&gt; $medium</span></span>
+<span><span class="co">#&gt; [1] 50</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Processing: 15 ---</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: validate </span></span>
+<span><span class="co">#&gt; Validating input: 15 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Condition node 'condition_1' selected branches: medium </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing branch 'medium' -&gt; node 'double_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: double </span></span>
+<span><span class="co">#&gt; Processing medium number: 15 </span></span>
+<span><span class="co">#&gt; $medium</span></span>
+<span><span class="co">#&gt; [1] 30</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Processing: 150 ---</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: validate </span></span>
+<span><span class="co">#&gt; Validating input: 150 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Condition node 'condition_1' selected branches: large </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing branch 'large' -&gt; node 'scale_down_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: scale_down </span></span>
+<span><span class="co">#&gt; Processing large number: 150 </span></span>
+<span><span class="co">#&gt; $large</span></span>
+<span><span class="co">#&gt; [1] 15</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -221,7 +285,7 @@ executing the appropriate branch based on the condition’s result.</p>
 </h3>
 <p>Use <code><a href="../reference/when.html">when()</a></code> to execute multiple branches in parallel by
 returning multiple branch names:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define analysis functions</span></span>
 <span><span class="va">sentiment_analysis</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">text</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Analyzing sentiment...\n"</span><span class="op">)</span></span>
@@ -275,20 +339,60 @@ returning multiple branch names:</p>
 <span>  keywords <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">extract_keywords</span>, name <span class="op">=</span> <span class="st">"extract_keys"</span><span class="op">)</span>,</span>
 <span>  readability <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">readability_score</span>, name <span class="op">=</span> <span class="st">"readability"</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span><span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">combine_analysis</span>, name <span class="op">=</span> <span class="st">"combine"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">combine_analysis</span>, name <span class="op">=</span> <span class="st">"combine"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">text_analyzer</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Workflow: &lt;unnamed&gt; </span></span>
+<span><span class="co">#&gt; Nodes: 6 | Edges: 5 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ┌─ 🔀 when(sentiment, word_count, keywords, readability)</span></span>
+<span><span class="co">#&gt; │   ├─ sentiment: ⚙️ sentiment</span></span>
+<span><span class="co">#&gt; │   ├─ word_count: ⚙️ count_words</span></span>
+<span><span class="co">#&gt; │   ├─ keywords: ⚙️ extract_keys</span></span>
+<span><span class="co">#&gt; │   └─ readability: ⚙️ readability</span></span>
+<span><span class="co">#&gt; │</span></span>
+<span><span class="co">#&gt; └─ ⚙️ combine</span></span>
 <span></span>
 <span><span class="co"># Test parallel processing</span></span>
 <span><span class="va">sample_text</span> <span class="op">&lt;-</span> <span class="st">"The advanced workflow capabilities in llmr enable sophisticated data processing patterns."</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/execute.html">execute</a></span><span class="op">(</span><span class="va">text_analyzer</span>, <span class="va">sample_text</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Condition node 'condition_1' selected branches: sentiment, word_count, keywords, readability </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing branch 'sentiment' -&gt; node 'sentiment_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: sentiment </span></span>
+<span><span class="co">#&gt; Analyzing sentiment...</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing branch 'word_count' -&gt; node 'count_words_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: count_words </span></span>
+<span><span class="co">#&gt; Counting words...</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing branch 'keywords' -&gt; node 'extract_keys_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: extract_keys </span></span>
+<span><span class="co">#&gt; Extracting keywords...</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing branch 'readability' -&gt; node 'readability_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: readability </span></span>
+<span><span class="co">#&gt; Calculating readability...</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:16 [WORKFLOW] Executing node: combine </span></span>
+<span><span class="co">#&gt; Combining analysis results...</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $sentiment</span></span>
+<span><span class="co">#&gt; [1] "positive"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $word_count</span></span>
+<span><span class="co">#&gt; [1] 11</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $keywords</span></span>
+<span><span class="co">#&gt; [1] "enable" "in"     "llmr"  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $readability</span></span>
+<span><span class="co">#&gt; [1] 7.18</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $summary</span></span>
+<span><span class="co">#&gt; [1] "Text analysis: 11 words, positive sentiment, readability score: 7.18"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="dynamic-routing-based-on-data-characteristics">Dynamic Routing Based on Data Characteristics<a class="anchor" aria-label="anchor" href="#dynamic-routing-based-on-data-characteristics"></a>
 </h3>
 <p>Create workflows that route data based on its characteristics:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Data type classifier</span></span>
 <span><span class="va">classify_data_type</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">is.character</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -314,7 +418,8 @@ returning multiple branch names:</p>
 <span>  <span class="co"># Summarize long text</span></span>
 <span>  <span class="va">words</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="va">text</span>, <span class="st">"\\s+"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Summary:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">words</span><span class="op">)</span>, <span class="st">"words starting with:"</span>, </span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">words</span>, <span class="fl">3</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">" "</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">words</span>, <span class="fl">3</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">" "</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">process_short_text</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">text</span><span class="op">)</span> <span class="op">{</span></span>
@@ -357,6 +462,8 @@ returning multiple branch names:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">data_router</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Workflow conditional branch with 5 branches:</span></span>
+<span><span class="co">#&gt; Branches: long_text, short_text, numeric_vector, single_number, other</span></span>
 <span></span>
 <span><span class="co"># Test with different data types</span></span>
 <span><span class="va">test_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -371,32 +478,80 @@ returning multiple branch names:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n--- Test"</span>, <span class="va">i</span>, <span class="st">"---\n"</span><span class="op">)</span></span>
 <span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/execute.html">execute</a></span><span class="op">(</span><span class="va">data_router</span>, <span class="va">test_data</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Test 1 ---</span></span>
+<span><span class="co">#&gt; Processing short text: Hello World </span></span>
+<span><span class="co">#&gt; $short_text</span></span>
+<span><span class="co">#&gt; [1] "HELLO WORLD"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Test 2 ---</span></span>
+<span><span class="co">#&gt; Processing long text ( 114 characters)</span></span>
+<span><span class="co">#&gt; $long_text</span></span>
+<span><span class="co">#&gt; [1] "Summary: 20 words starting with: This is a"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Test 3 ---</span></span>
+<span><span class="co">#&gt; Processing single number: 42 </span></span>
+<span><span class="co">#&gt; $single_number</span></span>
+<span><span class="co">#&gt; $single_number$value</span></span>
+<span><span class="co">#&gt; [1] 42</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $single_number$squared</span></span>
+<span><span class="co">#&gt; [1] 1764</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $single_number$sqrt</span></span>
+<span><span class="co">#&gt; [1] 6.480741</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Test 4 ---</span></span>
+<span><span class="co">#&gt; Processing numeric vector of length 5 </span></span>
+<span><span class="co">#&gt; $numeric_vector</span></span>
+<span><span class="co">#&gt; $numeric_vector$mean</span></span>
+<span><span class="co">#&gt; [1] 3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $numeric_vector$sd</span></span>
+<span><span class="co">#&gt; [1] 1.581139</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $numeric_vector$range</span></span>
+<span><span class="co">#&gt; [1] 1 5</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Test 5 ---</span></span>
+<span><span class="co">#&gt; Processing other data type: factor </span></span>
+<span><span class="co">#&gt; $other</span></span>
+<span><span class="co">#&gt; [1] "Unsupported data type: factor"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="agent-based-conditional-workflows">Agent-Based Conditional Workflows<a class="anchor" aria-label="anchor" href="#agent-based-conditional-workflows"></a>
 </h3>
 <p>Combine AI agents with conditional logic for intelligent
 processing:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create specialized agents</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create provider</span></span>
+<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create specialized agents</span></span>
 <span><span class="va">technical_writer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"technical_writer"</span>, <span class="va">provider</span><span class="op">)</span></span>
 <span><span class="va">creative_writer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"creative_writer"</span>, <span class="va">provider</span><span class="op">)</span></span>
 <span><span class="va">data_analyst</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"data_analyst"</span>, <span class="va">provider</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Configure agents</span></span>
 <span><span class="fu"><a href="../reference/set_system_prompt.html">set_system_prompt</a></span><span class="op">(</span></span>
-<span>  <span class="va">technical_writer</span><span class="op">$</span><span class="va">provider</span>,</span>
+<span>  <span class="va">technical_writer</span>,</span>
 <span>  <span class="st">"You are a technical writer. Analyze text for technical accuracy and clarity. Provide structured feedback."</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/set_system_prompt.html">set_system_prompt</a></span><span class="op">(</span></span>
-<span>  <span class="va">creative_writer</span><span class="op">$</span><span class="va">provider</span>,</span>
+<span>  <span class="va">creative_writer</span>,</span>
 <span>  <span class="st">"You are a creative writing expert. Analyze text for creativity, style, and emotional impact."</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/set_system_prompt.html">set_system_prompt</a></span><span class="op">(</span></span>
-<span>  <span class="va">data_analyst</span><span class="op">$</span><span class="va">provider</span>,</span>
+<span>  <span class="va">data_analyst</span>,</span>
 <span>  <span class="st">"You are a data analyst. Extract quantitative insights and patterns from text."</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -428,6 +583,8 @@ processing:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">content_processor</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Workflow conditional branch with 3 branches:</span></span>
+<span><span class="co">#&gt; Branches: technical, creative, general</span></span>
 <span></span>
 <span><span class="co"># Test with different content types</span></span>
 <span><span class="va">technical_text</span> <span class="op">&lt;-</span> <span class="st">"The algorithm processes data using advanced statistical methods to optimize system performance."</span></span>
@@ -444,13 +601,22 @@ processing:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n--- Analyzing"</span>, <span class="va">type</span>, <span class="st">"content ---\n"</span><span class="op">)</span></span>
 <span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/execute.html">execute</a></span><span class="op">(</span><span class="va">content_processor</span>, <span class="va">test_texts</span><span class="op">[[</span><span class="va">type</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Analysis result:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">result</span>, <span class="fl">1</span>, <span class="fl">100</span><span class="op">)</span>, <span class="st">"...\n"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Analyzing technical content ---</span></span>
+<span><span class="co">#&gt; Analysis result: list(list(type = "text", text = "This sentence appears to describe a computational or analytical sys ...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Analyzing creative content ---</span></span>
+<span><span class="co">#&gt; Analysis result: list(list(type = "text", text = "This sounds like the opening to a captivating narrative! The phrase ...</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Analyzing general content ---</span></span>
+<span><span class="co">#&gt; Analysis result: list(list(type = "text", text = "That's positive news! Steady growth across all segments suggests th ...</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="complex-multi-stage-workflows">Complex Multi-Stage Workflows<a class="anchor" aria-label="anchor" href="#complex-multi-stage-workflows"></a>
 </h3>
 <p>Combine multiple advanced patterns for sophisticated processing:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Multi-stage document processor</span></span>
 <span><span class="va">document_preprocessor</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">doc</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Preprocessing document...\n"</span><span class="op">)</span></span>
@@ -519,34 +685,88 @@ processing:</p>
 <span></span>
 <span><span class="co"># Create complex multi-stage workflow</span></span>
 <span><span class="va">document_pipeline</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">document_preprocessor</span>, name <span class="op">=</span> <span class="st">"preprocess"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                    <span class="fu"><a href="../reference/when.html">when</a></span><span class="op">(</span></span>
-<span>                      <span class="va">classify_document</span>,</span>
-<span>                      long_document <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_long_document</span>, name <span class="op">=</span> <span class="st">"process_long"</span><span class="op">)</span>,</span>
-<span>                      medium_document <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_medium_document</span>, name <span class="op">=</span> <span class="st">"process_medium"</span><span class="op">)</span>,</span>
-<span>                      short_document <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_short_document</span>, name <span class="op">=</span> <span class="st">"process_short"</span><span class="op">)</span></span>
-<span>                    <span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                    <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">format_results</span>, name <span class="op">=</span> <span class="st">"format"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/when.html">when</a></span><span class="op">(</span></span>
+<span>    <span class="va">classify_document</span>,</span>
+<span>    long_document <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_long_document</span>, name <span class="op">=</span> <span class="st">"process_long"</span><span class="op">)</span>,</span>
+<span>    medium_document <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_medium_document</span>, name <span class="op">=</span> <span class="st">"process_medium"</span><span class="op">)</span>,</span>
+<span>    short_document <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">process_short_document</span>, name <span class="op">=</span> <span class="st">"process_short"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">format_results</span>, name <span class="op">=</span> <span class="st">"format"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">document_pipeline</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Workflow: &lt;unnamed&gt; </span></span>
+<span><span class="co">#&gt; Nodes: 6 | Edges: 5 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ┌─ ⚙️ preprocess</span></span>
+<span><span class="co">#&gt; │</span></span>
+<span><span class="co">#&gt; ├─ 🔀 when(long_document, medium_document, short_document)</span></span>
+<span><span class="co">#&gt; │   ├─ long_document: ⚙️ process_long</span></span>
+<span><span class="co">#&gt; │   ├─ medium_document: ⚙️ process_medium</span></span>
+<span><span class="co">#&gt; │   └─ short_document: ⚙️ process_short</span></span>
+<span><span class="co">#&gt; │</span></span>
+<span><span class="co">#&gt; └─ ⚙️ format</span></span>
 <span></span>
 <span><span class="co"># Test with documents of different lengths</span></span>
 <span><span class="va">test_documents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  short <span class="op">=</span> <span class="st">"Brief note."</span>,</span>
-<span>  medium <span class="op">=</span> <span class="st">"This is a medium-length document that contains several sentences and provides a reasonable amount of content for analysis purposes."</span>,</span>
-<span>  long <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"This is a very long document with many repeated sentences to simulate a lengthy piece of content."</span>, <span class="fl">10</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">" "</span><span class="op">)</span></span>
+<span>  medium <span class="op">=</span> <span class="st">"This is a medium-length document that contains several sentences and </span></span>
+<span><span class="st">    provides a reasonable amount of content for analysis purposes."</span>,</span>
+<span>  long <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"This is a very long document with many repeated sentences to </span></span>
+<span><span class="st">      simulate a lengthy piece of content."</span>, </span>
+<span>      <span class="fl">10</span></span>
+<span>    <span class="op">)</span>, </span>
+<span>    collapse <span class="op">=</span> <span class="st">" "</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">doc_type</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">test_documents</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n--- Processing"</span>, <span class="va">doc_type</span>, <span class="st">"document ---\n"</span><span class="op">)</span></span>
 <span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/execute.html">execute</a></span><span class="op">(</span><span class="va">document_pipeline</span>, <span class="va">test_documents</span><span class="op">[[</span><span class="va">doc_type</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Processing complete. Result type:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Processing short document ---</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: preprocess </span></span>
+<span><span class="co">#&gt; Preprocessing document...</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Condition node 'condition_1' selected branches: short_document </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing branch 'short_document' -&gt; node 'process_short_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: process_short </span></span>
+<span><span class="co">#&gt; Processing short document...</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: format </span></span>
+<span><span class="co">#&gt; Formatting final results...</span></span>
+<span><span class="co">#&gt; Processing complete. Result type: list </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Processing medium document ---</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: preprocess </span></span>
+<span><span class="co">#&gt; Preprocessing document...</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Condition node 'condition_1' selected branches: short_document </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing branch 'short_document' -&gt; node 'process_short_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: process_short </span></span>
+<span><span class="co">#&gt; Processing short document...</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: format </span></span>
+<span><span class="co">#&gt; Formatting final results...</span></span>
+<span><span class="co">#&gt; Processing complete. Result type: list </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Processing long document ---</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: preprocess </span></span>
+<span><span class="co">#&gt; Preprocessing document...</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Condition node 'condition_1' selected branches: long_document </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing branch 'long_document' -&gt; node 'process_long_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: process_long </span></span>
+<span><span class="co">#&gt; Processing long document...</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: format </span></span>
+<span><span class="co">#&gt; Formatting final results...</span></span>
+<span><span class="co">#&gt; Processing complete. Result type: list</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="error-handling-and-fault-tolerance">Error Handling and Fault Tolerance<a class="anchor" aria-label="anchor" href="#error-handling-and-fault-tolerance"></a>
 </h3>
 <p>Build robust workflows with error handling:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Safe processor with error handling</span></span>
 <span><span class="va">safe_processor</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span>
@@ -572,27 +792,78 @@ processing:</p>
 <span></span>
 <span><span class="co"># Workflow with error handling</span></span>
 <span><span class="va">robust_workflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">safe_processor</span>, name <span class="op">=</span> <span class="st">"safe_process"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                  <span class="fu"><a href="../reference/when.html">when</a></span><span class="op">(</span></span>
-<span>                    <span class="kw">function</span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"^Error:"</span>, <span class="va">result</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>                        <span class="st">"error"</span></span>
-<span>                      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>                        <span class="st">"success"</span></span>
-<span>                      <span class="op">}</span></span>
-<span>                    <span class="op">}</span>,</span>
-<span>                    error <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">fallback_processor</span>, name <span class="op">=</span> <span class="st">"fallback"</span><span class="op">)</span>,</span>
-<span>                    success <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Success:"</span>, <span class="va">x</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"finalize"</span><span class="op">)</span></span>
-<span>                  <span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/when.html">when</a></span><span class="op">(</span></span>
+<span>    <span class="kw">function</span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"^Error:"</span>, <span class="va">result</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="st">"error"</span></span>
+<span>      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>        <span class="st">"success"</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">}</span>,</span>
+<span>    error <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">fallback_processor</span>, name <span class="op">=</span> <span class="st">"fallback"</span><span class="op">)</span>,</span>
+<span>    success <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Success:"</span>, <span class="va">x</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"finalize"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">robust_workflow</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Workflow: &lt;unnamed&gt; </span></span>
+<span><span class="co">#&gt; Nodes: 4 | Edges: 3 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ┌─ ⚙️ safe_process</span></span>
+<span><span class="co">#&gt; │</span></span>
+<span><span class="co">#&gt; ├─ 🔀 when(error, success)</span></span>
+<span><span class="co">#&gt; │   ├─ error: ⚙️ fallback</span></span>
+<span><span class="co">#&gt; │   └─ success: ⚙️ finalize</span></span>
 <span></span>
 <span><span class="co"># Test error handling</span></span>
 <span><span class="va">test_inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"valid input"</span>, <span class="st">""</span>, <span class="op">-</span><span class="fl">5</span>, <span class="fl">42</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">input</span> <span class="kw">in</span> <span class="va">test_inputs</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n--- Testing input:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">input</span><span class="op">)</span>, <span class="st">"---\n"</span><span class="op">)</span></span>
 <span>  <span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/execute.html">execute</a></span><span class="op">(</span><span class="va">robust_workflow</span>, <span class="va">input</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Result:"</span>, <span class="va">result</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Testing input: valid input ---</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: safe_process </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Condition node 'condition_1' selected branches: success </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing branch 'success' -&gt; node 'finalize_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: finalize </span></span>
+<span><span class="co">#&gt; $success</span></span>
+<span><span class="co">#&gt; [1] "Success: Processed: valid input"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Testing input:  ---</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: safe_process </span></span>
+<span><span class="co">#&gt; Error occurred: Empty string not allowed </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Condition node 'condition_1' selected branches: error </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing branch 'error' -&gt; node 'fallback_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: fallback </span></span>
+<span><span class="co">#&gt; Using fallback processing...</span></span>
+<span><span class="co">#&gt; $error</span></span>
+<span><span class="co">#&gt; [1] "Fallback result for: Error: Empty string not allowed"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Testing input: -5 ---</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: safe_process </span></span>
+<span><span class="co">#&gt; Error occurred: Negative numbers not supported </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Condition node 'condition_1' selected branches: error </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing branch 'error' -&gt; node 'fallback_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: fallback </span></span>
+<span><span class="co">#&gt; Using fallback processing...</span></span>
+<span><span class="co">#&gt; $error</span></span>
+<span><span class="co">#&gt; [1] "Fallback result for: Error: Negative numbers not supported"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; --- Testing input: 42 ---</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: safe_process </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: condition_1 </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Condition node 'condition_1' selected branches: success </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing branch 'success' -&gt; node 'finalize_1' </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 09:46:38 [WORKFLOW] Executing node: finalize </span></span>
+<span><span class="co">#&gt; $success</span></span>
+<span><span class="co">#&gt; [1] "Success: Processed: 42"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="best-practices-for-advanced-workflows">Best Practices for Advanced Workflows<a class="anchor" aria-label="anchor" href="#best-practices-for-advanced-workflows"></a>
@@ -600,7 +871,7 @@ processing:</p>
 <div class="section level4">
 <h4 id="design-clear-condition-functions">1. Design Clear Condition Functions<a class="anchor" aria-label="anchor" href="#design-clear-condition-functions"></a>
 </h4>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Good: Clear, single-purpose condition</span></span>
 <span><span class="va">classify_by_size</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1000</span><span class="op">)</span> <span class="st">"large"</span></span>
@@ -619,7 +890,7 @@ processing:</p>
 <div class="section level4">
 <h4 id="handle-edge-cases">2. Handle Edge Cases<a class="anchor" aria-label="anchor" href="#handle-edge-cases"></a>
 </h4>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Always include fallback branches</span></span>
 <span><span class="va">robust_classifier</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="st">"null"</span><span class="op">)</span></span>
@@ -632,15 +903,15 @@ processing:</p>
 <div class="section level4">
 <h4 id="use-meaningful-names">3. Use Meaningful Names<a class="anchor" aria-label="anchor" href="#use-meaningful-names"></a>
 </h4>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Good: Descriptive workflow and step names</span></span>
 <span><span class="va">data_pipeline</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">validate_input</span>, name <span class="op">=</span> <span class="st">"validate"</span><span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                <span class="fu"><a href="../reference/when.html">when</a></span><span class="op">(</span></span>
-<span>                  <span class="va">classify_data_complexity</span>,</span>
-<span>                  simple <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">fast_processor</span>, name <span class="op">=</span> <span class="st">"fast_track"</span><span class="op">)</span>,</span>
-<span>                  complex <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">thorough_processor</span>, name <span class="op">=</span> <span class="st">"deep_analysis"</span><span class="op">)</span></span>
-<span>                <span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
-<span>                <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">format_output</span>, name <span class="op">=</span> <span class="st">"finalize"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/when.html">when</a></span><span class="op">(</span></span>
+<span>    <span class="va">classify_data_complexity</span>,</span>
+<span>    simple <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">fast_processor</span>, name <span class="op">=</span> <span class="st">"fast_track"</span><span class="op">)</span>,</span>
+<span>    complex <span class="op">=</span> <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">thorough_processor</span>, name <span class="op">=</span> <span class="st">"deep_analysis"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="../reference/grapes-greater-than-grapes.html">%-&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/step.html">step</a></span><span class="op">(</span><span class="va">format_output</span>, name <span class="op">=</span> <span class="st">"finalize"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">

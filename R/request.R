@@ -4,6 +4,9 @@
 #' @param message A message object.
 #' @param ... Additional arguments passed to methods.
 #'
+#' @details You can make a request with `message = NULL`
+#' The agent will send the history of the conversation to the LLM provider.
+#'
 #' @return A response object
 #' @export
 #'
@@ -13,6 +16,10 @@ request <- function(x, message = NULL, ...) UseMethod("request")
 #' @method request agent
 #' @export
 request.agent <- function(x, message = NULL, ...) {
+  if (!is.null(message) && is.character(message)) {
+    message <- new_message(message, role = "user")
+  }
+
   if (!is.null(message)) {
     x <- append_message(x, message)
   }
@@ -32,6 +39,12 @@ request.agent <- function(x, message = NULL, ...) {
 #' @method request provider_anthropic
 #' @export
 request.provider_anthropic <- function(x, message, ..., tools = NULL) {
+  stopifnot(!missing(message))
+
+  if (is.character(message)) {
+    message <- list(new_message(message, role = "user"))
+  }
+
   body <- list(
     model = attr(x, "model"),
     max_tokens = attr(x, "max_tokens"),
@@ -92,6 +105,12 @@ request.provider_anthropic <- function(x, message, ..., tools = NULL) {
 #' @method request provider_openai
 #' @export
 request.provider_openai <- function(x, message, ..., tools = NULL) {
+  stopifnot(!missing(message))
+
+  if (is.character(message)) {
+    message <- list(new_message(message, role = "user"))
+  }
+
   body <- list(
     model = attr(x, "model"),
     max_tokens = attr(x, "max_tokens"),

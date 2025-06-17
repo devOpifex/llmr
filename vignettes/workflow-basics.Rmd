@@ -11,7 +11,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE
+  eval = TRUE
 )
 ```
 
@@ -35,13 +35,6 @@ By the end of this guide, you'll understand how to:
 
 ```{r setup}
 library(llmr)
-```
-
-For examples using agents, you'll also need an API key configured:
-
-```{r api-setup, eval=FALSE}
-# Only needed for agent examples
-set_api_key("your-anthropic-api-key-here")
 ```
 
 ## Basic Workflow Concepts
@@ -80,8 +73,8 @@ subtract_five <- function(x) {
 
 # Create workflow steps and chain them together inline
 math_workflow <- step(add_ten, name = "add_ten") %->%
-                 step(multiply_by_two, name = "multiply_two") %->%
-                 step(subtract_five, name = "subtract_five")
+  step(multiply_by_two, name = "multiply_two") %->%
+  step(subtract_five, name = "subtract_five")
 
 # View the workflow structure
 print(math_workflow)
@@ -113,28 +106,29 @@ formatter <- new_agent("formatter", provider)
 
 # Configure each agent with specific instructions
 set_system_prompt(
-  summarizer$provider,
+  summarizer,
   "You are a text summarizer. Provide concise, one-sentence summaries."
 )
 set_system_prompt(
-  analyzer$provider,
+  analyzer,
   "You are a sentiment analyzer. Analyze the emotional tone and return just the sentiment (positive/negative/neutral)."
 )
 set_system_prompt(
-  formatter$provider,
+  formatter,
   "You are a formatter. Take the previous analysis and format it as: 'Summary: [summary] | Sentiment: [sentiment]'"
 )
 
 # Create workflow by chaining agent steps inline
 text_workflow <- step(summarizer, name = "summarize") %->%
-                 step(analyzer, name = "analyze_sentiment") %->%
-                 step(formatter, name = "format_output")
+  step(analyzer, name = "analyze_sentiment") %->%
+  step(formatter, name = "format_output")
 
 # View the workflow structure
 print(text_workflow)
 
 # Execute the workflow
-input_text <- "The new product launch was incredibly successful, exceeding all our expectations. Customers are thrilled with the innovative features and the team is celebrating this major milestone."
+input_text <- "The new product launch was incredibly successful, exceeding all our expectations.
+  Customers are thrilled with the innovative features and the team is celebrating this major milestone."
 
 result <- execute(text_workflow, input_text)
 print(result)
@@ -178,14 +172,14 @@ add_metadata <- function(analysis) {
 # Create an agent for the core analysis
 analyzer <- new_agent("text_analyzer", provider)
 set_system_prompt(
-  analyzer$provider,
+  analyzer,
   "Analyze the given text and provide insights about its main themes, tone, and key messages. Be concise but thorough."
 )
 
 # Create mixed workflow: function -> agent -> function
 mixed_workflow <- step(clean_text, name = "preprocess") %->%
-                  step(analyzer, name = "analyze") %->%
-                  step(add_metadata, name = "finalize")
+  step(analyzer, name = "analyze") %->%
+  step(add_metadata, name = "finalize")
 
 # View the workflow structure
 print(mixed_workflow)
@@ -214,7 +208,7 @@ print(result)
 ```{r step-naming}
 # Steps can be named for clarity
 my_workflow <- step(my_function, name = "descriptive_name") %->%
-               step(another_function, name = "another_step")
+  step(another_function, name = "another_step")
 
 # Names appear in workflow output and debugging
 print(my_workflow)  # Shows step names and visual diagram
@@ -256,8 +250,8 @@ double_value <- function(x) x * 2
 ```{r descriptive-names}
 # Good: Clear what each step does
 workflow <- step(validate_input, name = "validate") %->%
-           step(double_value, name = "double") %->%
-           step(format_output, name = "format")
+  step(double_value, name = "double") %->%
+  step(format_output, name = "format")
 ```
 
 ### 3. Design for Reusability
@@ -288,21 +282,21 @@ workflow_b <- validation_step %->% other_step %->% doubling_step
 ## Common Patterns
 
 ### Preprocessing Pipeline
-```{r preprocessing-pattern}
+```{r preprocessing-pattern, eval=FALSE}
 preprocessing <- step(validate_data, name = "validate") %->%
-                step(clean_data, name = "clean") %->%
-                step(normalize_data, name = "normalize")
+  step(clean_data, name = "clean") %->%
+  step(normalize_data, name = "normalize")
 ```
 
 ### Analysis Pipeline
-```{r analysis-pattern}
+```{r analysis-pattern, eval=FALSE}
 analysis <- step(analyzer_agent, name = "analyze") %->%
-           step(extract_insights, name = "extract") %->%
-           step(format_results, name = "format")
+  step(extract_insights, name = "extract") %->%
+  step(format_results, name = "format")
 ```
 
 ### Full Processing Pipeline
-```{r full-pipeline}
+```{r full-pipeline, eval=FALSE}
 complete_pipeline <- preprocessing %->% analysis
 ```
 

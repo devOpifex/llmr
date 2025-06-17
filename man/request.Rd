@@ -19,3 +19,7 @@ A response object
 \description{
 Make a request to an LLM provider
 }
+\details{
+You can make a request with \code{message = NULL}
+The agent will send the history of the conversation to the LLM provider.
+}

@@ -11,7 +11,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE
+  eval = TRUE 
 )
 ```
 
@@ -121,12 +121,12 @@ Let's test our calculator agent by asking it to perform some calculations:
 
 ```{r conversation}
 # Ask the agent to perform a calculation
-response <- request(agent, "What is 15 multiplied by 7?")
-print(response)
+request(agent, "What is 15 multiplied by 7?")
+get_last_message(agent)
 
 # Ask for a more complex calculation
-response <- request(agent, "I have 100 dollars and spend 23.50 on groceries and 15.75 on gas. How much do I have left?")
-print(response)
+request(agent, "I have 100 dollars and spend 23.50 on groceries and 15.75 on gas. How much do I have left?")
+get_last_message(agent)
 ```
 
 ## How It Works

@@ -69,10 +69,25 @@ append_message.agent <- function(x, message) {
 #' @param x An object of class `agent`.
 #'
 #' @return A list of messages
+#' @export
 get_messages <- function(x) UseMethod("get_messages")
 
 #' @method get_messages agent
 #' @export
 get_messages.agent <- function(x) {
   x$env$messages |> lapply(unclass)
+}
+
+#' Get last message
+#'
+#' @param x An object of class `agent`.
+#'
+#' @return A list of messages
+#' @export
+get_last_message <- function(x) UseMethod("get_last_message")
+
+#' @method get_last_message agent
+#' @export
+get_last_message.agent <- function(x) {
+  x$env$messages[[length(x$env$messages)]] |> unclass()
 }

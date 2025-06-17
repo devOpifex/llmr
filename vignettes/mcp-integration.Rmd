@@ -35,12 +35,33 @@ By the end of this guide, you'll understand how to:
 ### Development Phase: Inline Tools
 In the "Get Started" vignette, we created a calculator tool directly within our agent:
 
-```{r inline-tool, eval=FALSE}
+```{r inline-tool}
 # Development approach - tool embedded in agent
 calculator <- new_tool(
   name = "calculator",
   description = "Performs basic arithmetic operations",
-  # ... tool definition
+  input_schema = schema(
+    properties = properties(
+      operation = property_enum(
+        "Operation",
+        "Math operation to perform",
+        values = c("add", "subtract", "multiply", "divide"),
+        required = TRUE
+      ),
+      a = property_number("First number", "First operand", required = TRUE),
+      b = property_number("Second number", "Second operand", required = TRUE)
+    )
+  ),
+  handler = function(params) {
+    result <- switch(
+      params$operation,
+      "add" = params$a + params$b,
+      "subtract" = params$a - params$b,
+      "multiply" = params$a * params$b,
+      "divide" = params$a / params$b
+    )
+    response_text(result)
+  }
 )
 agent <- add_tool(agent, calculator)
 ```
@@ -53,7 +74,7 @@ This approach is perfect for:
 ### Production Phase: MCP Servers
 For production deployment, we can "lift and shift" the same tool logic into an MCP server:
 
-```{r mcp-approach, eval=FALSE}
+```{r mcp-approach}
 # Production approach - tool as external MCP server
 client <- new_client_io(command = "Rscript", args = "calculator-server.R")
 agent <- register_mcp(agent, client)
@@ -69,7 +90,7 @@ This approach provides:
 
 Let's transform our calculator tool into a standalone MCP server. Here's what the server code looks like:
 
-```{r server-code, eval=FALSE}
+```{r server-code}
 library(mcpr)
 
 # Create the same calculator tool from the Get Started guide
@@ -122,7 +143,7 @@ The llmr package includes this exact server as a ready-to-use example:
 
 Now let's create an agent that connects to our MCP server:
 
-```{r client-setup}
+```{r client-setup, eval=TRUE}
 library(llmr)
 library(mcpr)
 
@@ -137,7 +158,7 @@ agent <- new_agent("calculator", provider)
 
 Instead of adding tools directly, we'll connect to our external MCP server. The llmr package includes a ready-to-use calculator server:
 
-```{r mcp-connection}
+```{r mcp-connection, eval=TRUE}
 # Get the path to the example calculator server included with llmr
 server_path <- system.file("examples", "calculator-server.R", package = "llmr")
 
@@ -161,14 +182,14 @@ agent <- register_mcp(agent, calculator_client)
 
 The beauty of this approach is that the client interface remains **exactly the same**:
 
-```{r usage-examples}
+```{r usage-examples, eval=TRUE}
 # Same usage as the inline tool version
-response <- request(agent, "What is 25 multiplied by 4?")
-print(response)
+request(agent, "What is 25 multiplied by 4?")
+get_last_message(agent)
 
 # Complex calculations work the same way
-response <- request(agent, "I have 150 dollars, spend 47.50 on dinner and 23.75 on a book. How much is left?")
-print(response)
+request(agent, "I have 150 dollars, spend 47.50 on dinner and 23.75 on a book. How much is left?")
+get_last_message(agent)
 ```
 
 ## The "Lift and Shift" Advantage
@@ -183,7 +204,7 @@ print(response)
 ### Benefits of This Approach
 
 #### 🚀 **Scalability**
-```{r scalability-example, eval=FALSE}
+```{r scalability-example}
 # Multiple agents can share the same calculator service
 agent1 <- new_agent("financial_advisor", provider)
 agent2 <- new_agent("math_tutor", provider)
@@ -215,7 +236,7 @@ register_mcp(agent3, calculator_client)
 ### Multiple MCP Services
 You can connect to multiple MCP servers for different capabilities:
 
-```{r multiple-services, eval=FALSE}
+```{r multiple-services}
 # Connect to different specialized services
 calculator_client <- new_client_io(command = "Rscript", args = "calculator-server.R")
 weather_client <- new_client_io(command = "Rscript", args = "weather-server.R")
@@ -230,7 +251,7 @@ agent <- register_mcp(agent, database_client)
 ### Hybrid Approach
 You can mix inline tools with MCP services:
 
-```{r hybrid-approach, eval=FALSE}
+```{r hybrid-approach}
 # Quick inline tool for simple tasks
 simple_tool <- new_tool(name = "timestamp", ...)
 agent <- add_tool(agent, simple_tool)
@@ -260,20 +281,20 @@ agent <- register_mcp(agent, complex_client)
 ## Migration Strategy
 
 ### Phase 1: Development
-```{r phase1, eval=FALSE}
+```{r phase1}
 # Start with inline tools
 agent <- add_tool(agent, my_tool)
 ```
 
 ### Phase 2: Testing
-```{r phase2, eval=FALSE}
+```{r phase2}
 # Test MCP version alongside inline version
 agent <- add_tool(agent, my_tool)  # Keep original
 agent <- register_mcp(agent, mcp_client)  # Add MCP version
 ```
 
 ### Phase 3: Production
-```{r phase3, eval=FALSE}
+```{r phase3}
 # Remove inline tool, use only MCP
 agent <- register_mcp(agent, mcp_client)
 ```

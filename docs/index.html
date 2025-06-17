@@ -122,15 +122,17 @@
 <span><span class="va">message</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"Explain quantum computing in simple terms"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Send request and get response</span></span>
-<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span><span class="va">provider</span>, <span class="va">message</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span><span class="va">provider</span>, <span class="va">message</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Print the response</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">response</span><span class="op">$</span><span class="va">content</span><span class="op">)</span></span>
+<span><span class="co"># Print the last message</span></span>
+<span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Continue the conversation</span></span>
 <span><span class="va">message</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"Now give me a simple code example"</span><span class="op">)</span></span>
-<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span><span class="va">provider</span>, <span class="va">message</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">response</span><span class="op">$</span><span class="va">content</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span><span class="va">provider</span>, <span class="va">message</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># get all clear_messages</span></span>
+<span><span class="fu"><a href="reference/get_messages.html">get_messages</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Clear conversation history</span></span>
 <span><span class="fu"><a href="reference/clear_messages.html">clear_messages</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span></code></pre></div>
@@ -176,13 +178,13 @@
 <span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu">register_agent</span><span class="op">(</span><span class="va">provider</span>, <span class="va">agent</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Make a request to the LLM</span></span>
-<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span></span>
 <span>  <span class="va">provider</span>,</span>
 <span>  <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"What is 123 * 456? Please use the calculate tool."</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Print the response</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">response</span><span class="op">$</span><span class="va">content</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="integrating-with-mcp-model-context-protocol">Integrating with MCP (Model Context Protocol)<a class="anchor" aria-label="anchor" href="#integrating-with-mcp-model-context-protocol"></a>
@@ -209,13 +211,13 @@
 <span><span class="fu"><a href="reference/register_mcp.html">register_mcp</a></span><span class="op">(</span><span class="va">provider</span>, <span class="va">client</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Make a request</span></span>
-<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span></span>
 <span>  <span class="va">provider</span>, </span>
 <span>  <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"Subtract 5 from 10."</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Print the response</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">response</span><span class="op">$</span><span class="va">content</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">provider</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="workflows">Workflows<a class="anchor" aria-label="anchor" href="#workflows"></a>
