@@ -13,10 +13,8 @@ set_model <- function(x, name, ...) UseMethod("set_model")
 #' @export
 set_model.provider <- function(x, name, ...) {
   stopifnot(is.character(name), length(name) == 1)
-
   attr(x, "model") <- name
-
-  x
+  invisible(x)
 }
 
 #' @method set_model agent

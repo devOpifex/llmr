@@ -13,24 +13,21 @@ set_system_prompt <- function(x, prompt, ...) UseMethod("set_system_prompt")
 #' @export
 set_system_prompt.provider_anthropic <- function(x, prompt, ...) {
   stopifnot(is.character(prompt), length(prompt) == 1)
-
   attr(x, "system") <- prompt
-
-  x
+  invisible(x)
 }
 
 #' @method set_system_prompt provider_openai
 #' @export
 set_system_prompt.provider_openai <- function(x, prompt, ...) {
   stopifnot(is.character(prompt), length(prompt) == 1)
-
   x <- append_message(x, new_message(prompt, role = "system"))
-
-  x
+  invisible(x)
 }
 
 #' @method set_system_prompt agent
 #' @export
 set_system_prompt.agent <- function(x, prompt, ...) {
+  attr(x, "system") <- prompt
   set_system_prompt(x$provider, prompt)
 }

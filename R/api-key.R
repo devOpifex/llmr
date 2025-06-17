@@ -13,9 +13,7 @@ set_api_key <- function(x, key, ...) UseMethod("set_api_key")
 set_api_key.provider <- function(x, key, ...) {
   stopifnot(!missing(key))
   stopifnot(is.character(key), length(key) == 1)
-
   attr(x, "key") <- key
-
   invisible(x)
 }
 

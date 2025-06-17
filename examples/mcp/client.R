@@ -1,15 +1,13 @@
 devtools::load_all()
 
-provider <- new_anthropic()
-set_retry(provider, max_tries = 5)
-
 client <- mcpr::new_client_io(
   command = "Rscript",
   args = "/home/john/Opifex/Packages/llmr/examples/mcp/server.R",
   name = "calculator"
 )
 
-agent <- new_agent("Weather forecaster and calculator", provider)
+agent <- new_agent("Weather forecaster and calculator", new_anthropic)
+set_retry(agent, max_tries = 5)
 
 register_mcp(agent, client)
 

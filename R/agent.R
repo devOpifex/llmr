@@ -1,33 +1,57 @@
 #' Create a new agent
 #'
-#' Creates a new agent with the specified name
+#' Creates a new agent with the specified name and provider.
 #'
-#' @param name Character string specifying the agent name
-#' @param provider An object of class `provider`.
+#' @param name Character string specifying the agent name.
+#' @param provider An object of class `provider` or a function that returns a provider.
+#' @param ... Additional arguments passed to methods.
 #'
 #' @return An object of class "agent"
 #' @export
-new_agent <- function(name, provider) {
-  stopifnot(is.character(name), length(name) == 1)
-  stopifnot(!missing(provider), inherits(provider, "provider"))
+new_agent <- function(name, provider, ...) {
+  UseMethod("new_agent", provider)
+}
 
-  # Create a new environment for the agent
+#' @method new_agent provider
+#' @export
+new_agent.provider <- function(name, provider, ...) {
   env <- new.env(parent = emptyenv())
   env$tools <- list()
   env$messages <- list()
   env$mcps <- list()
 
-  # Create the agent structure
   agent <- structure(
     list(
       env = env,
       provider = provider
     ),
     name = name,
+    system = "",
     class = c("agent")
   )
 
   invisible(agent)
+}
+
+#' @method new_agent function
+#' @export
+new_agent.function <- function(name, provider, ...) {
+  instance <- tryCatch(provider(), error = function(e) e)
+
+  if (inherits(instance, "error")) {
+    stop(
+      sprintf(
+        "Error creating agent: %s",
+        conditionMessage(instance)
+      )
+    )
+  }
+
+  if (!inherits(instance, "provider")) {
+    stop("The provider function must return an object of class 'provider'")
+  }
+
+  new_agent(name, instance, ...)
 }
 
 #' Add a tool to an agent

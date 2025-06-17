@@ -13,9 +13,7 @@ set_max_tokens <- function(x, max, ...) UseMethod("set_max_tokens")
 set_max_tokens.provider <- function(x, max, ...) {
   stopifnot(!missing(max))
   stopifnot(is.numeric(max), length(max) == 1)
-
   attr(x, "max_tokens") <- max
-
   invisible(x)
 }
 

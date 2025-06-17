@@ -4,16 +4,18 @@
 \alias{new_agent}
 \title{Create a new agent}
 \usage{
-new_agent(name, provider)
+new_agent(name, provider, ...)
 }
 \arguments{
-\item{name}{Character string specifying the agent name}
+\item{name}{Character string specifying the agent name.}
 
-\item{provider}{An object of class \code{provider}.}
+\item{provider}{An object of class \code{provider} or a function that returns a provider.}
+
+\item{...}{Additional arguments passed to methods.}
 }
 \value{
 An object of class "agent"
 }
 \description{
-Creates a new agent with the specified name
+Creates a new agent with the specified name and provider.
 }
