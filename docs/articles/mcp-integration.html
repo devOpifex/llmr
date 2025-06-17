@@ -129,7 +129,28 @@ within our agent:</p>
 <span><span class="va">calculator</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/new_tool.html" class="external-link">new_tool</a></span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="st">"calculator"</span>,</span>
 <span>  description <span class="op">=</span> <span class="st">"Performs basic arithmetic operations"</span>,</span>
-<span>  <span class="co"># ... tool definition</span></span>
+<span>  input_schema <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/schema.html" class="external-link">schema</a></span><span class="op">(</span></span>
+<span>    properties <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/properties.html" class="external-link">properties</a></span><span class="op">(</span></span>
+<span>      operation <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/property_enum.html" class="external-link">property_enum</a></span><span class="op">(</span></span>
+<span>        <span class="st">"Operation"</span>,</span>
+<span>        <span class="st">"Math operation to perform"</span>,</span>
+<span>        values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"add"</span>, <span class="st">"subtract"</span>, <span class="st">"multiply"</span>, <span class="st">"divide"</span><span class="op">)</span>,</span>
+<span>        required <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>      a <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/property_number.html" class="external-link">property_number</a></span><span class="op">(</span><span class="st">"First number"</span>, <span class="st">"First operand"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>      b <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/property_number.html" class="external-link">property_number</a></span><span class="op">(</span><span class="st">"Second number"</span>, <span class="st">"Second operand"</span>, required <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  handler <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">result</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/switch.html" class="external-link">switch</a></span><span class="op">(</span></span>
+<span>      <span class="va">params</span><span class="op">$</span><span class="va">operation</span>,</span>
+<span>      <span class="st">"add"</span> <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">a</span> <span class="op">+</span> <span class="va">params</span><span class="op">$</span><span class="va">b</span>,</span>
+<span>      <span class="st">"subtract"</span> <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">a</span> <span class="op">-</span> <span class="va">params</span><span class="op">$</span><span class="va">b</span>,</span>
+<span>      <span class="st">"multiply"</span> <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">a</span> <span class="op">*</span> <span class="va">params</span><span class="op">$</span><span class="va">b</span>,</span>
+<span>      <span class="st">"divide"</span> <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">a</span> <span class="op">/</span> <span class="va">params</span><span class="op">$</span><span class="va">b</span></span>
+<span>    <span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://mcpr.opifex.org/reference/response.html" class="external-link">response_text</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/add_tool.html">add_tool</a></span><span class="op">(</span><span class="va">agent</span>, <span class="va">calculator</span><span class="op">)</span></span></code></pre></div>
 <p>This approach is perfect for: - <strong>Rapid prototyping</strong> -
@@ -212,7 +233,20 @@ example:</p>
 <p>Now let’s create an agent that connects to our MCP server:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'llmr'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     step</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mcpr.opifex.org/" class="external-link">mcpr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'mcpr'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:methods':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     initialize</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     write</span></span>
 <span></span>
 <span><span class="co"># Set up your provider (same as before)</span></span>
 <span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -251,12 +285,53 @@ to the agent</p>
 <strong>exactly the same</strong>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Same usage as the inline tool version</span></span>
-<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 25 multiplied by 4?"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">response</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 25 multiplied by 4?"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 11:22:58 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
+<span><span class="co">#&gt; $env</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5887b36df2b0&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $provider</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"name")</span></span>
+<span><span class="co">#&gt; [1] "calculator"</span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "agent"</span></span>
+<span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $role</span></span>
+<span><span class="co">#&gt; [1] "assistant"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $content</span></span>
+<span><span class="co">#&gt; $content[[1]]</span></span>
+<span><span class="co">#&gt; $content[[1]]$type</span></span>
+<span><span class="co">#&gt; [1] "text"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $content[[1]]$text</span></span>
+<span><span class="co">#&gt; [1] "25 multiplied by 4 equals 100."</span></span>
 <span></span>
 <span><span class="co"># Complex calculations work the same way</span></span>
-<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"I have 150 dollars, spend 47.50 on dinner and 23.75 on a book. How much is left?"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">response</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"I have 150 dollars, spend 47.50 on dinner and 23.75 on a book. How much is left?"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 11:23:09 [TOOL] Calling MCP (calculator) tool: calculator </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 11:23:15 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
+<span><span class="co">#&gt; $env</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5887b36df2b0&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $provider</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"name")</span></span>
+<span><span class="co">#&gt; [1] "calculator"</span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "agent"</span></span>
+<span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $role</span></span>
+<span><span class="co">#&gt; [1] "assistant"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $content</span></span>
+<span><span class="co">#&gt; $content[[1]]</span></span>
+<span><span class="co">#&gt; $content[[1]]$type</span></span>
+<span><span class="co">#&gt; [1] "text"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $content[[1]]$text</span></span>
+<span><span class="co">#&gt; [1] "You have $78.75 left after spending $47.50 on dinner and $23.75 on a book."</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="the-lift-and-shift-advantage">The “Lift and Shift” Advantage<a class="anchor" aria-label="anchor" href="#the-lift-and-shift-advantage"></a>

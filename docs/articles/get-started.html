@@ -125,7 +125,20 @@ tools)</li>
 </ol>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mcpr.opifex.org/" class="external-link">mcpr</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'llmr'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     step</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mcpr.opifex.org/" class="external-link">mcpr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'mcpr'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:methods':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     initialize</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     write</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="step-1-set-up-your-provider">Step 1: Set Up Your Provider<a class="anchor" aria-label="anchor" href="#step-1-set-up-your-provider"></a>
@@ -221,12 +234,53 @@ the calculation</li>
 calculations:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask the agent to perform a calculation</span></span>
-<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 15 multiplied by 7?"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">response</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 15 multiplied by 7?"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 11:22:27 [TOOL] Calling tool: calculator</span></span>
+<span><span class="co">#&gt; $env</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5906125d5128&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $provider</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"name")</span></span>
+<span><span class="co">#&gt; [1] "calculator"</span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "agent"</span></span>
+<span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $role</span></span>
+<span><span class="co">#&gt; [1] "assistant"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $content</span></span>
+<span><span class="co">#&gt; $content[[1]]</span></span>
+<span><span class="co">#&gt; $content[[1]]$type</span></span>
+<span><span class="co">#&gt; [1] "text"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $content[[1]]$text</span></span>
+<span><span class="co">#&gt; [1] "15 multiplied by 7 equals 105."</span></span>
 <span></span>
 <span><span class="co"># Ask for a more complex calculation</span></span>
-<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"I have 100 dollars and spend 23.50 on groceries and 15.75 on gas. How much do I have left?"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">response</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"I have 100 dollars and spend 23.50 on groceries and 15.75 on gas. How much do I have left?"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 11:22:38 [TOOL] Calling tool: calculator </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 11:22:47 [TOOL] Calling tool: calculator</span></span>
+<span><span class="co">#&gt; $env</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x5906125d5128&gt;</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $provider</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attr(,"name")</span></span>
+<span><span class="co">#&gt; [1] "calculator"</span></span>
+<span><span class="co">#&gt; attr(,"class")</span></span>
+<span><span class="co">#&gt; [1] "agent"</span></span>
+<span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $role</span></span>
+<span><span class="co">#&gt; [1] "assistant"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $content</span></span>
+<span><span class="co">#&gt; $content[[1]]</span></span>
+<span><span class="co">#&gt; $content[[1]]$type</span></span>
+<span><span class="co">#&gt; [1] "text"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $content[[1]]$text</span></span>
+<span><span class="co">#&gt; [1] "You have $60.75 left after spending $23.50 on groceries and $15.75 on gas."</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="how-it-works">How It Works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>

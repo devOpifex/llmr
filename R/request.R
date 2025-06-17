@@ -336,7 +336,10 @@ handle_tool_use.provider_anthropic <- function(
           list(
             type = "tool_result",
             tool_use_id = tool_call$id,
-            content = result
+            content = yyjsonr::write_json_str(
+              result,
+              list(auto_unbox = TRUE)
+            )
           )
         },
         error = function(e) {
