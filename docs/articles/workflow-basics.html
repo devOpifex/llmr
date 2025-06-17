@@ -171,11 +171,11 @@ data, passing results through each step in sequence.</p>
 <span><span class="co"># Execute the workflow</span></span>
 <span><span class="va">input_value</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/execute.html">execute</a></span><span class="op">(</span><span class="va">math_workflow</span>, <span class="va">input_value</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:40:02 [WORKFLOW] Executing node: add_ten </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 12:54:06 [WORKFLOW] Executing node: add_ten </span></span>
 <span><span class="co">#&gt; Adding 10 to 5 </span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:40:02 [WORKFLOW] Executing node: multiply_two </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 12:54:06 [WORKFLOW] Executing node: multiply_two </span></span>
 <span><span class="co">#&gt; Multiplying 15 by 2</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:40:02 [WORKFLOW] Executing node: subtract_five </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 12:54:06 [WORKFLOW] Executing node: subtract_five </span></span>
 <span><span class="co">#&gt; Subtracting 5 from 30</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span>  <span class="co"># Should be 25: ((5 + 10) * 2) - 5 = 25</span></span>
 <span><span class="co">#&gt; [1] 25</span></span></code></pre></div>

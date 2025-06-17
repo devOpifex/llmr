@@ -143,31 +143,19 @@ Our agent can currently perform calculations, but let's expand its capabilities 
 ```{r create-formatter}
 # Create a text formatter tool
 formatter <- new_tool(
-  name = "formatter",
-  description = "Format text in different ways",
+  name = "convert",
+  description = "Convert a number to Roman numerals",
   input_schema = schema(
     properties = properties(
-      text = property_string(
-        "Text",
-        "The text to format",
-        required = TRUE
-      ),
-      format = property_enum(
-        "Format",
-        "The format to apply",
-        values = c("uppercase", "lowercase", "reverse"),
+      value = property_number(
+        "Number",
+        "The Number to convert",
         required = TRUE
       )
     )
   ),
   handler = function(params) {
-    result <- switch(
-      params$format,
-      "uppercase" = toupper(params$text),
-      "lowercase" = tolower(params$text),
-      "reverse" = paste(rev(strsplit(params$text, "")[[1]]), collapse = "")
-    )
-    response_text(result)
+    response_text(as.roman(params$value))
   }
 )
 
@@ -179,7 +167,7 @@ Now our agent has two tools at its disposal: a calculator and a text formatter. 
 
 ```{r multi-tool-request}
 # Ask a question that requires both calculation and text formatting
-response <- request(agent, "Calculate 25 times 4, then convert the result to uppercase Roman numerals.")
+request(agent, "Calculate 25 times 4, and convert the result to Roman numerals.")
 get_last_message(agent)
 ```
 

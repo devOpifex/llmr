@@ -214,7 +214,7 @@ calculations:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask the agent to perform a calculation</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 15 multiplied by 7?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:39:22 [TOOL] Calling tool: calculator</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 12:53:25 [TOOL] Calling tool: calculator</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
 <span><span class="co">#&gt; assistant: [{"type":"text","text":"15 multiplied by 7 equals 105."}]</span></span></code></pre></div>
 </div>
@@ -249,31 +249,19 @@ needed.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a text formatter tool</span></span>
 <span><span class="va">formatter</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/new_tool.html" class="external-link">new_tool</a></span><span class="op">(</span></span>
-<span>  name <span class="op">=</span> <span class="st">"formatter"</span>,</span>
-<span>  description <span class="op">=</span> <span class="st">"Format text in different ways"</span>,</span>
+<span>  name <span class="op">=</span> <span class="st">"convert"</span>,</span>
+<span>  description <span class="op">=</span> <span class="st">"Convert a number to Roman numerals"</span>,</span>
 <span>  input_schema <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/schema.html" class="external-link">schema</a></span><span class="op">(</span></span>
 <span>    properties <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/properties.html" class="external-link">properties</a></span><span class="op">(</span></span>
-<span>      text <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/property_string.html" class="external-link">property_string</a></span><span class="op">(</span></span>
-<span>        <span class="st">"Text"</span>,</span>
-<span>        <span class="st">"The text to format"</span>,</span>
-<span>        required <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>      format <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/property_enum.html" class="external-link">property_enum</a></span><span class="op">(</span></span>
-<span>        <span class="st">"Format"</span>,</span>
-<span>        <span class="st">"The format to apply"</span>,</span>
-<span>        values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"uppercase"</span>, <span class="st">"lowercase"</span>, <span class="st">"reverse"</span><span class="op">)</span>,</span>
+<span>      value <span class="op">=</span> <span class="fu"><a href="https://mcpr.opifex.org/reference/property_number.html" class="external-link">property_number</a></span><span class="op">(</span></span>
+<span>        <span class="st">"Number"</span>,</span>
+<span>        <span class="st">"The Number to convert"</span>,</span>
 <span>        required <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  handler <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">result</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/switch.html" class="external-link">switch</a></span><span class="op">(</span></span>
-<span>      <span class="va">params</span><span class="op">$</span><span class="va">format</span>,</span>
-<span>      <span class="st">"uppercase"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">toupper</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">text</span><span class="op">)</span>,</span>
-<span>      <span class="st">"lowercase"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">tolower</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">text</span><span class="op">)</span>,</span>
-<span>      <span class="st">"reverse"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">text</span>, <span class="st">""</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://mcpr.opifex.org/reference/response.html" class="external-link">response_text</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://mcpr.opifex.org/reference/response.html" class="external-link">response_text</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/roman.html" class="external-link">as.roman</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">value</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -283,10 +271,11 @@ needed.</p>
 formatter. Let’s ask it a question that requires both tools:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask a question that requires both calculation and text formatting</span></span>
-<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"Calculate 25 times 4, then convert the result to uppercase Roman numerals."</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-17 12:39:31 [TOOL] Calling tool: calculator</span></span>
+<span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"Calculate 25 times 4, and convert the result to Roman numerals."</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 12:53:35 [TOOL] Calling tool: calculator </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-17 12:53:39 [TOOL] Calling tool: convert</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
-<span><span class="co">#&gt; assistant: [{"type":"text","text":"25 times 4 equals 100.\n\nIn Roman numerals, 100 is written as \"C\". Since you want it in uppercase, it would be \"C\" (Roman numerals are traditionally written in uppercase already).\n\nNote: The formatter tool I have available can only convert text to uppercase, lowercase, or reverse it - it doesn't convert numbers to Roman numerals. However, I can tell you that 100 in Roman numerals is \"C\"."}]</span></span></code></pre></div>
+<span><span class="co">#&gt; assistant: [{"type":"text","text":"25 times 4 equals 100, which is **C** in Roman numerals."}]</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="how-multiple-tool-use-works">How Multiple Tool Use Works<a class="anchor" aria-label="anchor" href="#how-multiple-tool-use-works"></a>

@@ -31,10 +31,14 @@ as_message <- function(x) {
 
 #' @export
 print.message <- function(x, ...) {
+  result <- yyjsonr::write_json_str(x$content, list(auto_unbox = TRUE))
+  if (length(x$content) && is.character(x$content)) {
+    result <- x$content
+  }
   cat(sprintf(
     "%s: %s\n",
     x$role,
-    yyjsonr::write_json_str(x$content, list(auto_unbox = TRUE))
+    result
   ))
 }
 
