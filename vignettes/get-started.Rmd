@@ -136,6 +136,65 @@ When you ask the agent a question that requires calculation:
 
 This happens automatically - you don't need to explicitly tell the agent to use the calculator tool.
 
+## Step 6: Adding Multiple Tools
+
+Our agent can currently perform calculations, but let's expand its capabilities by adding a simple text formatter tool. This will demonstrate how a single request can invoke multiple tools when needed.
+
+```{r create-formatter}
+# Create a text formatter tool
+formatter <- new_tool(
+  name = "formatter",
+  description = "Format text in different ways",
+  input_schema = schema(
+    properties = properties(
+      text = property_string(
+        "Text",
+        "The text to format",
+        required = TRUE
+      ),
+      format = property_enum(
+        "Format",
+        "The format to apply",
+        values = c("uppercase", "lowercase", "reverse"),
+        required = TRUE
+      )
+    )
+  ),
+  handler = function(params) {
+    result <- switch(
+      params$format,
+      "uppercase" = toupper(params$text),
+      "lowercase" = tolower(params$text),
+      "reverse" = paste(rev(strsplit(params$text, "")[[1]]), collapse = "")
+    )
+    response_text(result)
+  }
+)
+
+# Add the formatter tool to our agent
+agent <- add_tool(agent, formatter)
+```
+
+Now our agent has two tools at its disposal: a calculator and a text formatter. Let's ask it a question that requires both tools:
+
+```{r multi-tool-request}
+# Ask a question that requires both calculation and text formatting
+response <- request(agent, "Calculate 25 times 4, then convert the result to uppercase Roman numerals.")
+get_last_message(agent)
+```
+
+## How Multiple Tool Use Works
+
+When you send a request that requires multiple tools:
+
+1. **The agent analyzes your request** and determines which tools it needs
+2. **It can call multiple tools in sequence** within a single request:
+   - First, it uses the calculator to compute 25 × 4 = 100
+   - Then, it uses the formatter to convert "C" (Roman numeral for 100) to uppercase
+3. **The agent combines all the results** into a coherent response
+
+The beauty of this approach is that you don't need to manage the tools manually - the agent decides which tools to use and in what order based on the task at hand.
+
 ## What's Next?
 
 Now that you understand the basics, you can:
@@ -152,5 +211,6 @@ Now that you understand the basics, you can:
 - **Tool**: A function that extends your agent's capabilities
 - **Schema**: Defines the structure of tool inputs
 - **Handler**: The R function that actually performs the tool's work
+- **Multiple Tool Use**: The ability for an agent to use several tools in a single request
 
-The llmr package makes it easy to create powerful AI agents that can interact with your R environment and perform real work. Start simple with tools like our calculator, then gradually build more sophisticated capabilities as you become comfortable with the framework.
+The llmr package makes it easy to create powerful AI agents that can interact with your R environment and perform real work. Start simple with tools like our calculator and formatter, then gradually build more sophisticated capabilities as you become comfortable with the framework.
