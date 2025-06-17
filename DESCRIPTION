@@ -23,6 +23,7 @@ Imports:
   yyjsonr
 Suggests:
   knitr,
+  processx,
   rmarkdown
 VignetteBuilder: knitr
 Remotes:

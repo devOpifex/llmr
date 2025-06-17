@@ -568,9 +568,9 @@ execute.workflow <- function(workflow, input) {
 }
 
 #' @export
-execute.workflow_when <- function(workflow_when, input) {
+execute.workflow_when <- function(workflow, input) {
   # Execute the condition function to determine branches
-  selected_branches <- workflow_when$condition(input)
+  selected_branches <- workflow$condition(input)
   
   if (length(selected_branches) == 0) {
     return(list()) # No branches selected
@@ -579,8 +579,8 @@ execute.workflow_when <- function(workflow_when, input) {
   # Execute all selected branches and collect results
   branch_results <- list()
   for (branch_name in selected_branches) {
-    if (branch_name %in% names(workflow_when$branches)) {
-      branch_content <- workflow_when$branches[[branch_name]]
+    if (branch_name %in% names(workflow$branches)) {
+      branch_content <- workflow$branches[[branch_name]]
       if (inherits(branch_content, "workflow_step")) {
         branch_results[[branch_name]] <- execute_step(branch_content, input)
       } else if (inherits(branch_content, "workflow")) {
