@@ -24,10 +24,6 @@ pak::pak("devOpifex/llmr")
 ```r
 library(llmr)
 
-# Set your Anthropic API key
-set_api_key("your-api-key") 
-# Or use ANTHROPIC_API_KEY environment variable
-
 # Create a provider
 provider <- new_anthropic()
 
@@ -60,11 +56,8 @@ This allows seamless integration with MCP (Model Context Protocol) servers.
 ```r
 library(llmr)
 
-# Create a provider (default is Anthropic)
-provider <- new_anthropic()
-
 # Create a simple agent
-agent <- new_agent("calculator", provider)
+agent <- new_agent("calculator", new_anthropic)
 
 # Add a calculator tool to the agent
 add_tool(
@@ -106,11 +99,8 @@ servers (and clients).
 library(llmr)
 library(mcpr)
 
-# Set your API key
-set_api_key("your_anthropic_api_key")
-
 # Create a provider
-provider <- new_anthropic()
+agent <- new_agent("mcp", new_anthropic)
 
 # Create an MCP client that connects to an external calculator service
 client <- mcpr::new_client(
@@ -120,16 +110,16 @@ client <- mcpr::new_client(
 )
 
 # Register the MCP with the provider
-register_mcp(provider, client)
+register_mcp(agent, client)
 
 # Make a request
 request(
-  provider, 
+  agent, 
   new_message("Subtract 5 from 10.")
 )
 
 # Print the response
-get_last_message(provider)
+get_last_message(agent)
 ```
 
 ## Workflows
@@ -155,6 +145,8 @@ result <- execute(workflow, 5)  # Returns 30: (5 + 10) * 2
 ```
 
 ## Configuration
+
+Methods for `agent` exists too.
 
 ```r
 # Set a different model
