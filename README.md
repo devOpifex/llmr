@@ -60,14 +60,11 @@ This allows seamless integration with MCP (Model Context Protocol) servers.
 ```r
 library(llmr)
 
-# Set your API key
-set_api_key("your_anthropic_api_key")
-
 # Create a provider (default is Anthropic)
 provider <- new_anthropic()
 
 # Create a simple agent
-agent <- new_agent("calculator")
+agent <- new_agent("calculator", provider)
 
 # Add a calculator tool to the agent
 add_tool(
@@ -90,17 +87,14 @@ add_tool(
   )
 )
 
-# Register the agent with the provider
-provider <- register_agent(provider, agent)
-
 # Make a request to the LLM
 request(
-  provider,
+  agent,
   new_message("What is 123 * 456? Please use the calculate tool.")
 )
 
 # Print the response
-get_last_message(provider)
+get_last_message(agent)
 ```
 
 ## Integrating with MCP (Model Context Protocol)
