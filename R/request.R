@@ -33,7 +33,7 @@ request.agent <- function(x, message = NULL, ...) {
   # Handle the response (for tool_use etc.)
   handle_response(x$provider, x, response)
 
-  x
+  invisible(x)
 }
 
 #' @method request provider_anthropic

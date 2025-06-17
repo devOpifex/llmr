@@ -31,7 +31,11 @@ as_message <- function(x) {
 
 #' @export
 print.message <- function(x, ...) {
-  cat(sprintf("%s: %s\n", x$role, x$content))
+  cat(sprintf(
+    "%s: %s\n",
+    x$role,
+    yyjsonr::write_json_str(x$content, list(auto_unbox = TRUE))
+  ))
 }
 
 #' Clear messages
@@ -89,5 +93,5 @@ get_last_message <- function(x) UseMethod("get_last_message")
 #' @method get_last_message agent
 #' @export
 get_last_message.agent <- function(x) {
-  x$env$messages[[length(x$env$messages)]] |> unclass()
+  x$env$messages[[length(x$env$messages)]]
 }
