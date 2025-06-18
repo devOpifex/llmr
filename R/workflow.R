@@ -73,7 +73,11 @@ generate_workflow_diagram <- function(workflow) {
 
   # Close the diagram
   if (length(lines) > 0) {
-    lines[length(lines)] <- gsub("\u251c\u2500", "\u2514\u2500", lines[length(lines)])
+    lines[length(lines)] <- gsub(
+      "\u251c\u2500",
+      "\u2514\u2500",
+      lines[length(lines)]
+    )
   }
 
   paste(lines, collapse = "\n")
@@ -297,17 +301,17 @@ generate_step_id <- function(workflow, step) {
 
 create_workflow_from_when <- function(when_obj, next_element) {
   workflow <- new_workflow()
-  
+
   # Add when() as the entry point
   workflow <- add_when_as_entry_point(workflow, when_obj)
-  
+
   # Connect to next element
   if (inherits(next_element, "workflow_step")) {
     workflow <- add_step_to_workflow(workflow, next_element)
   } else if (inherits(next_element, "workflow")) {
     workflow <- merge_workflow_after_when(workflow, next_element)
   }
-  
+
   workflow
 }
 
@@ -322,15 +326,15 @@ add_when_as_entry_point <- function(workflow, when_obj) {
     ),
     class = "workflow_condition_node"
   )
-  
+
   # Set as entry point and add branches
   workflow$nodes[[condition_id]] <- condition_node
   workflow$entry_point <- condition_id
-  
+
   # Process branches (similar to existing add_branch_to_workflow logic)
   for (branch_name in names(when_obj$branches)) {
     branch_content <- when_obj$branches[[branch_name]]
-    
+
     if (inherits(branch_content, "workflow_step")) {
       result <- add_step_to_empty_workflow(workflow, branch_content)
       workflow <- result$workflow
@@ -341,12 +345,15 @@ add_when_as_entry_point <- function(workflow, when_obj) {
       )
     } else if (inherits(branch_content, "workflow")) {
       merge_result <- merge_branch_workflow(
-        workflow, branch_content, condition_id, branch_name
+        workflow,
+        branch_content,
+        condition_id,
+        branch_name
       )
       workflow <- merge_result$workflow
     }
   }
-  
+
   # CRITICAL: condition node itself becomes the exit point
   # This matches the existing add_branch_to_workflow behavior
   workflow$current_exits <- condition_id
@@ -363,7 +370,7 @@ merge_workflow_after_when <- function(main_workflow, next_workflow) {
       main_workflow$nodes[[new_id]] <- next_workflow$nodes[[node_id]]
       node_mapping[[node_id]] <- new_id
     }
-    
+
     # Add edges from next workflow
     for (edge in next_workflow$edges) {
       new_edge <- list(
@@ -375,7 +382,7 @@ merge_workflow_after_when <- function(main_workflow, next_workflow) {
       }
       main_workflow$edges <- append(main_workflow$edges, list(new_edge))
     }
-    
+
     # Connect current exits to next workflow entry
     next_entry <- node_mapping[[next_workflow$entry_point]]
     for (exit_id in main_workflow$current_exits) {
@@ -384,14 +391,14 @@ merge_workflow_after_when <- function(main_workflow, next_workflow) {
         list(list(from = exit_id, to = next_entry))
       )
     }
-    
+
     # Update current exits
     main_workflow$current_exits <- sapply(
       next_workflow$current_exits,
       function(id) node_mapping[[id]]
     )
   }
-  
+
   main_workflow
 }
 
@@ -571,11 +578,11 @@ execute.workflow <- function(workflow, input) {
 execute.workflow_when <- function(workflow, input) {
   # Execute the condition function to determine branches
   selected_branches <- workflow$condition(input)
-  
+
   if (length(selected_branches) == 0) {
     return(list()) # No branches selected
   }
-  
+
   # Execute all selected branches and collect results
   branch_results <- list()
   for (branch_name in selected_branches) {
@@ -588,7 +595,7 @@ execute.workflow_when <- function(workflow, input) {
       }
     }
   }
-  
+
   branch_results
 }
 
@@ -603,7 +610,7 @@ execute_node <- function(workflow, node_id, input) {
   }
 
   node <- workflow$nodes[[node_id]]
-  
+
   # Log node execution start
   node_name <- if (!is.null(node$name)) node$name else node_id
   log("workflow", "Executing node: %s", node_name)
@@ -611,8 +618,12 @@ execute_node <- function(workflow, node_id, input) {
   if (inherits(node, "workflow_condition_node")) {
     # Handle condition node - execute branches and return named list
     selected_branches <- node$condition_fn(input)
-    log("workflow", "Condition node '%s' selected branches: %s", 
-      node_name, paste(selected_branches, collapse = ", "))
+    log(
+      "workflow",
+      "Condition node '%s' selected branches: %s",
+      node_name,
+      paste(selected_branches, collapse = ", ")
+    )
 
     # Get edges for selected branches
     condition_edges <- get_conditional_edges(
@@ -630,7 +641,12 @@ execute_node <- function(workflow, node_id, input) {
       for (edge in condition_edges) {
         branch_name <- edge$branch
         next_node_id <- edge$to
-        log("workflow", "Executing branch '%s' -> node '%s'", branch_name, next_node_id)
+        log(
+          "workflow",
+          "Executing branch '%s' -> node '%s'",
+          branch_name,
+          next_node_id
+        )
         branch_results[[branch_name]] <- execute_node(
           workflow,
           next_node_id,
@@ -642,7 +658,7 @@ execute_node <- function(workflow, node_id, input) {
     # Check for non-branch outgoing edges (subsequent steps)
     next_edges <- get_outgoing_edges(workflow$edges, node_id)
     non_branch_edges <- Filter(function(edge) is.null(edge$branch), next_edges)
-    
+
     if (length(non_branch_edges) == 0) {
       # No subsequent steps, return branch results
       branch_results
@@ -741,4 +757,3 @@ get_conditional_edges <- function(edges, condition_id, selected_branches) {
 `%||%` <- function(x, y) {
   if (is.null(x)) y else x
 }
-

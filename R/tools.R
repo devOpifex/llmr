@@ -24,3 +24,45 @@ set_max_tool_calls.agent <- function(x, max, ...) {
   set_max_tool_calls(x$provider, max)
   invisible(x)
 }
+
+get_max_tool_calls <- function(x, ...) {
+  v <- attr(x, "max_tool_calls")
+
+  if (!length(v)) {
+    return(25)
+  }
+
+  v
+}
+
+#' Increment the number of tool calls for an LLM provider
+#'
+#' @param x An object
+#' @param ... Additional arguments passed to methods
+#'
+#' @return The modified object
+#' @export
+#' @keywords internal
+increment_tool_calls <- function(x, ...) UseMethod("increment_tool_calls")
+
+#' @method increment_tool_calls agent
+#' @export
+increment_tool_calls.agent <- function(x, ...) {
+  v <- attr(x, "tool_calls")
+  if (!length(v)) {
+    v <- 0
+  }
+  attr(x, "tool_calls") <- v + 1
+  invisible(x)
+}
+
+#' @method increment_tool_calls provider
+#' @export
+increment_tool_calls.provider <- function(x, ...) {
+  v <- attr(x, "tool_calls")
+  if (!length(v)) {
+    v <- 0
+  }
+  attr(x, "tool_calls") <- v + 1
+  invisible(x)
+}

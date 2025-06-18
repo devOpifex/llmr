@@ -206,6 +206,8 @@ handle_response.provider_anthropic <- function(
       return(tool_response)
     }
 
+    increment_tool_calls(agent)
+
     return(request(agent, new_message(tool_response, role = "user")))
   }
 
@@ -272,6 +274,8 @@ handle_response.provider_openai <- function(
     if (!loop) {
       return(tool_responses)
     }
+
+    increment_tool_calls(agent)
 
     return(request(agent))
   }
