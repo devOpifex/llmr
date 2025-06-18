@@ -24,23 +24,7 @@ new_agent.provider <- function(name, provider, ...) {
   warning(
     "It is advised to pass the `provider` as a factory function, see details in ?new_agent."
   )
-
-  env <- new.env(parent = emptyenv())
-  env$tools <- list()
-  env$messages <- list()
-  env$mcps <- list()
-
-  agent <- structure(
-    list(
-      env = env,
-      provider = provider
-    ),
-    name = name,
-    system = "",
-    class = c("agent")
-  )
-
-  invisible(agent)
+  create_agent(name, provider, ...)
 }
 
 #' @method new_agent function
@@ -61,7 +45,26 @@ new_agent.function <- function(name, provider, ...) {
     stop("The provider function must return an object of class 'provider'")
   }
 
-  new_agent(name, instance, ...)
+  create_agent(name, instance, ...)
+}
+
+create_agent <- function(name, provider, ...) {
+  env <- new.env(parent = emptyenv())
+  env$tools <- list()
+  env$messages <- list()
+  env$mcps <- list()
+
+  agent <- structure(
+    list(
+      env = env,
+      provider = provider
+    ),
+    name = name,
+    system = "",
+    class = c("agent")
+  )
+
+  invisible(agent)
 }
 
 #' Add a tool to an agent

@@ -49,6 +49,7 @@
 <url><loc>https://llmr.opifex.org/reference/handle_tool_response.html</loc></url>
 <url><loc>https://llmr.opifex.org/reference/handle_tool_use.html</loc></url>
 <url><loc>https://llmr.opifex.org/reference/has_tool_use.html</loc></url>
+<url><loc>https://llmr.opifex.org/reference/increment_tool_calls.html</loc></url>
 <url><loc>https://llmr.opifex.org/reference/index.html</loc></url>
 <url><loc>https://llmr.opifex.org/reference/message.html</loc></url>
 <url><loc>https://llmr.opifex.org/reference/new_agent.html</loc></url>
@@ -69,6 +70,7 @@
 <url><loc>https://llmr.opifex.org/reference/request_llm.html</loc></url>
 <url><loc>https://llmr.opifex.org/reference/set_api_key.html</loc></url>
 <url><loc>https://llmr.opifex.org/reference/set_max_tokens.html</loc></url>
+<url><loc>https://llmr.opifex.org/reference/set_max_tool_calls.html</loc></url>
 <url><loc>https://llmr.opifex.org/reference/set_model.html</loc></url>
 <url><loc>https://llmr.opifex.org/reference/set_retry.html</loc></url>
 <url><loc>https://llmr.opifex.org/reference/set_system_prompt.html</loc></url>

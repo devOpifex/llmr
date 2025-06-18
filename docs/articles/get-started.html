@@ -127,9 +127,7 @@ problems. Let’s create a simple calculator agent using Anthropic’s
 Claude:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create an agent with a descriptive name and the Anthropic provider factory</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in new_agent.provider(name, instance, ...): It is advised to pass the</span></span>
-<span><span class="co">#&gt; `provider` as a factory function, see details in ?new_agent.</span></span></code></pre></div>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Important:</strong> You’ll need an Anthropic API key for this
 to work. You can get one from <a href="https://console.anthropic.com/" class="external-link">Anthropic’s website</a>.</p>
 <p>That’s it! You now have a basic agent, but it can’t do much yet.
@@ -207,7 +205,7 @@ calculations:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask the agent to perform a calculation</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 15 multiplied by 7?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-18 01:24:32 [TOOL] Calling tool: calculator</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-18 09:03:06 [TOOL] Calling tool: calculator</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
 <span><span class="co">#&gt; assistant: [{"type":"text","text":"15 multiplied by 7 equals 105."}]</span></span></code></pre></div>
 </div>
@@ -265,8 +263,8 @@ formatter. Let’s ask it a question that requires both tools:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask a question that requires both calculation and text formatting</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"Calculate 25 times 12, and convert the result to Roman numerals."</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-18 01:24:47 [TOOL] Calling tool: calculator </span></span>
-<span><span class="co">#&gt; &gt; 2025-06-18 01:24:50 [TOOL] Calling tool: convert</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-18 09:03:16 [TOOL] Calling tool: calculator </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-18 09:03:19 [TOOL] Calling tool: convert</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
 <span><span class="co">#&gt; assistant: [{"type":"text","text":"25 times 12 equals 300, which is CCC in Roman numerals."}]</span></span></code></pre></div>
 </div>
