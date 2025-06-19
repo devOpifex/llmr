@@ -205,7 +205,7 @@ calculations:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask the agent to perform a calculation</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 15 multiplied by 7?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-18 09:03:06 [TOOL] Calling tool: calculator</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-19 18:54:39 [TOOL] Calling tool: calculator</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
 <span><span class="co">#&gt; assistant: [{"type":"text","text":"15 multiplied by 7 equals 105."}]</span></span></code></pre></div>
 </div>
@@ -263,10 +263,10 @@ formatter. Let’s ask it a question that requires both tools:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask a question that requires both calculation and text formatting</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"Calculate 25 times 12, and convert the result to Roman numerals."</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-18 09:03:16 [TOOL] Calling tool: calculator </span></span>
-<span><span class="co">#&gt; &gt; 2025-06-18 09:03:19 [TOOL] Calling tool: convert</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-19 18:54:47 [TOOL] Calling tool: calculator </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-19 18:54:52 [TOOL] Calling tool: convert</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
-<span><span class="co">#&gt; assistant: [{"type":"text","text":"25 times 12 equals 300, which is CCC in Roman numerals."}]</span></span></code></pre></div>
+<span><span class="co">#&gt; assistant: [{"type":"text","text":"25 times 12 equals 300, which in Roman numerals is CCC."}]</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="how-multiple-tool-use-works">How Multiple Tool Use Works<a class="anchor" aria-label="anchor" href="#how-multiple-tool-use-works"></a>

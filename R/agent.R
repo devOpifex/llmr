@@ -76,15 +76,19 @@ create_agent <- function(name, provider, ...) {
 #' @return The modified object
 #' @export
 #' @name add_tool
-add_tool <- function(x, tool, ...) UseMethod("add_tool")
+add_tool <- function(x, tool, ...) UseMethod("add_tool", tool)
 
-#' @method add_tool agent
+#' @method add_tool tool
 #' @export
-add_tool.agent <- function(x, tool, ...) {
-  stopifnot(inherits(tool, c("capability", "tool")))
-
-  # Add the tool to the agent's tool registry
+add_tool.tool <- function(x, tool, ...) {
   x$env$tools <- c(x$env$tools, mcp_to_provider_tools(x$provider, list(tool)))
+  invisible(x)
+}
 
+#' @method add_tool ellmer::ToolDef
+#' @export
+`add_tool.ellmer::ToolDef` <- function(x, tool, ...) {
+  tool <- mcpr::ellmer_to_mcpr_tool(tool)
+  x$env$tools <- c(x$env$tools, mcp_to_provider_tools(x$provider, list(tool)))
   invisible(x)
 }

@@ -4,7 +4,7 @@ document:
 	R -s -e "devtools::document()"
 
 check: document 
-	R -s -e "devtools::check(document = FALSE)"
+	R -s -e "devtools::check(document = FALSE, vignettes = FALSE)"
 
 install:
 	R -s -e "devtools::install()"

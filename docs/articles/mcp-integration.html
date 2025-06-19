@@ -261,16 +261,16 @@ to the agent</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Same usage as the inline tool version</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 25 multiplied by 4?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-18 09:03:29 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-19 18:55:02 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
 <span><span class="co">#&gt; assistant: [{"type":"text","text":"25 multiplied by 4 equals 100."}]</span></span>
 <span></span>
 <span><span class="co"># Complex calculations work the same way</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"I have 150 dollars, spend 47.50 on dinner and 23.75 on a book. How much is left?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-18 09:03:39 [TOOL] Calling MCP (calculator) tool: calculator </span></span>
-<span><span class="co">#&gt; &gt; 2025-06-18 09:03:43 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
+<span><span class="co">#&gt; &gt; 2025-06-19 18:55:11 [TOOL] Calling MCP (calculator) tool: calculator </span></span>
+<span><span class="co">#&gt; &gt; 2025-06-19 18:55:18 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
-<span><span class="co">#&gt; assistant: [{"type":"text","text":"You have **$78.75** left after spending $47.50 on dinner and $23.75 on a book."}]</span></span></code></pre></div>
+<span><span class="co">#&gt; assistant: [{"type":"text","text":"After spending $47.50 on dinner and $23.75 on a book, you have **$78.75** left from your original $150."}]</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="the-lift-and-shift-advantage">The “Lift and Shift” Advantage<a class="anchor" aria-label="anchor" href="#the-lift-and-shift-advantage"></a>
