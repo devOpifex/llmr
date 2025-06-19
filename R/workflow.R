@@ -32,8 +32,6 @@ print.workflow <- function(x, ...) {
   invisible(x)
 }
 
-# ASCII Diagram Generation ===================================================
-
 generate_workflow_diagram <- function(workflow) {
   if (length(workflow$nodes) == 0) {
     return("(empty workflow)")
@@ -164,8 +162,6 @@ topological_sort <- function(workflow) {
   result
 }
 
-# Step System ================================================================
-
 #' Create a workflow step
 #'
 #' Creates a step that can be used in workflows. Steps can wrap functions
@@ -209,8 +205,6 @@ print.workflow_step <- function(x, ...) {
   invisible(x)
 }
 
-# Workflow Pipe Operator ====================================================
-
 #' Workflow pipe operator
 #'
 #' Chains workflow steps together to create execution flows. Can connect
@@ -223,35 +217,37 @@ print.workflow_step <- function(x, ...) {
 #' @export
 `%->%` <- function(lhs, rhs) {
   if (inherits(lhs, "workflow_step") && inherits(rhs, "workflow_step")) {
-    # step %->% step: create new workflow
-    create_workflow_from_steps(lhs, rhs)
-  } else if (inherits(lhs, "workflow_step") && inherits(rhs, "workflow_when")) {
-    # step %->% when(): create workflow with step, then add branch
-    workflow <- create_workflow_from_step(lhs)
-    add_branch_to_workflow(workflow, rhs)
-  } else if (inherits(lhs, "workflow") && inherits(rhs, "workflow_step")) {
-    # workflow %->% step: add step to workflow
-    add_step_to_workflow(lhs, rhs)
-  } else if (inherits(lhs, "workflow") && inherits(rhs, "workflow_when")) {
-    # workflow %->% when(): handle branching
-    add_branch_to_workflow(lhs, rhs)
-  } else if (inherits(lhs, "workflow_when") && inherits(rhs, "workflow_step")) {
-    # NEW: when() %->% step: create workflow starting with conditional
-    create_workflow_from_when(lhs, rhs)
-  } else if (inherits(lhs, "workflow_when") && inherits(rhs, "workflow")) {
-    # NEW: when() %->% workflow: merge conditional with workflow
-    create_workflow_from_when(lhs, rhs)
-  } else {
-    stop(
-      "Invalid workflow pipe operation: cannot connect ",
-      class(lhs)[1],
-      " to ",
-      class(rhs)[1]
-    )
+    return(create_workflow_from_steps(lhs, rhs))
   }
-}
 
-# Workflow Building Functions ===============================================
+  if (inherits(lhs, "workflow_step") && inherits(rhs, "workflow_when")) {
+    workflow <- create_workflow_from_step(lhs)
+    return(add_branch_to_workflow(workflow, rhs))
+  }
+
+  if (inherits(lhs, "workflow") && inherits(rhs, "workflow_step")) {
+    return(add_step_to_workflow(lhs, rhs))
+  }
+
+  if (inherits(lhs, "workflow") && inherits(rhs, "workflow_when")) {
+    return(add_branch_to_workflow(lhs, rhs))
+  }
+
+  if (inherits(lhs, "workflow_when") && inherits(rhs, "workflow_step")) {
+    return(create_workflow_from_when(lhs, rhs))
+  }
+
+  if (inherits(lhs, "workflow_when") && inherits(rhs, "workflow")) {
+    return(create_workflow_from_when(lhs, rhs))
+  }
+
+  stop(
+    "Invalid workflow pipe operation: cannot connect ",
+    class(lhs)[1],
+    " to ",
+    class(rhs)[1]
+  )
+}
 
 create_workflow_from_steps <- function(step1, step2) {
   workflow <- new_workflow()
@@ -296,8 +292,6 @@ generate_step_id <- function(workflow, step) {
   base_name <- gsub("[^a-zA-Z0-9_]", "_", step$name)
   paste0(base_name, "_", workflow$.counter)
 }
-
-# When-First Workflow Functions =============================================
 
 create_workflow_from_when <- function(when_obj, next_element) {
   workflow <- new_workflow()
@@ -401,8 +395,6 @@ merge_workflow_after_when <- function(main_workflow, next_workflow) {
 
   main_workflow
 }
-
-# Branching System ===========================================================
 
 #' Create conditional branching in workflows
 #'
@@ -548,8 +540,6 @@ merge_branch_workflow <- function(
   })
   list(workflow = main_workflow, exits = branch_exits)
 }
-
-# Workflow Execution ========================================================
 
 #' Execute a workflow
 #'
@@ -735,8 +725,6 @@ execute_step.agent_step <- function(step, input) {
     }
   )
 }
-
-# Utility Functions ==========================================================
 
 get_outgoing_edges <- function(edges, node_id) {
   Filter(function(edge) edge$from == node_id, edges)
