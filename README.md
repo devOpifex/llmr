@@ -42,7 +42,7 @@ get_last_message(provider)
 
 Note that we leverage the tooling from the [mcpr](https://github.com/devOpifex/mcpr)
 package to create the tools,
-though you may also use the tools from [ellmer](https://github.com/tidyverse/ellmer)
+though you may also use the tools from [ellmer](https://github.com/tidyverse/ellmer).
 This allows seamless integration with MCP (Model Context Protocol) servers.
 
 ```r
@@ -75,7 +75,7 @@ add_tool(
 # Make a request to the LLM
 request(
   agent,
-  new_message("What is 123 * 456? Please use the calculate tool.")
+  new_message("What is the weather in Switzerland?")
 )
 
 # Print the response
