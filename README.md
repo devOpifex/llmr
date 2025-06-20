@@ -41,7 +41,8 @@ get_last_message(provider)
 ## Creating a Simple Agent
 
 Note that we leverage the tooling from the [mcpr](https://github.com/devOpifex/mcpr)
-package to create the tools.
+package to create the tools,
+though you may also use the tools from [ellmer](https://github.com/tidyverse/ellmer)
 This allows seamless integration with MCP (Model Context Protocol) servers.
 
 ```r
