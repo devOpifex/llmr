@@ -35,6 +35,7 @@ By the end of this guide, you'll understand how to:
 
 ```{r setup}
 library(llmr)
+library(ellmer)
 ```
 
 ## Basic Workflow Concepts
@@ -96,24 +97,21 @@ print(result)  # Should be 25: ((5 + 10) * 2) - 5 = 25
 Now let's create a workflow using AI agents for text processing:
 
 ```{r agent-workflow, eval = FALSE}
-# Create specialized agents using the factory pattern
-summarizer <- new_agent("summarizer", new_anthropic)
-analyzer <- new_agent("analyzer", new_anthropic)
-formatter <- new_agent("formatter", new_anthropic)
+# Create specialized agents using ellmer chat objects
+summarizer <- new_agent("summarizer", ellmer::chat_anthropic())
+analyzer <- new_agent("analyzer", ellmer::chat_anthropic())
+formatter <- new_agent("formatter", ellmer::chat_anthropic())
 
-# Configure each agent with specific instructions
-set_system_prompt(
-  summarizer,
-  "You are a text summarizer. Provide concise, one-sentence summaries."
-)
-set_system_prompt(
-  analyzer,
-  "You are a sentiment analyzer. Analyze the emotional tone and return just the sentiment (positive/negative/neutral)."
-)
-set_system_prompt(
-  formatter,
-  "You are a formatter. Take the previous analysis and format it as: 'Summary: [summary] | Sentiment: [sentiment]'"
-)
+# Create specialized agents with specific system prompts
+summarizer <- new_agent("summarizer", ellmer::chat_anthropic(
+  system_prompt = "You are a text summarizer. Provide concise, one-sentence summaries."
+))
+analyzer <- new_agent("analyzer", ellmer::chat_anthropic(
+  system_prompt = "You are a sentiment analyzer. Analyze the emotional tone and return just the sentiment (positive/negative/neutral)."
+))
+formatter <- new_agent("formatter", ellmer::chat_anthropic(
+  system_prompt = "You are a formatter. Take the previous analysis and format it as: 'Summary: [summary] | Sentiment: [sentiment]'"
+))
 
 # Create workflow by chaining agent steps inline
 text_workflow <- step(summarizer, name = "summarize") %->%
@@ -167,11 +165,9 @@ add_metadata <- function(analysis) {
 }
 
 # Create an agent for the core analysis
-analyzer <- new_agent("text_analyzer", new_anthropic)
-set_system_prompt(
-  analyzer,
-  "Analyze the given text and provide insights about its main themes, tone, and key messages. Be concise but thorough."
-)
+analyzer <- new_agent("text_analyzer", ellmer::chat_anthropic(
+  system_prompt = "Analyze the given text and provide insights about its main themes, tone, and key messages. Be concise but thorough."
+))
 
 # Create mixed workflow: function -> agent -> function
 mixed_workflow <- step(clean_text, name = "preprocess") %->%

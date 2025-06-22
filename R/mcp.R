@@ -10,7 +10,7 @@ register_mcp <- function(x, mcp) UseMethod("register_mcp")
 #' @method register_mcp agent
 #' @export
 register_mcp.agent <- function(x, mcp) {
-  if (inherits(x$provider, "provider_ellmer")) {
+  if (inherits(x$provider, "Chat")) {
     register_mcp_ellmer(x, mcp)
   } else {
     x$env$mcps <- c(x$env$mcps, list(mcp))

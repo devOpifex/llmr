@@ -51,17 +51,8 @@ new_agent.function <- function(name, provider, ...) {
 #' @method new_agent Chat
 #' @export
 new_agent.Chat <- function(name, provider, ...) {
-  # Wrap ellmer Chat object in a provider_ellmer
-  ellmer_provider <- structure(
-    list(
-      chat = provider,
-      env = new.env(parent = emptyenv())
-    ),
-    name = provider$get_provider()@name,
-    class = c("provider_ellmer", "provider")
-  )
-  
-  create_agent(name, ellmer_provider, ...)
+  # Handle ellmer Chat objects directly
+  create_agent(name, provider, ...)
 }
 
 create_agent <- function(name, provider, ...) {
@@ -97,7 +88,7 @@ add_tool <- function(x, tool, ...) UseMethod("add_tool", tool)
 #' @method add_tool tool
 #' @export
 add_tool.tool <- function(x, tool, ...) {
-  if (inherits(x$provider, "provider_ellmer")) {
+  if (inherits(x$provider, "Chat")) {
     add_tool_ellmer(x, tool, ...)
   } else {
     x$env$tools <- c(x$env$tools, mcp_to_provider_tools(x$provider, list(tool)))
@@ -108,7 +99,7 @@ add_tool.tool <- function(x, tool, ...) {
 #' @method add_tool ellmer::ToolDef
 #' @export
 `add_tool.ellmer::ToolDef` <- function(x, tool, ...) {
-  if (inherits(x$provider, "provider_ellmer")) {
+  if (inherits(x$provider, "Chat")) {
     add_tool_ellmer(x, tool, ...)
   } else {
     tool <- mcpr::ellmer_to_mcpr_tool(tool)

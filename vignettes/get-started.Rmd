@@ -38,6 +38,7 @@ Before you begin, you'll need:
 ```{r setup}
 library(llmr)
 library(mcpr)
+library(ellmer)
 ```
 
 ## Step 1: Create Your First Agent
@@ -45,11 +46,11 @@ library(mcpr)
 An agent is an AI assistant that can use tools to help solve problems. Let's create a simple calculator agent using Anthropic's Claude:
 
 ```{r create-agent}
-# Create an agent with a descriptive name and the Anthropic provider factory
-agent <- new_agent("calculator", new_anthropic)
+# Create an agent with a descriptive name and ellmer chat object
+agent <- new_agent("calculator", ellmer::chat_anthropic())
 ```
 
-**Important:** You'll need an Anthropic API key for this to work. You can get one from [Anthropic's website](https://console.anthropic.com/).
+**Important:** You'll need an Anthropic API key for this to work. You can get one from [Anthropic's website](https://console.anthropic.com/). The ellmer package will automatically use the `ANTHROPIC_API_KEY` environment variable.
 
 That's it! You now have a basic agent, but it can't do much yet. Let's give it some capabilities.
 

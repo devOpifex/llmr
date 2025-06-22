@@ -193,11 +193,10 @@ register_mcp(agent, mcp_client)
 
 ```{r}
 # ellmer providers support streaming
-provider <- new_ellmer_anthropic()
-agent <- new_agent("assistant", provider)
+agent <- new_agent("assistant", ellmer::chat_anthropic())
 
 # The underlying ellmer chat object supports streaming
-chat <- provider$chat
+chat <- agent$provider$chat
 chat$chat("Tell me a story", echo = "output")
 ```
 
@@ -205,7 +204,7 @@ chat$chat("Tell me a story", echo = "output")
 
 ```{r}
 # ellmer providers support structured data extraction
-response <- provider$chat$chat_structured(
+response <- agent$provider$chat$chat_structured(
   "Extract information about this person: John Doe, age 30, lives in NYC",
   type = ellmer::type_object(
     name = ellmer::type_string("Person's name"),
@@ -219,7 +218,7 @@ response <- provider$chat$chat_structured(
 
 ```{r}
 # ellmer supports async operations
-promise <- provider$chat$chat_async("What is the capital of France?")
+promise <- agent$provider$chat$chat_async("What is the capital of France?")
 promises::then(promise, function(result) {
   cat("Response:", result, "\n")
 })
@@ -230,12 +229,15 @@ promises::then(promise, function(result) {
 Most configuration methods work the same:
 
 ```{r}
-# These work with both provider types
-provider <- new_ellmer_anthropic() |>
-  set_model("claude-3-haiku-20240307") |>
-  set_temperature(0.8) |>
-  set_max_tokens(1500) |>
-  set_system_prompt("You are a helpful assistant.")
+# Configuration is done directly with ellmer chat objects
+agent <- new_agent("assistant", ellmer::chat_anthropic(
+  model = "claude-3-haiku-20240307",
+  params = ellmer::params(
+    temperature = 0.8,
+    max_tokens = 1500
+  ),
+  system_prompt = "You are a helpful assistant."
+))
 ```
 
 ## Migration Timeline
@@ -258,6 +260,6 @@ provider <- new_ellmer_anthropic() |>
 
 ## Getting Help
 
-- See `?new_ellmer_provider` for detailed documentation
+- See ellmer documentation for chat object configuration
 - Check [ellmer documentation](https://ellmer.tidyverse.org) for advanced features
 - Report issues at [llmr GitHub](https://github.com/devOpifex/llmr/issues)

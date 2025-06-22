@@ -46,12 +46,12 @@ new_anthropic <- function(
   ...
 ) {
   .Deprecated(
-    "new_ellmer_anthropic", 
+    "ellmer::chat_anthropic", 
     package = "llmr",
     msg = paste(
       "new_anthropic() is deprecated and will be removed in a future version.",
-      "Please use new_ellmer_anthropic() instead for better performance and features.",
-      "See ?new_ellmer_provider for migration guidance."
+      "Please use ellmer::chat_anthropic() directly instead for better performance and features.",
+      "See the ellmer package documentation for migration guidance."
     )
   )
   
@@ -69,12 +69,12 @@ new_openai <- function(
   ...
 ) {
   .Deprecated(
-    "new_ellmer_openai", 
+    "ellmer::chat_openai", 
     package = "llmr",
     msg = paste(
       "new_openai() is deprecated and will be removed in a future version.",
-      "Please use new_ellmer_openai() instead for better performance and features.",
-      "See ?new_ellmer_provider for migration guidance."
+      "Please use ellmer::chat_openai() directly instead for better performance and features.",
+      "See the ellmer package documentation for migration guidance."
     )
   )
   

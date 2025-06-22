@@ -11,18 +11,18 @@
 #' @return The modified agent
 #' @keywords internal
 add_tool_ellmer <- function(x, tool, ...) {
-  if (!inherits(x$provider, "provider_ellmer")) {
-    stop("This method is only for ellmer providers")
+  if (!inherits(x$provider, "Chat")) {
+    stop("This method is only for ellmer Chat objects")
   }
   
   # Register tool directly with ellmer chat
   if (inherits(tool, "ToolDef")) {
     # Already an ellmer ToolDef
-    x$provider$chat$register_tool(tool)
+    x$provider$register_tool(tool)
   } else if (inherits(tool, "tool")) {
     # Convert mcpr tool to ellmer ToolDef
     ellmer_tool <- mcpr_to_ellmer_tool(tool)
-    x$provider$chat$register_tool(ellmer_tool)
+    x$provider$register_tool(ellmer_tool)
   } else {
     stop("tool must be an ellmer ToolDef or mcpr tool object")
   }
@@ -151,8 +151,8 @@ convert_object_type <- function(prop) {
 #' @return The modified agent
 #' @keywords internal
 register_mcp_ellmer <- function(x, mcp) {
-  if (!inherits(x$provider, "provider_ellmer")) {
-    stop("This method is only for ellmer providers")
+  if (!inherits(x$provider, "Chat")) {
+    stop("This method is only for ellmer Chat objects")
   }
   
   # Get tools from MCP
@@ -184,7 +184,7 @@ register_mcp_ellmer <- function(x, mcp) {
       class = "tool"
     ))
     
-    x$provider$chat$register_tool(ellmer_tool)
+    x$provider$register_tool(ellmer_tool)
   }
   
   # Store MCP reference

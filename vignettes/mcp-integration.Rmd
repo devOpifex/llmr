@@ -146,9 +146,10 @@ Now let's create an agent that connects to our MCP server:
 ```{r client-setup, eval=TRUE}
 library(llmr)
 library(mcpr)
+library(ellmer)
 
-# Create an agent with the Anthropic provider factory
-agent <- new_agent("calculator", new_anthropic)
+# Create an agent with ellmer chat object
+agent <- new_agent("calculator", ellmer::chat_anthropic())
 ```
 
 ## Step 3: Connect to the MCP Server
@@ -203,9 +204,9 @@ get_last_message(agent)
 #### 🚀 **Scalability**
 ```{r scalability-example}
 # Multiple agents can share the same calculator service
-agent1 <- new_agent("financial_advisor", new_anthropic)
-agent2 <- new_agent("math_tutor", new_anthropic)
-agent3 <- new_agent("data_analyst", new_anthropic)
+agent1 <- new_agent("financial_advisor", ellmer::chat_anthropic())
+agent2 <- new_agent("math_tutor", ellmer::chat_anthropic())
+agent3 <- new_agent("data_analyst", ellmer::chat_anthropic())
 
 # All connect to the same MCP server
 register_mcp(agent1, calculator_client)

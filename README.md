@@ -37,12 +37,15 @@ get_last_message(agent)
 
 ### Legacy Provider Support
 
-The original provider API is still supported but deprecated:
+The original provider API is still supported but deprecated. Use ellmer chat objects directly instead:
 
 ```r
-# Legacy API (deprecated)
+# Legacy API (deprecated) - avoid this
 provider <- new_anthropic()  # Will show deprecation warning
 agent <- new_agent("assistant", provider)
+
+# Recommended approach
+agent <- new_agent("assistant", ellmer::chat_anthropic())
 ```
 
 ## Creating a Simple Agent
@@ -98,8 +101,8 @@ servers (and clients).
 library(llmr)
 library(mcpr)
 
-# Create a provider
-agent <- new_agent("mcp", new_anthropic)
+# Create an agent with ellmer chat object
+agent <- new_agent("mcp", ellmer::chat_anthropic())
 
 # Create an MCP client that connects to an external calculator service
 client <- mcpr::new_client(
@@ -189,9 +192,10 @@ agent <- new_agent("assistant", ellmer::chat_anthropic(
   system_prompt = "You are a helpful assistant that specializes in R programming."
 ))
 
-# Legacy provider configuration still works (deprecated)
+# Legacy provider configuration (deprecated) - avoid this
 provider <- new_anthropic() |>
   set_model("claude-3-haiku-20240307") |>
   set_max_tokens(1024) |>
   set_temperature(0.7)
+agent <- new_agent("assistant", provider)
 ```
