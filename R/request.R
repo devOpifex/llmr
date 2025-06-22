@@ -24,14 +24,27 @@ request.agent <- function(x, message = NULL, ...) {
     x <- append_message(x, message)
   }
 
-  response <- request(
-    x$provider,
-    x$env$messages,
-    tools = x$env$tools
-  )
+  # Handle ellmer providers differently
+  if (inherits(x$provider, "provider_ellmer")) {
+    # For ellmer providers, just send the message directly
+    # ellmer handles tool calling internally
+    if (!is.null(message)) {
+      response <- x$provider$chat$chat(message$content, echo = "none")
+    }
+    
+    # Sync conversation history
+    handle_response(x$provider, x, NULL)
+  } else {
+    # Legacy provider handling
+    response <- request(
+      x$provider,
+      x$env$messages,
+      tools = x$env$tools
+    )
 
-  # Handle the response (for tool_use etc.)
-  handle_response(x$provider, x, response)
+    # Handle the response (for tool_use etc.)
+    handle_response(x$provider, x, response)
+  }
 
   invisible(x)
 }

@@ -25,17 +25,24 @@ pak::pak("devOpifex/llmr")
 ```r
 library(llmr)
 
-# Create a provider
-provider <- new_anthropic()
-
-# defaults to user role
-message <- new_message("Explain quantum computing in simple terms")
+# Create an agent with ellmer chat object directly (recommended)
+agent <- new_agent("assistant", ellmer::chat_anthropic())
 
 # Send request and get response
-request(provider, message)
+request(agent, new_message("Explain quantum computing in simple terms"))
 
 # Print the last message
-get_last_message(provider)
+get_last_message(agent)
+```
+
+### Legacy Provider Support
+
+The original provider API is still supported but deprecated:
+
+```r
+# Legacy API (deprecated)
+provider <- new_anthropic()  # Will show deprecation warning
+agent <- new_agent("assistant", provider)
 ```
 
 ## Creating a Simple Agent
@@ -48,8 +55,8 @@ This allows seamless integration with MCP (Model Context Protocol) servers.
 ```r
 library(llmr)
 
-# Create a simple agent
-agent <- new_agent("calculator", new_anthropic)
+# Create a simple agent with ellmer chat object
+agent <- new_agent("calculator", ellmer::chat_anthropic())
 
 # Add a calculator tool to the agent
 add_tool(
@@ -136,23 +143,55 @@ workflow <- step1 %->% step2
 result <- execute(workflow, 5)  # Returns 30: (5 + 10) * 2
 ```
 
-## Configuration
+## ellmer Providers (Recommended)
 
-Methods for `agent` exists too.
+llmr now supports [ellmer](https://ellmer.tidyverse.org) as the underlying provider implementation, offering significant advantages:
+
+- **15+ provider support** (Anthropic, OpenAI, Google Gemini, AWS Bedrock, Ollama, and more)
+- **Advanced features**: streaming, async operations, structured data extraction
+- **Better performance** and professional maintenance by the tidyverse team
 
 ```r
-# Set a different model
-set_model(provider, "claude-3-haiku-20240307")
+# Multiple providers available - use ellmer chat objects directly
+anthropic_agent <- new_agent("claude", ellmer::chat_anthropic())
+openai_agent <- new_agent("gpt", ellmer::chat_openai())
+gemini_agent <- new_agent("gemini", ellmer::chat_google_gemini())
 
-# Set max tokens for response
-set_max_tokens(provider, 1024)
+# Advanced ellmer features - access the underlying chat object
+chat <- anthropic_agent$provider$chat
 
-# Set API version
-set_version(provider, "2023-06-01")
+# Streaming responses
+chat$chat("Tell me a story", echo = "output")
 
-# Set temperature for response randomness (0.0 to 1.0)
-set_temperature(provider, 0.7)
+# Structured data extraction
+data <- chat$chat_structured(
+  "Extract: John Doe, age 30, lives in NYC",
+  type = ellmer::type_object(
+    name = ellmer::type_string("Person's name"),
+    age = ellmer::type_integer("Person's age"),
+    city = ellmer::type_string("City")
+  )
+)
+```
 
-# Set system prompt
-set_system_prompt(provider, "You are a helpful assistant that specializes in R programming.")
+## Configuration
+
+Configuration methods work with both provider types:
+
+```r
+# Configure ellmer chat objects directly (recommended)
+agent <- new_agent("assistant", ellmer::chat_anthropic(
+  model = "claude-3-haiku-20240307",
+  params = ellmer::params(
+    temperature = 0.7,
+    max_tokens = 1024
+  ),
+  system_prompt = "You are a helpful assistant that specializes in R programming."
+))
+
+# Legacy provider configuration still works (deprecated)
+provider <- new_anthropic() |>
+  set_model("claude-3-haiku-20240307") |>
+  set_max_tokens(1024) |>
+  set_temperature(0.7)
 ```
