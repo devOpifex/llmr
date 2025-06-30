@@ -31,20 +31,21 @@ request.agent <- function(x, message = NULL, ...) {
     if (!is.null(message)) {
       response <- x$provider$chat(message$content, echo = "none")
     }
-    
+
     # Sync conversation history with ellmer
     sync_ellmer_history(x)
-  } else {
-    # Legacy provider handling
-    response <- request(
-      x$provider,
-      x$env$messages,
-      tools = x$env$tools
-    )
-
-    # Handle the response (for tool_use etc.)
-    handle_response(x$provider, x, response)
+    return(invisible(x))
   }
+
+  # Legacy provider handling
+  response <- request(
+    x$provider,
+    x$env$messages,
+    tools = x$env$tools
+  )
+
+  # Handle the response (for tool_use etc.)
+  handle_response(x$provider, x, response)
 
   invisible(x)
 }
@@ -57,18 +58,18 @@ sync_ellmer_history <- function(x) {
   if (!inherits(x$provider, "Chat")) {
     return(invisible(x))
   }
-  
+
   # Get the latest turns from ellmer chat
   turns <- x$provider$get_turns()
-  
+
   # Convert ellmer turns to llmr messages
   messages <- lapply(turns, function(turn) {
     new_message(turn@text, role = turn@role)
   })
-  
+
   # Update agent's message history
   x$env$messages <- messages
-  
+
   invisible(x)
 }
 
