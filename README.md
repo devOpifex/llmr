@@ -26,7 +26,7 @@ pak::pak("devOpifex/llmr")
 library(llmr)
 
 # Create an agent with ellmer chat object directly (recommended)
-agent <- new_agent("assistant", ellmer::chat_anthropic())
+agent <- new_agent("assistant", ellmer::chat_anthropic)
 
 # Send request and get response
 request(agent, new_message("Explain quantum computing in simple terms"))
@@ -59,7 +59,7 @@ This allows seamless integration with MCP (Model Context Protocol) servers.
 library(llmr)
 
 # Create a simple agent with ellmer chat object
-agent <- new_agent("calculator", ellmer::chat_anthropic())
+agent <- new_agent("calculator", ellmer::chat_anthropic)
 
 # Add a calculator tool to the agent
 add_tool(
@@ -102,7 +102,7 @@ library(llmr)
 library(mcpr)
 
 # Create an agent with ellmer chat object
-agent <- new_agent("mcp", ellmer::chat_anthropic())
+agent <- new_agent("mcp", ellmer::chat_anthropic)
 
 # Create an MCP client that connects to an external calculator service
 client <- mcpr::new_client(
@@ -156,9 +156,9 @@ llmr now supports [ellmer](https://ellmer.tidyverse.org) as the underlying provi
 
 ```r
 # Multiple providers available - use ellmer chat objects directly
-anthropic_agent <- new_agent("claude", ellmer::chat_anthropic())
-openai_agent <- new_agent("gpt", ellmer::chat_openai())
-gemini_agent <- new_agent("gemini", ellmer::chat_google_gemini())
+anthropic_agent <- new_agent("claude", ellmer::chat_anthropic)
+openai_agent <- new_agent("gpt", ellmer::chat_openai)
+gemini_agent <- new_agent("gemini", ellmer::chat_google_gemini)
 
 # Advanced ellmer features - access the underlying chat object
 chat <- anthropic_agent$provider$chat
@@ -182,15 +182,18 @@ data <- chat$chat_structured(
 Configuration methods work with both provider types:
 
 ```r
+chat <- \(){
+  ellmer::chat_anthropic(
+    model = "claude-3-haiku-20240307",
+    params = ellmer::params(
+      temperature = 0.7,
+      max_tokens = 1024
+    ),
+    system_prompt = "You are a helpful assistant that specializes in R programming."
+  )
+}
 # Configure ellmer chat objects directly (recommended)
-agent <- new_agent("assistant", ellmer::chat_anthropic(
-  model = "claude-3-haiku-20240307",
-  params = ellmer::params(
-    temperature = 0.7,
-    max_tokens = 1024
-  ),
-  system_prompt = "You are a helpful assistant that specializes in R programming."
-))
+agent <- new_agent("assistant", chat)
 
 # Legacy provider configuration (deprecated) - avoid this
 provider <- new_anthropic() |>
