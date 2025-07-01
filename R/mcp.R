@@ -10,25 +10,29 @@ register_mcp <- function(x, mcp) UseMethod("register_mcp")
 #' @method register_mcp agent
 #' @export
 register_mcp.agent <- function(x, mcp) {
-  x$env$mcps <- c(x$env$mcps, list(mcp))
+  if (inherits(x$provider, "Chat")) {
+    register_mcp_ellmer(x, mcp)
+  } else {
+    x$env$mcps <- c(x$env$mcps, list(mcp))
 
-  tools <- tryCatch(
-    mcpr::tools_list(mcp),
-    error = function(e) e
-  )
-
-  if (inherits(tools, "error")) {
-    stop(
-      sprintf(
-        "Could not retrieve tools from MCP client provider: %s",
-        tools$message
-      )
+    tools <- tryCatch(
+      mcpr::tools_list(mcp),
+      error = function(e) e
     )
-  }
 
-  tools <- mcp_to_provider_tools(x$provider, tools$result$tools)
-  tools <- namespace(mcp, tools)
-  x$env$tools <- c(x$env$tools, tools)
+    if (inherits(tools, "error")) {
+      stop(
+        sprintf(
+          "Could not retrieve tools from MCP client provider: %s",
+          tools$message
+        )
+      )
+    }
+
+    tools <- mcp_to_provider_tools(x$provider, tools$result$tools)
+    tools <- namespace(mcp, tools)
+    x$env$tools <- c(x$env$tools, tools)
+  }
 
   invisible(x)
 }

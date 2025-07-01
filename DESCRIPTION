@@ -18,13 +18,15 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports:
+  ellmer,
   httr2,
   mcpr (>= 0.0.1.9000),
   yyjsonr
 Suggests:
   knitr,
   processx,
-  rmarkdown
+  rmarkdown,
+  testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Remotes:
   devOpifex/mcpr

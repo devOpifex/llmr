@@ -45,6 +45,16 @@ new_anthropic <- function(
   url = "https://api.anthropic.com",
   ...
 ) {
+  .Deprecated(
+    "ellmer::chat_anthropic", 
+    package = "llmr",
+    msg = paste(
+      "new_anthropic() is deprecated and will be removed in a future version.",
+      "Please use ellmer::chat_anthropic() directly instead for better performance and features.",
+      "See the ellmer package documentation for migration guidance."
+    )
+  )
+  
   new_provider("anthropic", url, ...) |>
     set_api_key(Sys.getenv("ANTHROPIC_API_KEY")) |>
     set_model("claude-opus-4-20250514") |>
@@ -58,6 +68,16 @@ new_openai <- function(
   url = "https://api.openai.com",
   ...
 ) {
+  .Deprecated(
+    "ellmer::chat_openai", 
+    package = "llmr",
+    msg = paste(
+      "new_openai() is deprecated and will be removed in a future version.",
+      "Please use ellmer::chat_openai() directly instead for better performance and features.",
+      "See the ellmer package documentation for migration guidance."
+    )
+  )
+  
   new_provider("openai", url, ...) |>
     set_api_key(Sys.getenv("OPENAI_API_KEY")) |>
     set_model("gpt-4") |>

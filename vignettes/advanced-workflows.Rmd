@@ -36,6 +36,7 @@ By the end of this guide, you'll understand how to:
 
 ```{r setup}
 library(llmr)
+library(ellmer)
 ```
 
 ## Understanding `when()`: Conditional Branching
@@ -290,26 +291,18 @@ for (i in seq_along(test_data)) {
 Combine AI agents with conditional logic for intelligent processing:
 
 ```{r agent-conditional}
-# Create specialized agents using the factory pattern
-technical_writer <- new_agent("technical_writer", new_anthropic)
-creative_writer <- new_agent("creative_writer", new_anthropic)
-data_analyst <- new_agent("data_analyst", new_anthropic)
+# Create specialized agents with ellmer chat objects and system prompts
+technical_writer <- new_agent("technical_writer", ellmer::chat_anthropic(
+  system_prompt = "You are a technical writer. Analyze text for technical accuracy and clarity. Provide structured feedback."
+))
 
-# Configure agents
-set_system_prompt(
-  technical_writer,
-  "You are a technical writer. Analyze text for technical accuracy and clarity. Provide structured feedback."
-)
+creative_writer <- new_agent("creative_writer", ellmer::chat_anthropic(
+  system_prompt = "You are a creative writing expert. Analyze text for creativity, style, and emotional impact."
+))
 
-set_system_prompt(
-  creative_writer,
-  "You are a creative writing expert. Analyze text for creativity, style, and emotional impact."
-)
-
-set_system_prompt(
-  data_analyst,
-  "You are a data analyst. Extract quantitative insights and patterns from text."
-)
+data_analyst <- new_agent("data_analyst", ellmer::chat_anthropic(
+  system_prompt = "You are a data analyst. Extract quantitative insights and patterns from text."
+))
 
 # Content classifier
 classify_content <- function(text) {

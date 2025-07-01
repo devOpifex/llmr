@@ -1,0 +1,265 @@
+---
+title: "Migrating to ellmer Providers"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Migrating to ellmer Providers}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Migrating to ellmer Providers
+
+The llmr package now supports using [ellmer](https://ellmer.tidyverse.org) as the underlying provider implementation. This brings significant benefits including:
+
+- **15+ provider support** (vs 2 with legacy providers)
+- **Advanced features**: streaming, async operations, structured data extraction
+- **Better performance** and reliability
+- **Professional maintenance** by the tidyverse team
+
+## Quick Migration Guide
+
+### Old API (Deprecated)
+
+```{r}
+library(llmr)
+
+# Old way - deprecated
+provider <- new_anthropic()
+agent <- new_agent("assistant", provider)
+
+# Add tools
+weather_tool <- mcpr::new_tool(
+  name = "weather",
+  description = "Get weather forecast",
+  input_schema = mcpr::schema(
+    properties = mcpr::properties(
+      location = mcpr::property_string("Location", required = TRUE)
+    )
+  ),
+  handler = function(params) {
+    paste("Weather in", params$location, "is sunny")
+  }
+)
+
+add_tool(agent, weather_tool)
+```
+
+### New API (Recommended)
+
+```{r}
+library(llmr)
+
+# New way - direct ellmer usage
+agent <- new_agent("assistant", ellmer::chat_anthropic())
+
+# Add tools (same interface!)
+add_tool(agent, weather_tool)
+
+# Or use ellmer tools directly
+ellmer_tool <- ellmer::tool(
+  function(location) paste("Weather in", location, "is sunny"),
+  "Get weather forecast",
+  location = ellmer::type_string("Location to get weather for")
+)
+
+add_tool(agent, ellmer_tool)
+```
+
+## Provider Migration
+
+### Anthropic
+
+```{r}
+# Before
+provider <- new_anthropic() |>
+  set_model("claude-3-sonnet-20240229") |>
+  set_temperature(0.7) |>
+  set_max_tokens(2048)
+agent <- new_agent("assistant", provider)
+
+# After - direct ellmer usage
+agent <- new_agent("assistant", ellmer::chat_anthropic(
+  model = "claude-3-sonnet-20240229",
+  params = ellmer::params(
+    temperature = 0.7,
+    max_tokens = 2048
+  )
+))
+```
+
+### OpenAI
+
+```{r}
+# Before
+provider <- new_openai() |>
+  set_model("gpt-4") |>
+  set_temperature(0.5) |>
+  set_max_tokens(1024)
+agent <- new_agent("assistant", provider)
+
+# After - direct ellmer usage
+agent <- new_agent("assistant", ellmer::chat_openai(
+  model = "gpt-4",
+  params = ellmer::params(
+    temperature = 0.5,
+    max_tokens = 1024
+  )
+))
+```
+
+### New Providers Available
+
+With ellmer, you now have access to many more providers:
+
+```{r}
+# Google Gemini
+agent <- new_agent("gemini", ellmer::chat_google_gemini(model = "gemini-pro"))
+
+# AWS Bedrock
+agent <- new_agent("bedrock", ellmer::chat_aws_bedrock(model = "anthropic.claude-v2"))
+
+# Ollama (local models)
+agent <- new_agent("local", ellmer::chat_ollama(model = "llama2"))
+
+# And many more...
+```
+
+## Tool Migration
+
+### mcpr Tools
+
+Your existing mcpr tools work seamlessly:
+
+```{r}
+# This works with both old and new providers
+calculator_tool <- mcpr::new_tool(
+  name = "calculate",
+  description = "Perform calculations",
+  input_schema = mcpr::schema(
+    properties = mcpr::properties(
+      expression = mcpr::property_string("Math expression", required = TRUE)
+    )
+  ),
+  handler = function(params) {
+    eval(parse(text = params$expression))
+  }
+)
+
+add_tool(agent, calculator_tool)
+```
+
+### ellmer Tools
+
+You can also use ellmer's native tool system:
+
+```{r}
+# ellmer tools have better type safety
+calculator_tool <- ellmer::tool(
+  function(expression) eval(parse(text = expression)),
+  "Perform mathematical calculations",
+  expression = ellmer::type_string("Mathematical expression to evaluate")
+)
+
+add_tool(agent, calculator_tool)
+```
+
+### MCP Integration
+
+MCP integration continues to work:
+
+```{r}
+# Create MCP client
+mcp_client <- mcpr::new_client(
+  command = "Rscript",
+  args = "path/to/server.R",
+  name = "calculator"
+)
+
+# Register with agent (works with both provider types)
+register_mcp(agent, mcp_client)
+```
+
+## Advanced Features
+
+### Streaming (ellmer providers only)
+
+```{r}
+# ellmer providers support streaming
+agent <- new_agent("assistant", ellmer::chat_anthropic())
+
+# The underlying ellmer chat object supports streaming
+chat <- agent$provider$chat
+chat$chat("Tell me a story", echo = "output")
+```
+
+### Structured Data Extraction
+
+```{r}
+# ellmer providers support structured data extraction
+response <- agent$provider$chat$chat_structured(
+  "Extract information about this person: John Doe, age 30, lives in NYC",
+  type = ellmer::type_object(
+    name = ellmer::type_string("Person's name"),
+    age = ellmer::type_integer("Person's age"),
+    city = ellmer::type_string("City where person lives")
+  )
+)
+```
+
+### Async Operations
+
+```{r}
+# ellmer supports async operations
+promise <- agent$provider$chat$chat_async("What is the capital of France?")
+promises::then(promise, function(result) {
+  cat("Response:", result, "\n")
+})
+```
+
+## Configuration Compatibility
+
+Most configuration methods work the same:
+
+```{r}
+# Configuration is done directly with ellmer chat objects
+agent <- new_agent("assistant", ellmer::chat_anthropic(
+  model = "claude-3-haiku-20240307",
+  params = ellmer::params(
+    temperature = 0.8,
+    max_tokens = 1500
+  ),
+  system_prompt = "You are a helpful assistant."
+))
+```
+
+## Migration Timeline
+
+- **Phase 1** (Current): Both APIs supported, deprecation warnings for old API
+- **Phase 2** (6 months): Old API marked as deprecated with clear warnings
+- **Phase 3** (12 months): Old API removed, ellmer becomes the only option
+
+## Benefits Summary
+
+| Feature | Legacy Providers | ellmer Providers |
+|---------|------------------|------------------|
+| Providers | 2 (Anthropic, OpenAI) | 15+ |
+| Streaming | ❌ | ✅ |
+| Async | ❌ | ✅ |
+| Structured Data | ❌ | ✅ |
+| Tool Safety | Basic | Type-safe |
+| Maintenance | Manual | Tidyverse |
+| Performance | Basic | Optimized |
+
+## Getting Help
+
+- See ellmer documentation for chat object configuration
+- Check [ellmer documentation](https://ellmer.tidyverse.org) for advanced features
+- Report issues at [llmr GitHub](https://github.com/devOpifex/llmr/issues)

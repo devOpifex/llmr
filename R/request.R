@@ -24,6 +24,20 @@ request.agent <- function(x, message = NULL, ...) {
     x <- append_message(x, message)
   }
 
+  # Handle ellmer Chat objects differently
+  if (inherits(x$provider, "Chat")) {
+    # For ellmer Chat objects, just send the message directly
+    # ellmer handles tool calling internally
+    if (!is.null(message)) {
+      response <- x$provider$chat(message$content, echo = "none")
+    }
+
+    # Sync conversation history with ellmer
+    sync_ellmer_history(x)
+    return(invisible(x))
+  }
+
+  # Legacy provider handling
   response <- request(
     x$provider,
     x$env$messages,
@@ -32,6 +46,29 @@ request.agent <- function(x, message = NULL, ...) {
 
   # Handle the response (for tool_use etc.)
   handle_response(x$provider, x, response)
+
+  invisible(x)
+}
+
+#' Sync conversation history with ellmer Chat object
+#'
+#' @param x An agent with ellmer Chat provider
+#' @keywords internal
+sync_ellmer_history <- function(x) {
+  if (!inherits(x$provider, "Chat")) {
+    return(invisible(x))
+  }
+
+  # Get the latest turns from ellmer chat
+  turns <- x$provider$get_turns()
+
+  # Convert ellmer turns to llmr messages
+  messages <- lapply(turns, function(turn) {
+    new_message(turn@text, role = turn@role)
+  })
+
+  # Update agent's message history
+  x$env$messages <- messages
 
   invisible(x)
 }
