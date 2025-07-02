@@ -51,7 +51,7 @@ weather_tool <- mcpr::new_tool(
     units <- params$units %||% "celsius"
     
     # Simulate weather API call
-    temp <- if (units == "celsius") "22°C" else "72°F"
+    temp <- if (units == "celsius") "22C" else "72F"
     paste("Current weather in", location, "is sunny,", temp)
   }
 )

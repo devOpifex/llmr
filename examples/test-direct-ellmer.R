@@ -6,7 +6,7 @@ cat("Testing direct ellmer integration...\n")
 # Test 1: Basic agent creation with ellmer chat object
 cat("\n1. Testing basic agent creation:\n")
 agent <- new_agent("test", ellmer::chat_anthropic())
-cat("✓ Agent created successfully with ellmer chat object\n")
+cat("[+] Agent created successfully with ellmer chat object\n")
 cat("Provider class:", class(agent$provider), "\n")
 
 # Test 2: Tool addition
@@ -29,14 +29,14 @@ weather_tool <- mcpr::new_tool(
 )
 
 add_tool(agent, weather_tool)
-cat("✓ Tool added successfully\n")
+cat("[+] Tool added successfully\n")
 cat("Registered tools:", names(agent$provider$chat$get_tools()), "\n")
 
 # Test 3: Request handling
 cat("\n3. Testing request handling:\n")
 request(agent, new_message("What's the weather in Tokyo?"))
 last_msg <- get_last_message(agent)
-cat("✓ Request processed successfully\n")
+cat("[+] Request processed successfully\n")
 cat("Response:", last_msg$content, "\n")
 
 # Test 4: Multiple providers
@@ -45,17 +45,17 @@ cat("\n4. Testing multiple ellmer providers:\n")
 # OpenAI
 if (Sys.getenv("OPENAI_API_KEY") != "") {
   openai_agent <- new_agent("openai", ellmer::chat_openai(model = "gpt-3.5-turbo"))
-  cat("✓ OpenAI agent created\n")
+  cat("[+] OpenAI agent created\n")
 } else {
-  cat("⚠ OpenAI API key not set, skipping OpenAI test\n")
+  cat("[!] OpenAI API key not set, skipping OpenAI test\n")
 }
 
 # Gemini
 if (Sys.getenv("GOOGLE_API_KEY") != "") {
   gemini_agent <- new_agent("gemini", ellmer::chat_google_gemini())
-  cat("✓ Gemini agent created\n")
+  cat("[+] Gemini agent created\n")
 } else {
-  cat("⚠ Google API key not set, skipping Gemini test\n")
+  cat("[!] Google API key not set, skipping Gemini test\n")
 }
 
 # Test 5: Configuration during creation
@@ -68,13 +68,13 @@ configured_agent <- new_agent("configured", ellmer::chat_anthropic(
   ),
   system_prompt = "You are a helpful assistant."
 ))
-cat("✓ Configured agent created successfully\n")
+cat("[+] Configured agent created successfully\n")
 
 # Test 6: Access to ellmer features
 cat("\n6. Testing access to ellmer features:\n")
 ellmer_chat <- configured_agent$provider$chat
-cat("✓ Can access underlying ellmer chat object\n")
+cat("[+] Can access underlying ellmer chat object\n")
 cat("Model:", ellmer_chat$get_model(), "\n")
 cat("System prompt:", ellmer_chat$get_system_prompt(), "\n")
 
-cat("\n✅ All tests passed! Direct ellmer integration working correctly.\n")
+cat("\n[SUCCESS] All tests passed! Direct ellmer integration working correctly.\n")
