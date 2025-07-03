@@ -41,10 +41,6 @@ new_agent.function <- function(name, provider, ...) {
     )
   }
 
-  if (!inherits(instance, "provider")) {
-    stop("The provider function must return an object of class 'provider'")
-  }
-
   create_agent(name, instance, ...)
 }
 
