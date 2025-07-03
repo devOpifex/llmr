@@ -41,10 +41,6 @@ new_agent.function <- function(name, provider, ...) {
     )
   }
 
-  if (!inherits(instance, "provider")) {
-    stop("The provider function must return an object of class 'provider'")
-  }
-
   create_agent(name, instance, ...)
 }
 
@@ -131,17 +127,17 @@ set_approval_callback <- function(agent, callback_fn) {
   if (!inherits(agent, "agent")) {
     stop("agent must be an agent object")
   }
-  
+
   if (!is.function(callback_fn) && !is.null(callback_fn)) {
     stop("callback_fn must be a function or NULL")
   }
-  
+
   agent$env$approval_callback <- callback_fn
-  
+
   if (inherits(agent$provider, "Chat")) {
     setup_approval_integration(agent)
   }
-  
+
   invisible(agent)
 }
 
@@ -153,18 +149,22 @@ setup_approval_integration <- function(agent) {
   if (is.null(agent$env$approval_callback)) {
     return(invisible(agent))
   }
-  
+
   agent$provider$on_tool_request(function(request) {
     tool_info <- list(
       name = request@name,
       arguments = request@arguments,
       id = request@id
     )
-    
+
     approved <- agent$env$approval_callback(tool_info)
-    
+
     if (!isTRUE(approved)) {
-      reason <- if (is.character(approved)) approved else "Human denied tool execution"
+      reason <- if (is.character(approved)) {
+        approved
+      } else {
+        "Human denied tool execution"
+      }
       # Create error condition with ellmer_tool_reject class
       err <- structure(
         list(message = reason, call = NULL),
@@ -173,6 +173,7 @@ setup_approval_integration <- function(agent) {
       stop(err)
     }
   })
-  
+
   invisible(agent)
 }
+

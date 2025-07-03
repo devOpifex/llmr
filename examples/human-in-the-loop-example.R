@@ -1,9 +1,4 @@
-# Human-in-the-Loop Example for llmr
-# 
-# This example demonstrates how to set up human approval for tool execution
-# using the new human-in-the-loop functionality in llmr.
-
-library(llmr)
+devtools::load_all()
 
 # Example 1: Basic Interactive Approval
 # =====================================
@@ -35,9 +30,10 @@ add_tool(
 # Set up interactive human approval
 agent <- set_approval_callback(agent, prompt_human_approval)
 
+request(agent, new_message("What's the weather in Paris?"))
+
 # Now when you make a request that triggers tool use, you'll be prompted:
 # request(agent, new_message("What's the weather in Paris?"))
-
 
 # Example 2: Custom Approval Logic
 # =================================
@@ -46,22 +42,22 @@ agent <- set_approval_callback(agent, prompt_human_approval)
 custom_approval <- function(tool_info) {
   # Auto-approve safe tools
   safe_tools <- c("get_weather", "search_docs", "calculate")
-  
+
   if (tool_info$name %in% safe_tools) {
     cat("[+] Auto-approving safe tool:", tool_info$name, "\n")
     return(TRUE)
   }
-  
+
   # Require approval for potentially dangerous tools
   dangerous_tools <- c("delete_file", "send_email", "make_payment")
-  
+
   if (tool_info$name %in% dangerous_tools) {
     cat("[!] DANGEROUS TOOL:", tool_info$name, "\n")
     cat("This tool can make irreversible changes!\n")
     response <- readline("Are you SURE you want to proceed? (yes/no): ")
     return(tolower(trimws(response)) == "yes")
   }
-  
+
   # For unknown tools, use the default prompt
   prompt_human_approval(tool_info)
 }
@@ -87,7 +83,6 @@ agent3 <- new_agent("smart_assistant", ellmer::chat_anthropic) |>
 # list_tool_approvals()    # See current preferences
 # clear_tool_approvals()   # Clear all preferences
 
-
 # Example 4: Batch Approval Interface
 # ====================================
 
@@ -101,7 +96,6 @@ agent4 <- new_agent("batch_assistant", ellmer::chat_anthropic) |>
 # - Block a specific tool type
 # - View detailed information
 
-
 # Example 5: Workflow Integration
 # ================================
 
@@ -113,12 +107,11 @@ approval_step <- function(data) {
 
 # Create a workflow with an agent that requires approval
 workflow <- step(function(x) x + 10) %->%
-           step(agent) %->%
-           step(approval_step)
+  step(agent) %->%
+  step(approval_step)
 
 # When executed, the agent step will prompt for tool approval if needed
 # result <- execute(workflow, 5)
-
 
 # Example 6: Disabling Approval
 # ==============================
@@ -130,7 +123,6 @@ agent_no_approval <- set_approval_callback(agent, NULL)
 agent_auto_approve <- new_agent("auto_agent", ellmer::chat_anthropic)
 # (no set_approval_callback call means no approval required)
 
-
 # Tips for Using Human-in-the-Loop
 # =================================
 
@@ -140,6 +132,3 @@ agent_auto_approve <- new_agent("auto_agent", ellmer::chat_anthropic)
 # 4. Use batch_approval_interface() for power users who want more control
 # 5. Remember that approval only works with ellmer Chat providers
 # 6. Tool approval happens before tool execution, so you can prevent unwanted actions
-
-cat("Human-in-the-loop examples loaded successfully!\n")
-cat("Remember to set your API keys before running the examples.\n")
