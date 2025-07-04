@@ -65,10 +65,12 @@ prompt_human_approval <- function(tool_info) {
 #' @param tool_info A list containing tool information
 #' @keywords internal
 show_tool_details <- function(tool_info) {
-  log_plain("\n=== Tool Call Details ===")
+  log_plain("")
+  log_plain("=== Tool Call Details ===")
   log_plain("Tool Name:", tool_info$name)
   log_plain("Call ID:", tool_info$id)
-  log_plain("\nArguments (detailed):")
+  log_plain("")
+  log_plain("Arguments (detailed):")
 
   if (length(tool_info$arguments) == 0) {
     log_plain("  (no arguments)")
