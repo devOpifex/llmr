@@ -40,7 +40,6 @@ prompt_human_approval <- function(tool_info) {
     }
   }
 
-  log_plain("")
   response <- readline("[?] Approve this tool call? (y/n/details): ")
 
   switch(
@@ -65,11 +64,9 @@ prompt_human_approval <- function(tool_info) {
 #' @param tool_info A list containing tool information
 #' @keywords internal
 show_tool_details <- function(tool_info) {
-  log_plain("")
   log_plain("=== Tool Call Details ===")
   log_plain("Tool Name:", tool_info$name)
   log_plain("Call ID:", tool_info$id)
-  log_plain("")
   log_plain("Arguments (detailed):")
 
   if (length(tool_info$arguments) == 0) {
@@ -77,8 +74,6 @@ show_tool_details <- function(tool_info) {
   } else {
     utils::str(tool_info$arguments)
   }
-
-  log_plain("")
 }
 
 #' Batch approval interface for multiple tool calls
@@ -91,7 +86,6 @@ show_tool_details <- function(tool_info) {
 #' @return `TRUE` if approved, `FALSE` if denied, or a character string with denial reason
 #' @export
 batch_approval_interface <- function(tool_info) {
-  log_plain("")
   log_info("Tool Call Request")
   log_plain("Tool:", tool_info$name)
 
@@ -101,7 +95,6 @@ batch_approval_interface <- function(tool_info) {
     log_plain("Args:", arg_summary)
   }
 
-  log_plain("")
   response <- readline(
     "Action? (y)es/(n)o/(d)etails/(a)lways approve this tool/(b)lock this tool: "
   )
