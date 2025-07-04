@@ -18,31 +18,29 @@
 #'   set_approval_callback(prompt_human_approval)
 #' }
 prompt_human_approval <- function(tool_info) {
-  cat("\n")
-  cat("[AGENT] Agent wants to use tool:", tool_info$name, "\n")
-  cat("[ARGS] Arguments:\n")
+  log_info("Agent wants to use tool: %s", tool_info$name)
+  log_plain("[ARGS] Arguments:")
 
   # Pretty print arguments
   if (length(tool_info$arguments) == 0) {
-    cat("  (no arguments)\n")
+    log_plain("  (no arguments)")
   } else {
     for (arg_name in names(tool_info$arguments)) {
       arg_value <- tool_info$arguments[[arg_name]]
       if (is.character(arg_value) && length(arg_value) == 1) {
-        cat("  ", arg_name, ":", arg_value, "\n")
+        log_plain("  ", arg_name, ":", arg_value)
       } else {
-        cat(
+        log_plain(
           "  ",
           arg_name,
           ":",
-          utils::capture.output(utils::str(arg_value, max.level = 1)),
-          "\n"
+          utils::capture.output(utils::str(arg_value, max.level = 1))
         )
       }
     }
   }
 
-  cat("\n")
+  log_plain("")
   response <- readline("[?] Approve this tool call? (y/n/details): ")
 
   switch(
@@ -56,7 +54,7 @@ prompt_human_approval <- function(tool_info) {
       prompt_human_approval(tool_info)
     },
     {
-      cat("Please respond with y/n/details\n")
+      log_warn("Please respond with y/n/details")
       prompt_human_approval(tool_info)
     }
   )
@@ -67,18 +65,18 @@ prompt_human_approval <- function(tool_info) {
 #' @param tool_info A list containing tool information
 #' @keywords internal
 show_tool_details <- function(tool_info) {
-  cat("\n=== Tool Call Details ===\n")
-  cat("Tool Name:", tool_info$name, "\n")
-  cat("Call ID:", tool_info$id, "\n")
-  cat("\nArguments (detailed):\n")
+  log_plain("\n=== Tool Call Details ===")
+  log_plain("Tool Name:", tool_info$name)
+  log_plain("Call ID:", tool_info$id)
+  log_plain("\nArguments (detailed):")
 
   if (length(tool_info$arguments) == 0) {
-    cat("  (no arguments)\n")
+    log_plain("  (no arguments)")
   } else {
     utils::str(tool_info$arguments)
   }
 
-  cat("\n")
+  log_plain("")
 }
 
 #' Batch approval interface for multiple tool calls
@@ -91,17 +89,17 @@ show_tool_details <- function(tool_info) {
 #' @return `TRUE` if approved, `FALSE` if denied, or a character string with denial reason
 #' @export
 batch_approval_interface <- function(tool_info) {
-  cat("\n")
-  cat("[TOOL] Tool Call Request\n")
-  cat("Tool:", tool_info$name, "\n")
+  log_plain("")
+  log_info("Tool Call Request")
+  log_plain("Tool:", tool_info$name)
 
   # Show a summary of arguments
   if (length(tool_info$arguments) > 0) {
     arg_summary <- paste(names(tool_info$arguments), collapse = ", ")
-    cat("Args:", arg_summary, "\n")
+    log_plain("Args:", arg_summary)
   }
 
-  cat("\n")
+  log_plain("")
   response <- readline(
     "Action? (y)es/(n)o/(d)etails/(a)lways approve this tool/(b)lock this tool: "
   )
@@ -139,7 +137,7 @@ batch_approval_interface <- function(tool_info) {
       paste("Tool", tool_info$name, "is blocked by user preference")
     },
     {
-      cat("Please respond with y/n/d/a/b\n")
+      log_warn("Please respond with y/n/d/a/b")
       batch_approval_interface(tool_info)
     }
   )
@@ -156,9 +154,9 @@ batch_approval_interface <- function(tool_info) {
 store_tool_approval <- function(tool_name, approved) {
   .tool_approvals[[tool_name]] <- approved
   if (approved) {
-    cat("[+] Tool", tool_name, "will be auto-approved in future\n")
+    log_status("Tool %s will be auto-approved in future", tool_name)
   } else {
-    cat("[-] Tool", tool_name, "will be auto-blocked in future\n")
+    log_status("Tool %s will be auto-blocked in future", tool_name)
   }
 }
 
@@ -190,10 +188,10 @@ smart_approval_callback <- function(tool_info) {
 
   if (!is.null(stored_approval)) {
     if (stored_approval) {
-      cat("[+] Auto-approving tool:", tool_info$name, "\n")
+      log_status("Auto-approving tool: %s", tool_info$name)
       return(TRUE)
     } else {
-      cat("[-] Auto-blocking tool:", tool_info$name, "\n")
+      log_status("Auto-blocking tool: %s", tool_info$name)
       return(paste("Tool", tool_info$name, "is blocked by user preference"))
     }
   }
@@ -207,7 +205,7 @@ smart_approval_callback <- function(tool_info) {
 #' @export
 clear_tool_approvals <- function() {
   rm(list = ls(.tool_approvals), envir = .tool_approvals)
-  cat("[CLEAR] Cleared all tool approval preferences\n")
+  log_system("Cleared all tool approval preferences")
 }
 
 #' List current tool approval preferences
@@ -215,14 +213,17 @@ clear_tool_approvals <- function() {
 #' @export
 list_tool_approvals <- function() {
   if (length(ls(.tool_approvals)) == 0) {
-    cat("No tool approval preferences stored\n")
+    log_system("No tool approval preferences stored")
     return(invisible(NULL))
   }
 
-  cat("Current tool approval preferences:\n")
+  log_system("Current tool approval preferences:")
   for (tool_name in ls(.tool_approvals)) {
-    status <- if (.tool_approvals[[tool_name]]) "[+] APPROVED" else "[-] BLOCKED"
-    cat("  ", tool_name, ":", status, "\n")
+    status <- if (.tool_approvals[[tool_name]]) {
+      "[+] APPROVED"
+    } else {
+      "[-] BLOCKED"
+    }
+    log_plain("  ", tool_name, ":", status)
   }
 }
-
