@@ -92,6 +92,51 @@ request(
 get_last_message(agent)
 ```
 
+## Human-in-the-Loop Tool Approval
+
+For sensitive operations, you can require human approval before tools are executed:
+
+```r
+library(llmr)
+
+# Create an agent with human approval enabled from the start
+agent <- new_agent("assistant", ellmer::chat_anthropic, 
+                   approval_callback = prompt_human_approval)
+
+add_tool(
+  agent,
+  mcpr::new_tool(
+    name = "delete_file",
+    description = "Delete a file from the system",
+    input_schema = mcpr::schema(
+      properties = mcpr::properties(
+        filepath = mcpr::property_string(
+          title = "File Path",
+          description = "Path to the file to delete",
+          required = TRUE
+        )
+      )
+    ),
+    handler = function(params) {
+      file.remove(params$filepath)
+      sprintf("Deleted file: %s", params$filepath)
+    }
+  )
+)
+
+# When the LLM tries to use the tool, you'll see:
+# > 2024-01-15 10:30:45 [INFO] Agent wants to use tool: delete_file
+# [ARGS] Arguments:
+#   filepath: /tmp/example.txt
+# 
+# [?] Approve this tool call? (y/n/details): 
+
+request(agent, new_message("Please delete the file /tmp/example.txt"))
+
+# Alternative: Set approval callback after agent creation
+agent <- set_approval_callback(agent, prompt_human_approval)
+```
+
 ## Integrating with MCP (Model Context Protocol)
 
 See [mcpr](https://github.com/devOpifex/mcpr) for how to create and use MCP

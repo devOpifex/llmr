@@ -51,3 +51,13 @@ reference:
     desc: "Functions for Memory Client Provider integration"
     contents:
       - register_mcp
+      
+  - title: "Human-in-the-Loop Approval"
+    desc: "Functions for requiring human approval before tool execution"
+    contents:
+      - set_approval_callback
+      - prompt_human_approval
+      - batch_approval_interface
+      - smart_approval_callback
+      - clear_tool_approvals
+      - list_tool_approvals

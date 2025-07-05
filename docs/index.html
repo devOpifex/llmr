@@ -150,10 +150,54 @@
 <span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="human-in-the-loop-tool-approval">Human-in-the-Loop Tool Approval<a class="anchor" aria-label="anchor" href="#human-in-the-loop-tool-approval"></a>
+</h2>
+<p>For sensitive operations, you can require human approval before tools are executed:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create an agent with human approval enabled from the start</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"assistant"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="va"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span>, </span>
+<span>                   approval_callback <span class="op">=</span> <span class="va">prompt_human_approval</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/add_tool.html">add_tool</a></span><span class="op">(</span></span>
+<span>  <span class="va">agent</span>,</span>
+<span>  <span class="fu">mcpr</span><span class="fu">::</span><span class="fu"><a href="https://mcpr.opifex.org/reference/new_tool.html" class="external-link">new_tool</a></span><span class="op">(</span></span>
+<span>    name <span class="op">=</span> <span class="st">"delete_file"</span>,</span>
+<span>    description <span class="op">=</span> <span class="st">"Delete a file from the system"</span>,</span>
+<span>    input_schema <span class="op">=</span> <span class="fu">mcpr</span><span class="fu">::</span><span class="fu"><a href="https://mcpr.opifex.org/reference/schema.html" class="external-link">schema</a></span><span class="op">(</span></span>
+<span>      properties <span class="op">=</span> <span class="fu">mcpr</span><span class="fu">::</span><span class="fu"><a href="https://mcpr.opifex.org/reference/properties.html" class="external-link">properties</a></span><span class="op">(</span></span>
+<span>        filepath <span class="op">=</span> <span class="fu">mcpr</span><span class="fu">::</span><span class="fu"><a href="https://mcpr.opifex.org/reference/property_string.html" class="external-link">property_string</a></span><span class="op">(</span></span>
+<span>          title <span class="op">=</span> <span class="st">"File Path"</span>,</span>
+<span>          description <span class="op">=</span> <span class="st">"Path to the file to delete"</span>,</span>
+<span>          required <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>        <span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    handler <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">filepath</span><span class="op">)</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Deleted file: %s"</span>, <span class="va">params</span><span class="op">$</span><span class="va">filepath</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># When the LLM tries to use the tool, you'll see:</span></span>
+<span><span class="co"># &gt; 2024-01-15 10:30:45 [INFO] Agent wants to use tool: delete_file</span></span>
+<span><span class="co"># [ARGS] Arguments:</span></span>
+<span><span class="co">#   filepath: /tmp/example.txt</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># [?] Approve this tool call? (y/n/details): </span></span>
+<span></span>
+<span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"Please delete the file /tmp/example.txt"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Alternative: Set approval callback after agent creation</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/set_approval_callback.html">set_approval_callback</a></span><span class="op">(</span><span class="va">agent</span>, <span class="va">prompt_human_approval</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="integrating-with-mcp-model-context-protocol">Integrating with MCP (Model Context Protocol)<a class="anchor" aria-label="anchor" href="#integrating-with-mcp-model-context-protocol"></a>
 </h2>
 <p>See <a href="https://github.com/devOpifex/mcpr" class="external-link">mcpr</a> for how to create and use MCP servers (and clients).</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mcpr.opifex.org/" class="external-link">mcpr</a></span><span class="op">)</span></span>
 <span></span>
@@ -183,7 +227,7 @@
 <h2 id="workflows">Workflows<a class="anchor" aria-label="anchor" href="#workflows"></a>
 </h2>
 <p>Chain together processing steps and agents into workflows:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define processing functions</span></span>
@@ -212,7 +256,7 @@
 <li>
 <strong>Better performance</strong> and professional maintenance by the tidyverse team</li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Multiple providers available - use ellmer chat objects directly</span></span>
 <span><span class="va">anthropic_agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"claude"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="va"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span><span class="op">)</span></span>
 <span><span class="va">openai_agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"gpt"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="va"><a href="https://ellmer.tidyverse.org/reference/chat_openai.html" class="external-link">chat_openai</a></span><span class="op">)</span></span>
@@ -238,7 +282,7 @@
 <h2 id="configuration">Configuration<a class="anchor" aria-label="anchor" href="#configuration"></a>
 </h2>
 <p>Configuration methods work with both provider types:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">chat</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span><span class="op">(</span></span>
 <span>    model <span class="op">=</span> <span class="st">"claude-3-haiku-20240307"</span>,</span>

@@ -4,6 +4,8 @@
 #'
 #' @param name Character string specifying the agent name.
 #' @param provider An object of class `provider` or a function that returns a provider.
+#' @param approval_callback Optional function for human approval of tool calls.
+#'   Should accept a tool_info parameter and return TRUE/FALSE or a character string.
 #' @param ... Additional arguments passed to methods.
 #'
 #' @details
@@ -14,22 +16,22 @@
 #'
 #' @return An object of class "agent"
 #' @export
-new_agent <- function(name, provider, ...) {
+new_agent <- function(name, provider, approval_callback = NULL, ...) {
   UseMethod("new_agent", provider)
 }
 
 #' @method new_agent provider
 #' @export
-new_agent.provider <- function(name, provider, ...) {
+new_agent.provider <- function(name, provider, approval_callback = NULL, ...) {
   warning(
     "It is advised to pass the `provider` as a factory function, see details in ?new_agent."
   )
-  create_agent(name, provider, ...)
+  create_agent(name, provider, approval_callback = approval_callback, ...)
 }
 
 #' @method new_agent function
 #' @export
-new_agent.function <- function(name, provider, ...) {
+new_agent.function <- function(name, provider, approval_callback = NULL, ...) {
   instance <- tryCatch(provider(), error = function(e) e)
 
   if (inherits(instance, "error")) {
@@ -47,21 +49,27 @@ new_agent.function <- function(name, provider, ...) {
     )
   }
 
-  create_agent(name, instance, ...)
+  create_agent(name, instance, approval_callback = approval_callback, ...)
 }
 
 #' @method new_agent Chat
 #' @export
-new_agent.Chat <- function(name, provider, ...) {
+new_agent.Chat <- function(name, provider, approval_callback = NULL, ...) {
   # Handle ellmer Chat objects directly
-  create_agent(name, provider, ...)
+  create_agent(name, provider, approval_callback = approval_callback, ...)
 }
 
-create_agent <- function(name, provider, ...) {
+create_agent <- function(name, provider, approval_callback = NULL, ...) {
+  # Validate approval_callback if provided
+  if (!is.null(approval_callback) && !is.function(approval_callback)) {
+    stop("approval_callback must be a function or NULL")
+  }
+
   env <- new.env(parent = emptyenv())
   env$tools <- list()
   env$messages <- list()
   env$mcps <- list()
+  env$approval_callback <- approval_callback
 
   agent <- structure(
     list(
@@ -108,4 +116,76 @@ add_tool.tool <- function(x, tool, ...) {
     x$env$tools <- c(x$env$tools, mcp_to_provider_tools(x$provider, list(tool)))
   }
   invisible(x)
+}
+
+#' Set approval callback for human-in-the-loop tool execution
+#'
+#' @param agent An agent object
+#' @param callback_fn A function that takes tool information and returns TRUE/FALSE for approval
+#'
+#' @details
+#' The callback function receives a list with the following elements:
+#' - `name`: The name of the tool being called
+#' - `arguments`: A list of arguments passed to the tool
+#' - `id`: The unique identifier for this tool call
+#'
+#' The callback should return:
+#' - `TRUE` to approve the tool execution
+#' - `FALSE` to deny the tool execution
+#' - A character string to deny with a custom error message
+#'
+#' @return The modified agent (invisibly)
+#' @export
+set_approval_callback <- function(agent, callback_fn) {
+  if (!inherits(agent, "agent")) {
+    stop("agent must be an agent object")
+  }
+
+  if (!is.function(callback_fn) && !is.null(callback_fn)) {
+    stop("callback_fn must be a function or NULL")
+  }
+
+  agent$env$approval_callback <- callback_fn
+
+  if (inherits(agent$provider, "Chat")) {
+    setup_approval_integration(agent)
+  }
+
+  invisible(agent)
+}
+
+#' Setup approval integration with ellmer Chat objects
+#'
+#' @param agent An agent with ellmer Chat provider
+#' @keywords internal
+setup_approval_integration <- function(agent) {
+  if (is.null(agent$env$approval_callback)) {
+    return(invisible(agent))
+  }
+
+  agent$provider$on_tool_request(function(request) {
+    tool_info <- list(
+      name = request@name,
+      arguments = request@arguments,
+      id = request@id
+    )
+
+    approved <- agent$env$approval_callback(tool_info)
+
+    if (!isTRUE(approved)) {
+      reason <- if (is.character(approved)) {
+        approved
+      } else {
+        "Human denied tool execution"
+      }
+      # Create error condition with ellmer_tool_reject class
+      err <- structure(
+        list(message = reason, call = NULL),
+        class = c("ellmer_tool_reject", "error", "condition")
+      )
+      stop(err)
+    }
+  })
+
+  invisible(agent)
 }

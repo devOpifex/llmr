@@ -3,10 +3,11 @@ pkgdown: 2.1.2
 pkgdown_sha: ~
 articles:
   advanced-workflows: advanced-workflows.html
+  ellmer-migration: ellmer-migration.html
   get-started: get-started.html
   mcp-integration: mcp-integration.html
   workflow-basics: workflow-basics.html
-last_built: 2025-06-19T16:54Z
+last_built: 2025-07-04T09:49Z
 urls:
   reference: https://llmr.opifex.org/reference
   article: https://llmr.opifex.org/articles

@@ -19,6 +19,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/advanced-workflows.html">Advanced Workflows: Conditional and Dynamic Patterns</a></li>
+    <li><a class="dropdown-item" href="../articles/ellmer-migration.html">Migrating to ellmer Providers</a></li>
     <li><a class="dropdown-item" href="../articles/get-started.html">Get Started with llmr</a></li>
     <li><a class="dropdown-item" href="../articles/mcp-integration.html">MCP Integration: From Development to Production</a></li>
     <li><a class="dropdown-item" href="../articles/workflow-basics.html">Workflow Basics: Linear Chains</a></li>
@@ -239,6 +240,53 @@
 
         </dt>
         <dd>Register a memory client provider</dd>
+      </dl></div><div class="section level2">
+      <h2 id="human-in-the-loop-approval">Human-in-the-Loop Approval<a class="anchor" aria-label="anchor" href="#human-in-the-loop-approval"></a></h2>
+
+      <div class="section-desc"><p>Functions for requiring human approval before tool execution</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="set_approval_callback.html">set_approval_callback()</a></code>
+
+        </dt>
+        <dd>Set approval callback for human-in-the-loop tool execution</dd>
+      </dl><dl><dt>
+
+          <code><a href="prompt_human_approval.html">prompt_human_approval()</a></code>
+
+        </dt>
+        <dd>Interactive human approval prompt for tool execution</dd>
+      </dl><dl><dt>
+
+          <code><a href="batch_approval_interface.html">batch_approval_interface()</a></code>
+
+        </dt>
+        <dd>Batch approval interface for multiple tool calls</dd>
+      </dl><dl><dt>
+
+          <code><a href="smart_approval_callback.html">smart_approval_callback()</a></code>
+
+        </dt>
+        <dd>Smart approval callback that uses stored preferences</dd>
+      </dl><dl><dt>
+
+          <code><a href="clear_tool_approvals.html">clear_tool_approvals()</a></code>
+
+        </dt>
+        <dd>Clear all stored tool approval preferences</dd>
+      </dl><dl><dt>
+
+          <code><a href="list_tool_approvals.html">list_tool_approvals()</a></code>
+
+        </dt>
+        <dd>List current tool approval preferences</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

@@ -40,6 +40,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/advanced-workflows.html">Advanced Workflows: Conditional and Dynamic Patterns</a></li>
+    <li><a class="dropdown-item" href="../articles/ellmer-migration.html">Migrating to ellmer Providers</a></li>
     <li><a class="dropdown-item" href="../articles/get-started.html">Get Started with llmr</a></li>
     <li><a class="dropdown-item" href="../articles/mcp-integration.html">MCP Integration: From Development to Production</a></li>
     <li><a class="dropdown-item" href="../articles/workflow-basics.html">Workflow Basics: Linear Chains</a></li>
@@ -225,9 +226,11 @@ example:</p>
 <span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     write</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ellmer.tidyverse.org" class="external-link">ellmer</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Create an agent with the Anthropic provider factory</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Create an agent with ellmer chat object</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using <span style="color: #00BB00;">model</span> = <span style="color: #0000BB;">"claude-sonnet-4-20250514"</span>.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="step-3-connect-to-the-mcp-server">Step 3: Connect to the MCP Server<a class="anchor" aria-label="anchor" href="#step-3-connect-to-the-mcp-server"></a>
@@ -261,16 +264,16 @@ to the agent</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Same usage as the inline tool version</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 25 multiplied by 4?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-19 18:55:02 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
+<span><span class="co">#&gt; Warning in read.client_io(x, timeout): Timeout waiting for client response</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
-<span><span class="co">#&gt; assistant: [{"type":"text","text":"25 multiplied by 4 equals 100."}]</span></span>
+<span><span class="co">#&gt; assistant: 25 multiplied by 4 equals 100.</span></span>
 <span></span>
 <span><span class="co"># Complex calculations work the same way</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"I have 150 dollars, spend 47.50 on dinner and 23.75 on a book. How much is left?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-19 18:55:11 [TOOL] Calling MCP (calculator) tool: calculator </span></span>
-<span><span class="co">#&gt; &gt; 2025-06-19 18:55:18 [TOOL] Calling MCP (calculator) tool: calculator</span></span>
+<span><span class="co">#&gt; Warning in read.client_io(x, timeout): Timeout waiting for client response</span></span>
+<span><span class="co">#&gt; Warning in read.client_io(x, timeout): Timeout waiting for client response</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
-<span><span class="co">#&gt; assistant: [{"type":"text","text":"After spending $47.50 on dinner and $23.75 on a book, you have **$78.75** left from your original $150."}]</span></span></code></pre></div>
+<span><span class="co">#&gt; assistant: After spending $47.50 on dinner and $23.75 on a book, you have $78.75 left from your original $150.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="the-lift-and-shift-advantage">The “Lift and Shift” Advantage<a class="anchor" aria-label="anchor" href="#the-lift-and-shift-advantage"></a>
@@ -300,9 +303,9 @@ changes</li>
 </h5>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Multiple agents can share the same calculator service</span></span>
-<span><span class="va">agent1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"financial_advisor"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
-<span><span class="va">agent2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"math_tutor"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
-<span><span class="va">agent3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"data_analyst"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span>
+<span><span class="va">agent1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"financial_advisor"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">agent2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"math_tutor"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">agent3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"data_analyst"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># All connect to the same MCP server</span></span>
 <span><span class="fu"><a href="../reference/register_mcp.html">register_mcp</a></span><span class="op">(</span><span class="va">agent1</span>, <span class="va">calculator_client</span><span class="op">)</span></span>

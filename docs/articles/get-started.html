@@ -40,6 +40,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/advanced-workflows.html">Advanced Workflows: Conditional and Dynamic Patterns</a></li>
+    <li><a class="dropdown-item" href="../articles/ellmer-migration.html">Migrating to ellmer Providers</a></li>
     <li><a class="dropdown-item" href="../articles/get-started.html">Get Started with llmr</a></li>
     <li><a class="dropdown-item" href="../articles/mcp-integration.html">MCP Integration: From Development to Production</a></li>
     <li><a class="dropdown-item" href="../articles/workflow-basics.html">Workflow Basics: Linear Chains</a></li>
@@ -117,7 +118,8 @@ tools)</li>
 <span><span class="co">#&gt;     initialize</span></span>
 <span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     write</span></span></code></pre></div>
+<span><span class="co">#&gt;     write</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ellmer.tidyverse.org" class="external-link">ellmer</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="step-1-create-your-first-agent">Step 1: Create Your First Agent<a class="anchor" aria-label="anchor" href="#step-1-create-your-first-agent"></a>
@@ -126,10 +128,13 @@ tools)</li>
 problems. Let’s create a simple calculator agent using Anthropic’s
 Claude:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create an agent with a descriptive name and the Anthropic provider factory</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="va">new_anthropic</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Create an agent with a descriptive name and ellmer chat object</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"calculator"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using <span style="color: #00BB00;">model</span> = <span style="color: #0000BB;">"claude-sonnet-4-20250514"</span>.</span></span></code></pre></div>
 <p><strong>Important:</strong> You’ll need an Anthropic API key for this
-to work. You can get one from <a href="https://console.anthropic.com/" class="external-link">Anthropic’s website</a>.</p>
+to work. You can get one from <a href="https://console.anthropic.com/" class="external-link">Anthropic’s website</a>. The
+ellmer package will automatically use the <code>ANTHROPIC_API_KEY</code>
+environment variable.</p>
 <p>That’s it! You now have a basic agent, but it can’t do much yet.
 Let’s give it some capabilities.</p>
 </div>
@@ -205,9 +210,8 @@ calculations:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask the agent to perform a calculation</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"What is 15 multiplied by 7?"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-19 18:54:39 [TOOL] Calling tool: calculator</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
-<span><span class="co">#&gt; assistant: [{"type":"text","text":"15 multiplied by 7 equals 105."}]</span></span></code></pre></div>
+<span><span class="co">#&gt; assistant: 15 multiplied by 7 equals 105.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="how-it-works">How It Works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
@@ -263,10 +267,8 @@ formatter. Let’s ask it a question that requires both tools:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Ask a question that requires both calculation and text formatting</span></span>
 <span><span class="fu"><a href="../reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="st">"Calculate 25 times 12, and convert the result to Roman numerals."</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &gt; 2025-06-19 18:54:47 [TOOL] Calling tool: calculator </span></span>
-<span><span class="co">#&gt; &gt; 2025-06-19 18:54:52 [TOOL] Calling tool: convert</span></span>
 <span><span class="fu"><a href="../reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span>
-<span><span class="co">#&gt; assistant: [{"type":"text","text":"25 times 12 equals 300, which in Roman numerals is CCC."}]</span></span></code></pre></div>
+<span><span class="co">#&gt; assistant: 25 times 12 equals 300, and 300 in Roman numerals is **CCC**.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="how-multiple-tool-use-works">How Multiple Tool Use Works<a class="anchor" aria-label="anchor" href="#how-multiple-tool-use-works"></a>

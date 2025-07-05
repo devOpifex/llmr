@@ -26,6 +26,11 @@ request.agent <- function(x, message = NULL, ...) {
 
   # Handle ellmer Chat objects differently
   if (inherits(x$provider, "Chat")) {
+    # Ensure approval callback is set up if one exists
+    if (!is.null(x$env$approval_callback)) {
+      setup_approval_integration(x)
+    }
+    
     # For ellmer Chat objects, just send the message directly
     # ellmer handles tool calling internally
     if (!is.null(message)) {
