@@ -43,6 +43,12 @@ new_agent.function <- function(name, provider, approval_callback = NULL, ...) {
     )
   }
 
+  if (!inherits(instance, "provider") && !inherits(instance, "Chat")) {
+    stop(
+      "The provider function must return an object of class 'provider' or 'Chat'."
+    )
+  }
+
   create_agent(name, instance, approval_callback = approval_callback, ...)
 }
 
@@ -58,7 +64,7 @@ create_agent <- function(name, provider, approval_callback = NULL, ...) {
   if (!is.null(approval_callback) && !is.function(approval_callback)) {
     stop("approval_callback must be a function or NULL")
   }
-  
+
   env <- new.env(parent = emptyenv())
   env$tools <- list()
   env$messages <- list()
