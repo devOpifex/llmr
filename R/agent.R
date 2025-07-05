@@ -176,4 +176,3 @@ setup_approval_integration <- function(agent) {
 
   invisible(agent)
 }
-
