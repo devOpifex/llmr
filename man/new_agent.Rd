@@ -4,12 +4,15 @@
 \alias{new_agent}
 \title{Create a new agent}
 \usage{
-new_agent(name, provider, ...)
+new_agent(name, provider, approval_callback = NULL, ...)
 }
 \arguments{
 \item{name}{Character string specifying the agent name.}
 
 \item{provider}{An object of class \code{provider} or a function that returns a provider.}
+
+\item{approval_callback}{Optional function for human approval of tool calls.
+Should accept a tool_info parameter and return TRUE/FALSE or a character string.}
 
 \item{...}{Additional arguments passed to methods.}
 }

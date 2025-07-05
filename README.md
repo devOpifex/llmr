@@ -99,8 +99,9 @@ For sensitive operations, you can require human approval before tools are execut
 ```r
 library(llmr)
 
-# Create an agent with a potentially sensitive tool
-agent <- new_agent("assistant", ellmer::chat_anthropic)
+# Create an agent with human approval enabled from the start
+agent <- new_agent("assistant", ellmer::chat_anthropic, 
+                   approval_callback = prompt_human_approval)
 
 add_tool(
   agent,
@@ -123,9 +124,6 @@ add_tool(
   )
 )
 
-# Set up human approval - user will be prompted before tool execution
-agent <- set_approval_callback(agent, prompt_human_approval)
-
 # When the LLM tries to use the tool, you'll see:
 # > 2024-01-15 10:30:45 [INFO] Agent wants to use tool: delete_file
 # [ARGS] Arguments:
@@ -134,22 +132,9 @@ agent <- set_approval_callback(agent, prompt_human_approval)
 # [?] Approve this tool call? (y/n/details): 
 
 request(agent, new_message("Please delete the file /tmp/example.txt"))
-```
 
-### Advanced Approval Options
-
-```r
-# Smart approval with memory - remembers your preferences
-agent <- set_approval_callback(agent, smart_approval_callback)
-
-# Batch approval interface with more options
-agent <- set_approval_callback(agent, batch_approval_interface)
-
-# Clear stored preferences
-clear_tool_approvals()
-
-# List current approval preferences  
-list_tool_approvals()
+# Alternative: Set approval callback after agent creation
+agent <- set_approval_callback(agent, prompt_human_approval)
 ```
 
 ## Integrating with MCP (Model Context Protocol)

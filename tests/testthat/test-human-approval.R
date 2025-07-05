@@ -1,3 +1,30 @@
+test_that("new_agent accepts approval_callback parameter", {
+  # Skip if ellmer not available
+  skip_if_not_installed("ellmer")
+  
+  # Create a mock chat object
+  mock_chat <- structure(
+    list(
+      on_tool_request = function(callback) {
+        # Store the callback for testing
+        attr(mock_chat, "callback") <- callback
+      }
+    ),
+    class = "Chat"
+  )
+  
+  # Test creating agent with approval callback
+  test_callback <- function(tool_info) TRUE
+  agent <- new_agent("test", mock_chat, approval_callback = test_callback)
+  
+  # Check that callback was set
+  expect_identical(agent$env$approval_callback, test_callback)
+  
+  # Test creating agent without approval callback
+  agent2 <- new_agent("test2", mock_chat)
+  expect_null(agent2$env$approval_callback)
+})
+
 test_that("set_approval_callback works with agents", {
   # Skip if ellmer not available
   skip_if_not_installed("ellmer")

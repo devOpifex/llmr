@@ -4,6 +4,8 @@
 #'
 #' @param name Character string specifying the agent name.
 #' @param provider An object of class `provider` or a function that returns a provider.
+#' @param approval_callback Optional function for human approval of tool calls.
+#'   Should accept a tool_info parameter and return TRUE/FALSE or a character string.
 #' @param ... Additional arguments passed to methods.
 #'
 #' @details
@@ -14,22 +16,22 @@
 #'
 #' @return An object of class "agent"
 #' @export
-new_agent <- function(name, provider, ...) {
+new_agent <- function(name, provider, approval_callback = NULL, ...) {
   UseMethod("new_agent", provider)
 }
 
 #' @method new_agent provider
 #' @export
-new_agent.provider <- function(name, provider, ...) {
+new_agent.provider <- function(name, provider, approval_callback = NULL, ...) {
   warning(
     "It is advised to pass the `provider` as a factory function, see details in ?new_agent."
   )
-  create_agent(name, provider, ...)
+  create_agent(name, provider, approval_callback = approval_callback, ...)
 }
 
 #' @method new_agent function
 #' @export
-new_agent.function <- function(name, provider, ...) {
+new_agent.function <- function(name, provider, approval_callback = NULL, ...) {
   instance <- tryCatch(provider(), error = function(e) e)
 
   if (inherits(instance, "error")) {
@@ -41,22 +43,27 @@ new_agent.function <- function(name, provider, ...) {
     )
   }
 
-  create_agent(name, instance, ...)
+  create_agent(name, instance, approval_callback = approval_callback, ...)
 }
 
 #' @method new_agent Chat
 #' @export
-new_agent.Chat <- function(name, provider, ...) {
+new_agent.Chat <- function(name, provider, approval_callback = NULL, ...) {
   # Handle ellmer Chat objects directly
-  create_agent(name, provider, ...)
+  create_agent(name, provider, approval_callback = approval_callback, ...)
 }
 
-create_agent <- function(name, provider, ...) {
+create_agent <- function(name, provider, approval_callback = NULL, ...) {
+  # Validate approval_callback if provided
+  if (!is.null(approval_callback) && !is.function(approval_callback)) {
+    stop("approval_callback must be a function or NULL")
+  }
+  
   env <- new.env(parent = emptyenv())
   env$tools <- list()
   env$messages <- list()
   env$mcps <- list()
-  env$approval_callback <- NULL
+  env$approval_callback <- approval_callback
 
   agent <- structure(
     list(
