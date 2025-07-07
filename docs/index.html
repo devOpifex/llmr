@@ -96,24 +96,12 @@
 <span></span>
 <span><span class="co"># Print the last message</span></span>
 <span><span class="fu"><a href="reference/get_last_message.html">get_last_message</a></span><span class="op">(</span><span class="va">agent</span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="legacy-provider-support">Legacy Provider Support<a class="anchor" aria-label="anchor" href="#legacy-provider-support"></a>
-</h3>
-<p>The original provider API is still supported but deprecated. Use ellmer chat objects directly instead:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Legacy API (deprecated) - avoid this</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span>  <span class="co"># Will show deprecation warning</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"assistant"</span>, <span class="va">provider</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Recommended approach</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"assistant"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-</div>
 </div>
 <div class="section level2">
 <h2 id="creating-a-simple-agent">Creating a Simple Agent<a class="anchor" aria-label="anchor" href="#creating-a-simple-agent"></a>
 </h2>
 <p>Note that we leverage the tooling from the <a href="https://github.com/devOpifex/mcpr" class="external-link">mcpr</a> package to create the tools, though you may also use the tools from <a href="https://github.com/tidyverse/ellmer" class="external-link">ellmer</a>. This allows seamless integration with MCP (Model Context Protocol) servers.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create a simple agent with ellmer chat object</span></span>
@@ -153,12 +141,15 @@
 <h2 id="human-in-the-loop-tool-approval">Human-in-the-Loop Tool Approval<a class="anchor" aria-label="anchor" href="#human-in-the-loop-tool-approval"></a>
 </h2>
 <p>For sensitive operations, you can require human approval before tools are executed:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create an agent with human approval enabled from the start</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"assistant"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="va"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span>, </span>
-<span>                   approval_callback <span class="op">=</span> <span class="va">prompt_human_approval</span><span class="op">)</span></span>
+<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span></span>
+<span>  <span class="st">"assistant"</span>, </span>
+<span>  <span class="fu">ellmer</span><span class="fu">::</span><span class="va"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span>, </span>
+<span>  approval_callback <span class="op">=</span> <span class="va">prompt_human_approval</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/add_tool.html">add_tool</a></span><span class="op">(</span></span>
 <span>  <span class="va">agent</span>,</span>
@@ -181,23 +172,13 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># When the LLM tries to use the tool, you'll see:</span></span>
-<span><span class="co"># &gt; 2024-01-15 10:30:45 [INFO] Agent wants to use tool: delete_file</span></span>
-<span><span class="co"># [ARGS] Arguments:</span></span>
-<span><span class="co">#   filepath: /tmp/example.txt</span></span>
-<span><span class="co"># </span></span>
-<span><span class="co"># [?] Approve this tool call? (y/n/details): </span></span>
-<span></span>
-<span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"Please delete the file /tmp/example.txt"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Alternative: Set approval callback after agent creation</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/set_approval_callback.html">set_approval_callback</a></span><span class="op">(</span><span class="va">agent</span>, <span class="va">prompt_human_approval</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/request.html">request</a></span><span class="op">(</span><span class="va">agent</span>, <span class="fu"><a href="reference/message.html">new_message</a></span><span class="op">(</span><span class="st">"Please delete the file /tmp/example.txt"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="integrating-with-mcp-model-context-protocol">Integrating with MCP (Model Context Protocol)<a class="anchor" aria-label="anchor" href="#integrating-with-mcp-model-context-protocol"></a>
+<h2 id="mcp-integration">MCP Integration<a class="anchor" aria-label="anchor" href="#mcp-integration"></a>
 </h2>
 <p>See <a href="https://github.com/devOpifex/mcpr" class="external-link">mcpr</a> for how to create and use MCP servers (and clients).</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mcpr.opifex.org/" class="external-link">mcpr</a></span><span class="op">)</span></span>
 <span></span>
@@ -227,7 +208,7 @@
 <h2 id="workflows">Workflows<a class="anchor" aria-label="anchor" href="#workflows"></a>
 </h2>
 <p>Chain together processing steps and agents into workflows:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">llmr</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define processing functions</span></span>
@@ -243,65 +224,6 @@
 <span></span>
 <span><span class="co"># Execute workflow</span></span>
 <span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/execute.html">execute</a></span><span class="op">(</span><span class="va">workflow</span>, <span class="fl">5</span><span class="op">)</span>  <span class="co"># Returns 30: (5 + 10) * 2</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="ellmer-providers-recommended">ellmer Providers (Recommended)<a class="anchor" aria-label="anchor" href="#ellmer-providers-recommended"></a>
-</h2>
-<p>llmr now supports <a href="https://ellmer.tidyverse.org" class="external-link">ellmer</a> as the underlying provider implementation, offering significant advantages:</p>
-<ul>
-<li>
-<strong>15+ provider support</strong> (Anthropic, OpenAI, Google Gemini, AWS Bedrock, Ollama, and more)</li>
-<li>
-<strong>Advanced features</strong>: streaming, async operations, structured data extraction</li>
-<li>
-<strong>Better performance</strong> and professional maintenance by the tidyverse team</li>
-</ul>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Multiple providers available - use ellmer chat objects directly</span></span>
-<span><span class="va">anthropic_agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"claude"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="va"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span><span class="op">)</span></span>
-<span><span class="va">openai_agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"gpt"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="va"><a href="https://ellmer.tidyverse.org/reference/chat_openai.html" class="external-link">chat_openai</a></span><span class="op">)</span></span>
-<span><span class="va">gemini_agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"gemini"</span>, <span class="fu">ellmer</span><span class="fu">::</span><span class="va"><a href="https://ellmer.tidyverse.org/reference/chat_google_gemini.html" class="external-link">chat_google_gemini</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Advanced ellmer features - access the underlying chat object</span></span>
-<span><span class="va">chat</span> <span class="op">&lt;-</span> <span class="va">anthropic_agent</span><span class="op">$</span><span class="va">provider</span><span class="op">$</span><span class="va">chat</span></span>
-<span></span>
-<span><span class="co"># Streaming responses</span></span>
-<span><span class="va">chat</span><span class="op">$</span><span class="fu">chat</span><span class="op">(</span><span class="st">"Tell me a story"</span>, echo <span class="op">=</span> <span class="st">"output"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Structured data extraction</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">chat</span><span class="op">$</span><span class="fu">chat_structured</span><span class="op">(</span></span>
-<span>  <span class="st">"Extract: John Doe, age 30, lives in NYC"</span>,</span>
-<span>  type <span class="op">=</span> <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/type_boolean.html" class="external-link">type_object</a></span><span class="op">(</span></span>
-<span>    name <span class="op">=</span> <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/type_boolean.html" class="external-link">type_string</a></span><span class="op">(</span><span class="st">"Person's name"</span><span class="op">)</span>,</span>
-<span>    age <span class="op">=</span> <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/type_boolean.html" class="external-link">type_integer</a></span><span class="op">(</span><span class="st">"Person's age"</span><span class="op">)</span>,</span>
-<span>    city <span class="op">=</span> <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/type_boolean.html" class="external-link">type_string</a></span><span class="op">(</span><span class="st">"City"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="configuration">Configuration<a class="anchor" aria-label="anchor" href="#configuration"></a>
-</h2>
-<p>Configuration methods work with both provider types:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">chat</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/chat_anthropic.html" class="external-link">chat_anthropic</a></span><span class="op">(</span></span>
-<span>    model <span class="op">=</span> <span class="st">"claude-3-haiku-20240307"</span>,</span>
-<span>    params <span class="op">=</span> <span class="fu">ellmer</span><span class="fu">::</span><span class="fu"><a href="https://ellmer.tidyverse.org/reference/params.html" class="external-link">params</a></span><span class="op">(</span></span>
-<span>      temperature <span class="op">=</span> <span class="fl">0.7</span>,</span>
-<span>      max_tokens <span class="op">=</span> <span class="fl">1024</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    system_prompt <span class="op">=</span> <span class="st">"You are a helpful assistant that specializes in R programming."</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="co"># Configure ellmer chat objects directly (recommended)</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"assistant"</span>, <span class="va">chat</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Legacy provider configuration (deprecated) - avoid this</span></span>
-<span><span class="va">provider</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/provider.html">new_anthropic</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/set_model.html">set_model</a></span><span class="op">(</span><span class="st">"claude-3-haiku-20240307"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/set_max_tokens.html">set_max_tokens</a></span><span class="op">(</span><span class="fl">1024</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/set_temperature.html">set_temperature</a></span><span class="op">(</span><span class="fl">0.7</span><span class="op">)</span></span>
-<span><span class="va">agent</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/new_agent.html">new_agent</a></span><span class="op">(</span><span class="st">"assistant"</span>, <span class="va">provider</span><span class="op">)</span></span></code></pre></div>
 </div>
 
   </main><aside class="col-md-3"><div class="license">

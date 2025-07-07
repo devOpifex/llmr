@@ -35,19 +35,6 @@ request(agent, new_message("Explain quantum computing in simple terms"))
 get_last_message(agent)
 ```
 
-### Legacy Provider Support
-
-The original provider API is still supported but deprecated. Use ellmer chat objects directly instead:
-
-```r
-# Legacy API (deprecated) - avoid this
-provider <- new_anthropic()  # Will show deprecation warning
-agent <- new_agent("assistant", provider)
-
-# Recommended approach
-agent <- new_agent("assistant", ellmer::chat_anthropic())
-```
-
 ## Creating a Simple Agent
 
 Note that we leverage the tooling from the [mcpr](https://github.com/devOpifex/mcpr)
@@ -100,8 +87,11 @@ For sensitive operations, you can require human approval before tools are execut
 library(llmr)
 
 # Create an agent with human approval enabled from the start
-agent <- new_agent("assistant", ellmer::chat_anthropic, 
-                   approval_callback = prompt_human_approval)
+agent <- new_agent(
+  "assistant", 
+  ellmer::chat_anthropic, 
+  approval_callback = prompt_human_approval
+)
 
 add_tool(
   agent,
@@ -124,20 +114,10 @@ add_tool(
   )
 )
 
-# When the LLM tries to use the tool, you'll see:
-# > 2024-01-15 10:30:45 [INFO] Agent wants to use tool: delete_file
-# [ARGS] Arguments:
-#   filepath: /tmp/example.txt
-# 
-# [?] Approve this tool call? (y/n/details): 
-
 request(agent, new_message("Please delete the file /tmp/example.txt"))
-
-# Alternative: Set approval callback after agent creation
-agent <- set_approval_callback(agent, prompt_human_approval)
 ```
 
-## Integrating with MCP (Model Context Protocol)
+## MCP Integration
 
 See [mcpr](https://github.com/devOpifex/mcpr) for how to create and use MCP
 servers (and clients).
@@ -189,61 +169,4 @@ workflow <- step1 %->% step2
 
 # Execute workflow
 result <- execute(workflow, 5)  # Returns 30: (5 + 10) * 2
-```
-
-## ellmer Providers (Recommended)
-
-llmr now supports [ellmer](https://ellmer.tidyverse.org) as the underlying provider implementation, offering significant advantages:
-
-- **15+ provider support** (Anthropic, OpenAI, Google Gemini, AWS Bedrock, Ollama, and more)
-- **Advanced features**: streaming, async operations, structured data extraction
-- **Better performance** and professional maintenance by the tidyverse team
-
-```r
-# Multiple providers available - use ellmer chat objects directly
-anthropic_agent <- new_agent("claude", ellmer::chat_anthropic)
-openai_agent <- new_agent("gpt", ellmer::chat_openai)
-gemini_agent <- new_agent("gemini", ellmer::chat_google_gemini)
-
-# Advanced ellmer features - access the underlying chat object
-chat <- anthropic_agent$provider$chat
-
-# Streaming responses
-chat$chat("Tell me a story", echo = "output")
-
-# Structured data extraction
-data <- chat$chat_structured(
-  "Extract: John Doe, age 30, lives in NYC",
-  type = ellmer::type_object(
-    name = ellmer::type_string("Person's name"),
-    age = ellmer::type_integer("Person's age"),
-    city = ellmer::type_string("City")
-  )
-)
-```
-
-## Configuration
-
-Configuration methods work with both provider types:
-
-```r
-chat <- \(){
-  ellmer::chat_anthropic(
-    model = "claude-3-haiku-20240307",
-    params = ellmer::params(
-      temperature = 0.7,
-      max_tokens = 1024
-    ),
-    system_prompt = "You are a helpful assistant that specializes in R programming."
-  )
-}
-# Configure ellmer chat objects directly (recommended)
-agent <- new_agent("assistant", chat)
-
-# Legacy provider configuration (deprecated) - avoid this
-provider <- new_anthropic() |>
-  set_model("claude-3-haiku-20240307") |>
-  set_max_tokens(1024) |>
-  set_temperature(0.7)
-agent <- new_agent("assistant", provider)
 ```
